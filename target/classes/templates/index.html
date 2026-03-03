@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVC Persona</title>
+</head>
+<body>
+<h1>Inicio de la aplicacion</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <th>Identificacion</th>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>Telefono</th>
+        <th>Email</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="persona:${personas}">
+        <td th:text="${persona.idPersona}"></td>
+        <td th:text="${persona.nombre}"></td>
+        <td th:text="${persona.apellido}"></td>
+        <td th:text="${persona.telefono}"></td>
+        <td th:text="${persona.email}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
