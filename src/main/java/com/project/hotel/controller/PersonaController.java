@@ -18,20 +18,20 @@ public class PersonaController {
         Persona persona3 = new Persona();
 
         persona1.setIdPersona("001");
-        persona1.setNombre("Alan");
+        persona1.setNombre("Johan");
         persona1.setApellido("Brito");
-        persona1.setEmail("abrito@ucentral.edu.co");
+        persona1.setEmail("jsaltarinb@ucentral.edu.co");
         persona1.setTelefono("3001002003");
 
         persona2.setIdPersona("002");
-        persona2.setNombre("Pacho");
-        persona2.setApellido("Galan");
-        persona2.setEmail("pachito@ucentral.edu.co");
+        persona2.setNombre("Nicolas");
+        persona2.setApellido("Trujillo");
+        persona2.setEmail("ntrujilloc@ucentral.edu.co");
         persona2.setTelefono("3001002004");
 
         persona3.setIdPersona("003");
-        persona3.setNombre("Maria");
-        persona3.setApellido("Paniagua");
+        persona3.setNombre("Amparo");
+        persona3.setApellido("Grizales");
         persona3.setEmail("marucha@ucentral.edu.co");
         persona3.setTelefono("3001002005");
 
