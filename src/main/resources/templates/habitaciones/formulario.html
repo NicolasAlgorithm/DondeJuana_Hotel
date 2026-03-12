@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Habitaci&oacute;n - Hotel Donde Juana</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
+        h1 { color: #333; }
+        form { background: white; padding: 24px; border-radius: 8px; max-width: 500px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        label { display: block; margin-top: 12px; font-weight: bold; color: #444; }
+        input, select, textarea { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .error { color: red; font-size: 0.85em; }
+        .btn { display: inline-block; padding: 8px 18px; border-radius: 4px; text-decoration: none; margin-top: 16px; margin-right: 8px; cursor: pointer; border: none; font-size: 1em; }
+        .btn-primary { background: #0066cc; color: white; }
+        .btn-secondary { background: #666; color: white; }
+    </style>
+</head>
+<body>
+<h1 th:text="${habitacion.idHabitacion != null} ? 'Editar Habitaci&oacute;n' : 'Nueva Habitaci&oacute;n'">Habitaci&oacute;n</h1>
+<form th:action="@{/habitaciones/guardar}" th:object="${habitacion}" method="post">
+    <input type="hidden" th:field="*{idHabitacion}" />
+
+    <label>N&uacute;mero de Habitaci&oacute;n *</label>
+    <input type="text" th:field="*{numero}" placeholder="Ej: 101, 202" />
+    <span class="error" th:if="${#fields.hasErrors('numero')}" th:errors="*{numero}"></span>
+
+    <label>Tipo de Habitaci&oacute;n *</label>
+    <select th:field="*{tipoHabitacion}">
+        <option value="">-- Seleccione un tipo --</option>
+        <option th:each="tipo : ${tipos}"
+                th:value="${tipo.idTipo}"
+                th:text="${tipo.nombre} + ' - $' + ${#numbers.formatDecimal(tipo.precioNoche, 1, 2)}">
+        </option>
+    </select>
+    <span class="error" th:if="${#fields.hasErrors('tipoHabitacion')}" th:errors="*{tipoHabitacion}"></span>
+
+    <label>Estado</label>
+    <select th:field="*{estado}">
+        <option value="">-- Seleccione estado --</option>
+        <option th:each="est : ${estados}" th:value="${est}" th:text="${est}"></option>
+    </select>
+
+    <label>Descripci&oacute;n</label>
+    <textarea th:field="*{descripcion}" rows="3" placeholder="Descripci&oacute;n de la habitaci&oacute;n"></textarea>
+
+    <div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a class="btn btn-secondary" th:href="@{/habitaciones}">Cancelar</a>
+    </div>
+</form>
+</body>
+</html>

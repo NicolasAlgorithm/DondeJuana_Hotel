@@ -1,46 +1,53 @@
 package com.project.hotel.controller;
 
 import com.project.hotel.entities.Persona;
+import com.project.hotel.service.PersonaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 @Controller
+@RequestMapping("/personas")
 public class PersonaController {
 
-    @GetMapping("/")
-    public String index(Model model) {
-        Persona persona1 = new Persona();
-        Persona persona2 = new Persona();
-        Persona persona3 = new Persona();
+    private final PersonaService personaService;
 
-        persona1.setIdPersona("001");
-        persona1.setNombre("Johan");
-        persona1.setApellido("Brito");
-        persona1.setEmail("jsaltarinb@ucentral.edu.co");
-        persona1.setTelefono("3001002003");
+    public PersonaController(PersonaService personaService) {
+        this.personaService = personaService;
+    }
 
-        persona2.setIdPersona("002");
-        persona2.setNombre("Nicolas");
-        persona2.setApellido("Trujillo");
-        persona2.setEmail("ntrujilloc@ucentral.edu.co");
-        persona2.setTelefono("3001002004");
+    @GetMapping
+    public String listar(Model model) {
+        model.addAttribute("personas", personaService.listarTodos());
+        return "personas/lista";
+    }
 
-        persona3.setIdPersona("003");
-        persona3.setNombre("Amparo");
-        persona3.setApellido("Grizales");
-        persona3.setEmail("marucha@ucentral.edu.co");
-        persona3.setTelefono("3001002005");
+    @GetMapping("/nuevo")
+    public String nuevo(Model model) {
+        model.addAttribute("persona", new Persona());
+        return "personas/formulario";
+    }
 
-        List<Persona> personas = new ArrayList<>();
-        personas.add(persona1);
-        personas.add(persona2);
-        personas.add(persona3);
+    @PostMapping("/guardar")
+    public String guardar(@Valid @ModelAttribute Persona persona, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "personas/formulario";
+        }
+        personaService.guardar(persona);
+        return "redirect:/personas";
+    }
 
-        model.addAttribute("personas", personas);
-        return "index";
+    @GetMapping("/editar/{id}")
+    public String editar(@PathVariable Long id, Model model) {
+        personaService.buscarPorId(id).ifPresent(p -> model.addAttribute("persona", p));
+        return "personas/formulario";
+    }
+
+    @GetMapping("/eliminar/{id}")
+    public String eliminar(@PathVariable Long id) {
+        personaService.eliminar(id);
+        return "redirect:/personas";
     }
 }

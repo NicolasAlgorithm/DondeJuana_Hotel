@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Reserva - Hotel Donde Juana</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
+        h1 { color: #333; }
+        form { background: white; padding: 24px; border-radius: 8px; max-width: 500px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        label { display: block; margin-top: 12px; font-weight: bold; color: #444; }
+        input, select { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .error { color: red; font-size: 0.85em; }
+        .btn { display: inline-block; padding: 8px 18px; border-radius: 4px; text-decoration: none; margin-top: 16px; margin-right: 8px; cursor: pointer; border: none; font-size: 1em; }
+        .btn-primary { background: #0066cc; color: white; }
+        .btn-secondary { background: #666; color: white; }
+    </style>
+</head>
+<body>
+<h1 th:text="${reserva.idReserva != null} ? 'Editar Reserva' : 'Nueva Reserva'">Reserva</h1>
+<form th:action="@{/reservas/guardar}" th:object="${reserva}" method="post">
+    <input type="hidden" th:field="*{idReserva}" />
+
+    <label>Huesped *</label>
+    <select th:field="*{persona}">
+        <option value="">-- Seleccione un huesped --</option>
+        <option th:each="p : ${personas}"
+                th:value="${p.idPersona}"
+                th:text="${p.nombre} + ' ' + ${p.apellido}">
+        </option>
+    </select>
+    <span class="error" th:if="${#fields.hasErrors('persona')}" th:errors="*{persona}"></span>
+
+    <label>Habitaci&oacute;n *</label>
+    <select th:field="*{habitacion}">
+        <option value="">-- Seleccione una habitaci&oacute;n --</option>
+        <option th:each="h : ${habitaciones}"
+                th:value="${h.idHabitacion}"
+                th:text="'Hab. ' + ${h.numero} + ' - ' + ${h.tipoHabitacion.nombre} + ' ($' + ${#numbers.formatDecimal(h.tipoHabitacion.precioNoche, 1, 2)} + '/noche)'">
+        </option>
+    </select>
+    <span class="error" th:if="${#fields.hasErrors('habitacion')}" th:errors="*{habitacion}"></span>
+
+    <label>Fecha de Entrada *</label>
+    <input type="date" th:field="*{fechaEntrada}" />
+    <span class="error" th:if="${#fields.hasErrors('fechaEntrada')}" th:errors="*{fechaEntrada}"></span>
+
+    <label>Fecha de Salida *</label>
+    <input type="date" th:field="*{fechaSalida}" />
+    <span class="error" th:if="${#fields.hasErrors('fechaSalida')}" th:errors="*{fechaSalida}"></span>
+
+    <label>Estado</label>
+    <select th:field="*{estado}">
+        <option value="">-- Seleccione estado --</option>
+        <option th:each="est : ${estados}" th:value="${est}" th:text="${est}"></option>
+    </select>
+
+    <label>Total (COP)</label>
+    <input type="number" th:field="*{total}" step="0.01" min="0" placeholder="0.00" />
+
+    <div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a class="btn btn-secondary" th:href="@{/reservas}">Cancelar</a>
+    </div>
+</form>
+</body>
+</html>

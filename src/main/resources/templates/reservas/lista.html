@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Reservas - Hotel Donde Juana</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
+        h1 { color: #333; }
+        table { border-collapse: collapse; width: 100%; background: white; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #0066cc; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        a.btn { display: inline-block; padding: 6px 14px; border-radius: 4px; text-decoration: none; margin: 2px; }
+        a.btn-primary { background: #0066cc; color: white; }
+        a.btn-warning { background: #f0a500; color: white; }
+        a.btn-danger { background: #cc0000; color: white; }
+        a.btn-secondary { background: #666; color: white; }
+        .toolbar { margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+<h1>Reservas</h1>
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/reservas/nuevo}">+ Nueva Reserva</a>
+    <a class="btn btn-secondary" th:href="@{/}">Inicio</a>
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Huesped</th>
+        <th>Habitacion</th>
+        <th>Fecha Entrada</th>
+        <th>Fecha Salida</th>
+        <th>Estado</th>
+        <th>Total</th>
+        <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="reserva : ${reservas}">
+        <td th:text="${reserva.idReserva}"></td>
+        <td th:text="${reserva.persona.nombre} + ' ' + ${reserva.persona.apellido}"></td>
+        <td th:text="${reserva.habitacion.numero}"></td>
+        <td th:text="${reserva.fechaEntrada}"></td>
+        <td th:text="${reserva.fechaSalida}"></td>
+        <td th:text="${reserva.estado}"></td>
+        <td th:text="${reserva.total != null} ? '$' + ${#numbers.formatDecimal(reserva.total, 1, 2)} : '-'"></td>
+        <td>
+            <a class="btn btn-warning" th:href="@{/reservas/editar/{id}(id=${reserva.idReserva})}">Editar</a>
+            <a class="btn btn-danger" th:href="@{/reservas/eliminar/{id}(id=${reserva.idReserva})}"
+               onclick="return confirm('¿Eliminar esta reserva?')">Eliminar</a>
+        </td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(reservas)}">
+        <td colspan="8" style="text-align:center; color:#999;">No hay reservas registradas.</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
