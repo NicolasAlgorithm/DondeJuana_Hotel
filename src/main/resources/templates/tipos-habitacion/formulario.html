@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tipo de Habitaci&oacute;n - Hotel Donde Juana</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
+        h1 { color: #333; }
+        form { background: white; padding: 24px; border-radius: 8px; max-width: 500px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        label { display: block; margin-top: 12px; font-weight: bold; color: #444; }
+        input, textarea { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        .error { color: red; font-size: 0.85em; }
+        .btn { display: inline-block; padding: 8px 18px; border-radius: 4px; text-decoration: none; margin-top: 16px; margin-right: 8px; cursor: pointer; border: none; font-size: 1em; }
+        .btn-primary { background: #0066cc; color: white; }
+        .btn-secondary { background: #666; color: white; }
+    </style>
+</head>
+<body>
+<h1 th:text="${tipo.idTipo != null} ? 'Editar Tipo de Habitaci&oacute;n' : 'Nuevo Tipo de Habitaci&oacute;n'">Tipo de Habitaci&oacute;n</h1>
+<form th:action="@{/tipos-habitacion/guardar}" th:object="${tipo}" method="post">
+    <input type="hidden" th:field="*{idTipo}" />
+
+    <label>Nombre *</label>
+    <input type="text" th:field="*{nombre}" placeholder="Ej: Sencilla, Doble, Suite" />
+    <span class="error" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></span>
+
+    <label>Descripci&oacute;n</label>
+    <textarea th:field="*{descripcion}" rows="3" placeholder="Descripci&oacute;n del tipo de habitaci&oacute;n"></textarea>
+
+    <label>Precio por Noche (COP) *</label>
+    <input type="number" th:field="*{precioNoche}" step="0.01" min="0" placeholder="0.00" />
+    <span class="error" th:if="${#fields.hasErrors('precioNoche')}" th:errors="*{precioNoche}"></span>
+
+    <div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a class="btn btn-secondary" th:href="@{/tipos-habitacion}">Cancelar</a>
+    </div>
+</form>
+</body>
+</html>

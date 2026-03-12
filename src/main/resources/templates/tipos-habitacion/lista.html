@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tipos de Habitaci&oacute;n - Hotel Donde Juana</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
+        h1 { color: #333; }
+        table { border-collapse: collapse; width: 100%; background: white; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #0066cc; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        a.btn { display: inline-block; padding: 6px 14px; border-radius: 4px; text-decoration: none; margin: 2px; }
+        a.btn-primary { background: #0066cc; color: white; }
+        a.btn-warning { background: #f0a500; color: white; }
+        a.btn-danger { background: #cc0000; color: white; }
+        a.btn-secondary { background: #666; color: white; }
+        .toolbar { margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+<h1>Tipos de Habitaci&oacute;n</h1>
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/tipos-habitacion/nuevo}">+ Nuevo Tipo</a>
+    <a class="btn btn-secondary" th:href="@{/}">Inicio</a>
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Descripcion</th>
+        <th>Precio por Noche</th>
+        <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="tipo : ${tipos}">
+        <td th:text="${tipo.idTipo}"></td>
+        <td th:text="${tipo.nombre}"></td>
+        <td th:text="${tipo.descripcion}"></td>
+        <td th:text="${#numbers.formatDecimal(tipo.precioNoche, 1, 2)}"></td>
+        <td>
+            <a class="btn btn-warning" th:href="@{/tipos-habitacion/editar/{id}(id=${tipo.idTipo})}">Editar</a>
+            <a class="btn btn-danger" th:href="@{/tipos-habitacion/eliminar/{id}(id=${tipo.idTipo})}"
+               onclick="return confirm('¿Eliminar este tipo de habitacion?')">Eliminar</a>
+        </td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(tipos)}">
+        <td colspan="5" style="text-align:center; color:#999;">No hay tipos de habitacion registrados.</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

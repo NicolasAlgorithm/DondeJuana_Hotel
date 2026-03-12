@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Habitaciones - Hotel Donde Juana</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
+        h1 { color: #333; }
+        table { border-collapse: collapse; width: 100%; background: white; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #0066cc; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        a.btn { display: inline-block; padding: 6px 14px; border-radius: 4px; text-decoration: none; margin: 2px; }
+        a.btn-primary { background: #0066cc; color: white; }
+        a.btn-warning { background: #f0a500; color: white; }
+        a.btn-danger { background: #cc0000; color: white; }
+        a.btn-secondary { background: #666; color: white; }
+        .toolbar { margin-bottom: 16px; }
+        .estado-disponible { color: green; font-weight: bold; }
+        .estado-ocupada { color: red; font-weight: bold; }
+        .estado-mantenimiento { color: orange; font-weight: bold; }
+    </style>
+</head>
+<body>
+<h1>Habitaciones</h1>
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/habitaciones/nuevo}">+ Nueva Habitacion</a>
+    <a class="btn btn-secondary" th:href="@{/}">Inicio</a>
+</div>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Numero</th>
+        <th>Tipo</th>
+        <th>Precio/Noche</th>
+        <th>Estado</th>
+        <th>Descripci&oacute;n</th>
+        <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="habitacion : ${habitaciones}">
+        <td th:text="${habitacion.idHabitacion}"></td>
+        <td th:text="${habitacion.numero}"></td>
+        <td th:text="${habitacion.tipoHabitacion.nombre}"></td>
+        <td th:text="${#numbers.formatDecimal(habitacion.tipoHabitacion.precioNoche, 1, 2)}"></td>
+        <td>
+            <span th:text="${habitacion.estado}"
+                  th:classappend="${habitacion.estado == 'Disponible'} ? 'estado-disponible' :
+                                  (${habitacion.estado == 'Ocupada'} ? 'estado-ocupada' : 'estado-mantenimiento')">
+            </span>
+        </td>
+        <td th:text="${habitacion.descripcion}"></td>
+        <td>
+            <a class="btn btn-warning" th:href="@{/habitaciones/editar/{id}(id=${habitacion.idHabitacion})}">Editar</a>
+            <a class="btn btn-danger" th:href="@{/habitaciones/eliminar/{id}(id=${habitacion.idHabitacion})}"
+               onclick="return confirm('¿Eliminar esta habitacion?')">Eliminar</a>
+        </td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(habitaciones)}">
+        <td colspan="7" style="text-align:center; color:#999;">No hay habitaciones registradas.</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
