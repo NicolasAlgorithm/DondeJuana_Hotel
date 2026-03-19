@@ -1,10 +1,13 @@
 package com.project.hotel.repository;
 
-import com.project.hotel.model.Habitacion;
-import org.springframework.data.jpa.repository.JpaRepository;
-
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.project.hotel.entities.Habitacion;
+
 public interface HabitacionRepository extends JpaRepository<Habitacion, Long> {
-    Optional<Habitacion> findByCodigo(String codigo);
+    Optional<Habitacion> findByNumero(String numero);
+    List<Habitacion> findByEstado(String estado);
 }

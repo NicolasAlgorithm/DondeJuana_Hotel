@@ -1,16 +1,25 @@
 package com.project.hotel.controller;
 
-import com.project.hotel.dto.EstadoHabitacionRequest;
-import com.project.hotel.dto.HabitacionRequest;
-import com.project.hotel.model.Habitacion;
-import com.project.hotel.service.HabitacionService;
-import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.project.hotel.dto.EstadoHabitacionRequest;
+import com.project.hotel.dto.HabitacionRequest;
+import com.project.hotel.entities.Habitacion;
+import com.project.hotel.service.HabitacionService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/habitaciones")
@@ -58,7 +67,10 @@ public class HabitacionController {
     }
 
     @PatchMapping("/{id}/estado")
-    public ResponseEntity<?> actualizarEstado(@PathVariable Long id, @Valid @RequestBody EstadoHabitacionRequest request) {
+    public ResponseEntity<?> actualizarEstado(
+            @PathVariable Long id,
+            @Valid @RequestBody EstadoHabitacionRequest request
+    ) {
         try {
             return ResponseEntity.ok(habitacionService.actualizarEstado(id, request.getEstado()));
         } catch (IllegalArgumentException e) {

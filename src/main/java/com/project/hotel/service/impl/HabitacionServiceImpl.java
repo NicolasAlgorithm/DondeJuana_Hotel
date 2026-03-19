@@ -1,20 +1,23 @@
 package com.project.hotel.service.impl;
 
-import com.project.hotel.dto.HabitacionRequest;
-import com.project.hotel.model.Habitacion;
-import com.project.hotel.repository.HabitacionRepository;
-import com.project.hotel.service.HabitacionService;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Set;
+import com.project.hotel.dto.HabitacionRequest;
+import com.project.hotel.entities.Habitacion;
+import com.project.hotel.repository.HabitacionRepository;
+import com.project.hotel.service.HabitacionService;
 
 @Service
 @Transactional
 public class HabitacionServiceImpl implements HabitacionService {
 
-    private static final Set<String> ESTADOS_VALIDOS = Set.of("DISPONIBLE", "OCUPADA", "MANTENIMIENTO");
+    private static final Set<String> ESTADOS_VALIDOS =
+            Set.of("DISPONIBLE", "OCUPADA", "MANTENIMIENTO");
+
     private final HabitacionRepository habitacionRepository;
 
     public HabitacionServiceImpl(HabitacionRepository habitacionRepository) {
@@ -25,9 +28,11 @@ public class HabitacionServiceImpl implements HabitacionService {
     public Habitacion crear(HabitacionRequest request) {
         validarEstado(request.getEstado());
 
-        habitacionRepository.findByCodigo(request.getCodigo())
+        habitacionRepository.findByNumero(request.getCodigo())
                 .ifPresent(h -> {
-                    throw new IllegalArgumentException("Ya existe una habitación con código: " + request.getCodigo());
+                    throw new IllegalArgumentException(
+                            "Ya existe una habitación con código: " + request.getCodigo()
+                    );
                 });
 
         Habitacion h = new Habitacion();
@@ -50,9 +55,22 @@ public class HabitacionServiceImpl implements HabitacionService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<Habitacion> listarTodos() {
+        return habitacionRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Habitacion> listarDisponibles() {
+        return habitacionRepository.findByEstado("DISPONIBLE");
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Habitacion obtenerPorId(Long id) {
         return habitacionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Habitación no encontrada con id: " + id));
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Habitación no encontrada con id: " + id));
     }
 
     @Override
@@ -61,10 +79,12 @@ public class HabitacionServiceImpl implements HabitacionService {
 
         Habitacion actual = obtenerPorId(id);
 
-        habitacionRepository.findByCodigo(request.getCodigo())
+        habitacionRepository.findByNumero(request.getCodigo())
                 .ifPresent(h -> {
                     if (!h.getIdHabitacion().equals(id)) {
-                        throw new IllegalArgumentException("Ya existe otra habitación con código: " + request.getCodigo());
+                        throw new IllegalArgumentException(
+                                "Ya existe otra habitación con código: " + request.getCodigo()
+                        );
                     }
                 });
 
@@ -90,7 +110,9 @@ public class HabitacionServiceImpl implements HabitacionService {
 
     private void validarEstado(String estado) {
         if (estado == null || !ESTADOS_VALIDOS.contains(estado.toUpperCase())) {
-            throw new IllegalArgumentException("Estado inválido. Valores permitidos: DISPONIBLE, OCUPADA, MANTENIMIENTO");
+            throw new IllegalArgumentException(
+                    "Estado inválido. Valores permitidos: DISPONIBLE, OCUPADA, MANTENIMIENTO"
+            );
         }
     }
 }
