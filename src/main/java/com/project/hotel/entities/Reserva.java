@@ -6,12 +6,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "RESERVA")
+@Table(name = "RESERVAS")
 public class Reserva {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "reserva_seq")
-    @SequenceGenerator(name = "reserva_seq", sequenceName = "SEQ_RESERVA", allocationSize = 1)
+    @SequenceGenerator(name = "reserva_seq", sequenceName = "SEQ_RESERVAS", allocationSize = 1)
     @Column(name = "ID_RESERVA")
     private Long idReserva;
 
