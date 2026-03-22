@@ -40,30 +40,14 @@ public class DbUserDetailsService implements UserDetailsService {
         }
 
         String roleName = rol.getNombre(); // ADMINISTRADOR / RECEPCIONISTA
-        String authority = "ROLE_" + roleName; // ROLE_ADMINISTRADOR / ROLE_RECEPCIONISTA
-
-        System.out.println("LOGIN user=" + u.getUsername()
-            + " activo=" + u.getActivo()
-            + " rol=" + (u.getRol()!=null ? u.getRol().getNombre() : "null")
-            + " rolActivo=" + (u.getRol()!=null ? u.getRol().getActivo() : "null")
-            + " hashLen=" + (u.getPasswordHash()!=null ? u.getPasswordHash().length() : -1)
-            + " hashStart=" + (u.getPasswordHash()!=null ? u.getPasswordHash().substring(0, Math.min(10,u.getPasswordHash().length())) : "null")
-        );
-
-        System.out.println("AUTH DBG username=" + u.getUsername()
-            + " userActivo=" + u.getActivo()
-            + " rol=" + (u.getRol() != null ? u.getRol().getNombre() : "null")
-            + " rolActivo=" + (u.getRol() != null ? u.getRol().getActivo() : "null")
-            + " hashLen=" + (u.getPasswordHash() != null ? u.getPasswordHash().length() : -1)
-            + " hashStart=" + (u.getPasswordHash() != null ? u.getPasswordHash().substring(0, Math.min(7, u.getPasswordHash().length())) : "null")
-        );
+        String authority = "ROLE_" + roleName;
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(u.getUsername())
                 .password(u.getPasswordHash()) // BCrypt hash desde BD
                 .authorities(List.of(new SimpleGrantedAuthority(authority)))
                 .accountLocked(false)
-                .disabled(false) // ya validamos arriba
+                .disabled(false)
                 .build();
     }
 }
