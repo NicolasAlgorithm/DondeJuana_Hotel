@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,17 +8,31 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
         h1 { color: #333; }
-        .menu { display: flex; gap: 20px; margin-top: 20px; }
+        .menu { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
         .card { background: white; border-radius: 8px; padding: 20px; min-width: 180px;
                 text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         .card a { text-decoration: none; color: #0066cc; font-size: 1.1em; font-weight: bold; }
         .card a:hover { text-decoration: underline; }
         .card p { color: #666; font-size: 0.9em; }
+        .db-status { margin-top: 24px; padding: 10px 16px; border-radius: 6px;
+                     display: inline-block; font-size: 0.9em; font-weight: 600; }
+        .db-ok  { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+        .db-err { background: #fdecea; color: #b71c1c; border: 1px solid #ef9a9a; }
+        .logout { float: right; font-size: 0.85em; }
+        .logout a { color: #c0392b; text-decoration: none; }
+        .logout a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
+<div class="logout">
+    <span sec:authentication="name"></span>
+    &nbsp;|&nbsp;
+    <a th:href="@{/logout}">Cerrar sesi&oacute;n</a>
+</div>
+
 <h1>&#127968; Hotel Donde Juana</h1>
 <p>Bienvenido al sistema de gesti&oacute;n del hotel.</p>
+
 <div class="menu">
     <div class="card">
         <a th:href="@{/personas}">&#128100; Hu&eacute;spedes</a>
@@ -35,6 +50,12 @@
         <a th:href="@{/reservas}">&#128203; Reservas</a>
         <p>Gestionar reservas</p>
     </div>
+</div>
+
+<div th:class="${dbStatus == 'OK'} ? 'db-status db-ok' : 'db-status db-err'">
+    <span th:if="${dbStatus == 'OK'}">&#9989; DB Status: OK &mdash; </span>
+    <span th:if="${dbStatus != 'OK'}">&#10060; DB Status: ERROR &mdash; </span>
+    <span th:text="${dbDetail}"></span>
 </div>
 </body>
 </html>
