@@ -3,17 +3,18 @@ package com.project.hotel.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
 import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
-@Table(name = "TIPO_HABITACION")
+@Table(name = "TIPOS_HABITACION")
 public class TipoHabitacion {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tipo_hab_seq")
-    @SequenceGenerator(name = "tipo_hab_seq", sequenceName = "SEQ_TIPO_HABITACION", allocationSize = 1)
-    @Column(name = "ID_TIPO")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tipos_hab_seq")
+    @SequenceGenerator(name = "tipos_hab_seq", sequenceName = "SEQ_TIPOS_HABITACION", allocationSize = 1)
+    @Column(name = "ID_TIPO_HABITACION")
     private Long idTipo;
 
     @NotBlank
