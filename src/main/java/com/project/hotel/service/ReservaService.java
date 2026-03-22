@@ -17,10 +17,10 @@ import java.util.Optional;
 @Transactional
 public class ReservaService {
 
-    private static final String ESTADO_CONFIRMADA = "CONFIRMADA";
+    // Estados reales en BD (constraint SYS_C0033032)
+    private static final String ESTADO_ACTIVA = "ACTIVA";
     private static final String ESTADO_CANCELADA = "CANCELADA";
-    private static final String ESTADO_CHECKIN = "CHECKIN";
-    private static final String ESTADO_CHECKOUT = "CHECKOUT";
+    private static final String ESTADO_CUMPLIDA = "CUMPLIDA";
 
     private final ReservaRepository reservaRepository;
     private final PersonaRepository personaRepository;
@@ -61,7 +61,7 @@ public class ReservaService {
 
     @Transactional(readOnly = true)
     public List<Reserva> listarPorEstado(String estado) {
-        return reservaRepository.findByEstado(estado);
+        return reservaRepository.findByEstado(normalizarEstado(estado, ESTADO_ACTIVA));
     }
 
     public Reserva crear(Long idPersona, Long idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida, String estado) {
@@ -79,7 +79,7 @@ public class ReservaService {
         r.setHabitacion(habitacion);
         r.setFechaEntrada(fechaEntrada);
         r.setFechaSalida(fechaSalida);
-        r.setEstado(normalizarEstado(estado, ESTADO_CONFIRMADA));
+        r.setEstado(normalizarEstado(estado, ESTADO_ACTIVA));
 
         return reservaRepository.save(r);
     }
@@ -110,9 +110,9 @@ public class ReservaService {
         Reserva actual = reservaRepository.findById(idReserva)
                 .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada: " + idReserva));
 
-        String estadoActual = normalizarEstado(actual.getEstado(), ESTADO_CONFIRMADA);
-        if (ESTADO_CHECKOUT.equals(estadoActual)) {
-            throw new IllegalArgumentException("No se puede cancelar una reserva en CHECKOUT");
+        String estadoActual = normalizarEstado(actual.getEstado(), ESTADO_ACTIVA);
+        if (ESTADO_CUMPLIDA.equals(estadoActual)) {
+            throw new IllegalArgumentException("No se puede cancelar una reserva CUMPLIDA");
         }
 
         actual.setEstado(ESTADO_CANCELADA);
@@ -122,7 +122,6 @@ public class ReservaService {
     public void borrar(Long idReserva) {
         Reserva actual = reservaRepository.findById(idReserva)
                 .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada: " + idReserva));
-
         reservaRepository.delete(actual);
     }
 
@@ -149,14 +148,19 @@ public class ReservaService {
     }
 
     private String normalizarEstado(String estado, String porDefecto) {
-        String valor = (estado == null || estado.isBlank()) ? porDefecto : estado.trim().toUpperCase();
+        String valor = (estado == null || estado.isBlank()) ? porDefecto : estado.trim();
 
-        if (!ESTADO_CONFIRMADA.equals(valor)
-                && !ESTADO_CANCELADA.equals(valor)
-                && !ESTADO_CHECKIN.equals(valor)
-                && !ESTADO_CHECKOUT.equals(valor)) {
-            throw new IllegalArgumentException("Estado inválido. Valores permitidos: CONFIRMADA, CANCELADA, CHECKIN, CHECKOUT");
+        // Acepta valores de UI y los traduce al constraint real de BD
+        if (valor.equalsIgnoreCase("ACTIVA") || valor.equalsIgnoreCase("CONFIRMADA") || valor.equalsIgnoreCase("CHECKIN")) {
+            return ESTADO_ACTIVA;
         }
-        return valor;
+        if (valor.equalsIgnoreCase("CANCELADA")) {
+            return ESTADO_CANCELADA;
+        }
+        if (valor.equalsIgnoreCase("CUMPLIDA") || valor.equalsIgnoreCase("CHECKOUT")) {
+            return ESTADO_CUMPLIDA;
+        }
+
+        throw new IllegalArgumentException("Estado inválido. Valores permitidos en BD: ACTIVA, CANCELADA, CUMPLIDA");
     }
 }

@@ -266,11 +266,10 @@
                 <div class="field">
                     <label for="estado">Estado</label>
                     <select id="estado" th:field="*{estado}">
-                        <option value="">CONFIRMADA (por defecto)</option>
-                        <option value="CONFIRMADA">CONFIRMADA</option>
-                        <option value="CHECKIN">CHECKIN</option>
-                        <option value="CHECKOUT">CHECKOUT</option>
+                        <option value="">ACTIVA (por defecto)</option>
+                        <option value="ACTIVA">ACTIVA</option>
                         <option value="CANCELADA">CANCELADA</option>
+                        <option value="CUMPLIDA">CUMPLIDA</option>
                     </select>
                     <div class="help">El backend valida estados permitidos.</div>
                 </div>
@@ -339,7 +338,7 @@
                 idHabitacion: Number(idHabitacion),
                 fechaEntrada: fechaEntrada,
                 fechaSalida: fechaSalida,
-                estado: estado || "CONFIRMADA"
+                estado: estado || "ACTIVA"
             };
 
             var isEdit = idReserva.length > 0;

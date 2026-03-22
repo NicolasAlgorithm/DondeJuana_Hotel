@@ -35,7 +35,7 @@ public class ReservaController {
         model.addAttribute("reserva", new Reserva());
         model.addAttribute("personas", personaService.listarTodos());
         model.addAttribute("habitaciones", habitacionService.listarDisponibles());
-        model.addAttribute("estados", new String[]{"Confirmada", "Cancelada", "CheckIn", "CheckOut"});
+        model.addAttribute("estados", new String[]{"ACTIVA", "CANCELADA", "CUMPLIDA"});
         return "reservas/formulario";
     }
 
@@ -44,7 +44,7 @@ public class ReservaController {
         if (result.hasErrors()) {
             model.addAttribute("personas", personaService.listarTodos());
             model.addAttribute("habitaciones", habitacionService.listarDisponibles());
-            model.addAttribute("estados", new String[]{"Confirmada", "Cancelada", "CheckIn", "CheckOut"});
+            model.addAttribute("estados", new String[]{"ACTIVA", "CANCELADA", "CUMPLIDA"});
             return "reservas/formulario";
         }
         reservaService.guardar(reserva);
@@ -56,7 +56,7 @@ public class ReservaController {
         reservaService.buscarPorId(id).ifPresent(r -> model.addAttribute("reserva", r));
         model.addAttribute("personas", personaService.listarTodos());
         model.addAttribute("habitaciones", habitacionService.listarTodos());
-        model.addAttribute("estados", new String[]{"Confirmada", "Cancelada", "CheckIn", "CheckOut"});
+        model.addAttribute("estados", new String[]{"ACTIVA", "CANCELADA", "CUMPLIDA"});
         return "reservas/formulario";
     }
 

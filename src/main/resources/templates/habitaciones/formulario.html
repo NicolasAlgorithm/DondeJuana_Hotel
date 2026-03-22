@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Habitaci&oacute;n - Hotel Donde Juana</title>
+    <title>Habitacion - Hotel Donde Juana</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
         h1 { color: #333; }
@@ -16,20 +16,20 @@
     </style>
 </head>
 <body>
-<h1 th:text="${habitacion.idHabitacion != null} ? 'Editar Habitaci&oacute;n' : 'Nueva Habitaci&oacute;n'">Habitaci&oacute;n</h1>
+<h1 th:text="${habitacion.idHabitacion != null} ? 'Editar Habitacion' : 'Nueva Habitacion'">Habitacion</h1>
 <form th:action="@{/habitaciones/guardar}" th:object="${habitacion}" method="post">
     <input type="hidden" th:field="*{idHabitacion}" />
 
-    <label>N&uacute;mero de Habitaci&oacute;n *</label>
+    <label>Numero de Habitacion *</label>
     <input type="text" th:field="*{numero}" placeholder="Ej: 101, 202" />
     <span class="error" th:if="${#fields.hasErrors('numero')}" th:errors="*{numero}"></span>
 
-    <label>Tipo de Habitaci&oacute;n *</label>
+    <label>Tipo de Habitacion *</label>
     <select th:field="*{tipoHabitacion}">
         <option value="">-- Seleccione un tipo --</option>
         <option th:each="tipo : ${tipos}"
                 th:value="${tipo.idTipo}"
-                th:text="${tipo.nombre} + ' - $' + ${#numbers.formatDecimal(tipo.precioNoche, 1, 2)}">
+                th:text="${tipo.nombre + ' - $' + #numbers.formatDecimal(tipo.precioNoche, 1, 2)}">
         </option>
     </select>
     <span class="error" th:if="${#fields.hasErrors('tipoHabitacion')}" th:errors="*{tipoHabitacion}"></span>
@@ -40,8 +40,8 @@
         <option th:each="est : ${estados}" th:value="${est}" th:text="${est}"></option>
     </select>
 
-    <label>Descripci&oacute;n</label>
-    <textarea th:field="*{descripcion}" rows="3" placeholder="Descripci&oacute;n de la habitaci&oacute;n"></textarea>
+    <label>Descripcion</label>
+    <textarea th:field="*{descripcion}" rows="3" placeholder="Descripcion de la habitacion"></textarea>
 
     <div>
         <button type="submit" class="btn btn-primary">Guardar</button>
