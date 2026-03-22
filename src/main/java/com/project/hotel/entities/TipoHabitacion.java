@@ -25,8 +25,8 @@ public class TipoHabitacion {
     private String descripcion;
 
     @NotNull
-    @Column(name = "PRECIO_NOCHE", nullable = false, precision = 10, scale = 2)
-    private BigDecimal precioNoche;
+    @Column(name = "TARIFA_BASE", nullable = false, precision = 10, scale = 2)
+    private BigDecimal tarifaBase;
 
     @OneToMany(mappedBy = "tipoHabitacion", fetch = FetchType.LAZY)
     private List<Habitacion> habitaciones;
@@ -34,10 +34,10 @@ public class TipoHabitacion {
     public TipoHabitacion() {
     }
 
-    public TipoHabitacion(String nombre, String descripcion, BigDecimal precioNoche) {
+    public TipoHabitacion(String nombre, String descripcion, BigDecimal tarifaBase) {
         this.nombre = nombre;
         this.descripcion = descripcion;
-        this.precioNoche = precioNoche;
+        this.tarifaBase = tarifaBase;
     }
 
     public Long getIdTipo() {
@@ -64,12 +64,21 @@ public class TipoHabitacion {
         this.descripcion = descripcion;
     }
 
+    public BigDecimal getTarifaBase() {
+        return tarifaBase;
+    }
+
+    public void setTarifaBase(BigDecimal tarifaBase) {
+        this.tarifaBase = tarifaBase;
+    }
+
+    // Compatibilidad con vistas/formularios que aun usan "precioNoche"
     public BigDecimal getPrecioNoche() {
-        return precioNoche;
+        return tarifaBase;
     }
 
     public void setPrecioNoche(BigDecimal precioNoche) {
-        this.precioNoche = precioNoche;
+        this.tarifaBase = precioNoche;
     }
 
     public List<Habitacion> getHabitaciones() {

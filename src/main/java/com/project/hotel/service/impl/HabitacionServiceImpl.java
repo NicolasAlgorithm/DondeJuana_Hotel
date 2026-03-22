@@ -28,10 +28,10 @@ public class HabitacionServiceImpl implements HabitacionService {
     public Habitacion crear(HabitacionRequest request) {
         validarEstado(request.getEstado());
 
-        habitacionRepository.findByNumero(request.getCodigo())
+        habitacionRepository.findByNumero(request.getNumero())
                 .ifPresent(h -> {
                     throw new IllegalArgumentException(
-                            "Ya existe una habitación con código: " + request.getCodigo()
+                            "Ya existe una habitacion con numero: " + request.getNumero()
                     );
                 });
 
@@ -70,7 +70,7 @@ public class HabitacionServiceImpl implements HabitacionService {
     public Habitacion obtenerPorId(Long id) {
         return habitacionRepository.findById(id)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("Habitación no encontrada con id: " + id));
+                        new IllegalArgumentException("Habitacion no encontrada con id: " + id));
     }
 
     @Override
@@ -79,11 +79,11 @@ public class HabitacionServiceImpl implements HabitacionService {
 
         Habitacion actual = obtenerPorId(id);
 
-        habitacionRepository.findByNumero(request.getCodigo())
+        habitacionRepository.findByNumero(request.getNumero())
                 .ifPresent(h -> {
                     if (!h.getIdHabitacion().equals(id)) {
                         throw new IllegalArgumentException(
-                                "Ya existe otra habitación con código: " + request.getCodigo()
+                                "Ya existe otra habitacion con numero: " + request.getNumero()
                         );
                     }
                 });
@@ -111,7 +111,7 @@ public class HabitacionServiceImpl implements HabitacionService {
     private void validarEstado(String estado) {
         if (estado == null || !ESTADOS_VALIDOS.contains(estado.toUpperCase())) {
             throw new IllegalArgumentException(
-                    "Estado inválido. Valores permitidos: DISPONIBLE, OCUPADA, MANTENIMIENTO"
+                    "Estado invalido. Valores permitidos: DISPONIBLE, OCUPADA, MANTENIMIENTO"
             );
         }
     }

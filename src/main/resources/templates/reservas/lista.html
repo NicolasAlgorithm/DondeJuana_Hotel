@@ -248,9 +248,8 @@
                     <td th:text="${reserva.fechaSalida != null ? reserva.fechaSalida : '-'}"></td>
                     <td>
                         <span class="badge"
-                              th:classappend="${#strings.equalsIgnoreCase(reserva.estado, 'CONFIRMADA')} ? ' b-confirmada' :
-                                              (${#strings.equalsIgnoreCase(reserva.estado, 'CHECKIN')} ? ' b-checkin' :
-                                              (${#strings.equalsIgnoreCase(reserva.estado, 'CHECKOUT')} ? ' b-checkout' : ' b-cancelada'))"
+                              th:classappend="${#strings.equalsIgnoreCase(reserva.estado, 'ACTIVA')} ? ' b-confirmada' :
+                      (${#strings.equalsIgnoreCase(reserva.estado, 'CUMPLIDA')} ? ' b-checkout' : ' b-cancelada')"
                               th:text="${reserva.estado != null ? reserva.estado : 'SIN_ESTADO'}">
                         </span>
                     </td>
