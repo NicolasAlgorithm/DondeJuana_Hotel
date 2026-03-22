@@ -7,17 +7,36 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
         h1 { color: #333; }
-        .menu { display: flex; gap: 20px; margin-top: 20px; }
+        .menu { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
         .card { background: white; border-radius: 8px; padding: 20px; min-width: 180px;
                 text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
         .card a { text-decoration: none; color: #0066cc; font-size: 1.1em; font-weight: bold; }
         .card a:hover { text-decoration: underline; }
         .card p { color: #666; font-size: 0.9em; }
+        .db-badge { display: inline-flex; align-items: center; gap: 8px;
+                    padding: 6px 14px; border-radius: 20px; font-size: 0.85em;
+                    font-weight: bold; margin-top: 12px; }
+        .db-ok   { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+        .db-fail { background: #fdecea; color: #b71c1c; border: 1px solid #ef9a9a; }
+        .db-dot  { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .dot-ok   { background: #43a047; }
+        .dot-fail { background: #e53935; }
     </style>
 </head>
 <body>
 <h1>&#127968; Hotel Donde Juana</h1>
 <p>Bienvenido al sistema de gesti&oacute;n del hotel.</p>
+
+<!-- DB connection status -->
+<div th:if="${dbOk}" class="db-badge db-ok">
+    <span class="db-dot dot-ok"></span>
+    BD Oracle: OK &mdash; conectado como <span th:text="${dbUser}">HOTEL</span>
+</div>
+<div th:unless="${dbOk}" class="db-badge db-fail">
+    <span class="db-dot dot-fail"></span>
+    BD Oracle: ERROR &mdash; no se pudo conectar
+</div>
+
 <div class="menu">
     <div class="card">
         <a th:href="@{/personas}">&#128100; Hu&eacute;spedes</a>
