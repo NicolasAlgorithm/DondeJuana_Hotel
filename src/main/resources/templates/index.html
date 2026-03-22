@@ -13,11 +13,17 @@
         .card a { text-decoration: none; color: #0066cc; font-size: 1.1em; font-weight: bold; }
         .card a:hover { text-decoration: underline; }
         .card p { color: #666; font-size: 0.9em; }
+        .db-status { margin-top: 20px; padding: 10px 14px; border-radius: 6px; font-size: 0.9em; display: inline-block; }
+        .db-ok { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+        .db-error { background: #fdecea; color: #b71c1c; border: 1px solid #ef9a9a; }
     </style>
 </head>
 <body>
 <h1>&#127968; Hotel Donde Juana</h1>
 <p>Bienvenido al sistema de gesti&oacute;n del hotel.</p>
+<div th:class="${dbOk} ? 'db-status db-ok' : 'db-status db-error'">
+    DB: <span th:text="${dbStatus}">...</span>
+</div>
 <div class="menu">
     <div class="card">
         <a th:href="@{/personas}">&#128100; Hu&eacute;spedes</a>
