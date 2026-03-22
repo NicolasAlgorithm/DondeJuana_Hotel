@@ -2,6 +2,7 @@ package com.project.hotel.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -17,7 +18,7 @@ public class Reserva {
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "ID_PERSONA", nullable = false)
+    @JoinColumn(name = "ID_HUESPED", nullable = false)
     private Persona persona;
 
     @NotNull
@@ -26,17 +27,18 @@ public class Reserva {
     private Habitacion habitacion;
 
     @NotNull
-    @Column(name = "FECHA_ENTRADA", nullable = false)
+    @Column(name = "FECHA_INICIO", nullable = false)
     private LocalDate fechaEntrada;
 
     @NotNull
-    @Column(name = "FECHA_SALIDA", nullable = false)
+    @Column(name = "FECHA_FIN", nullable = false)
     private LocalDate fechaSalida;
 
     @Column(name = "ESTADO", length = 20)
     private String estado;
 
-    @Column(name = "TOTAL", precision = 12, scale = 2)
+    // La tabla RESERVAS no tiene columna TOTAL; se deja solo para no romper vistas/formularios.
+    @Transient
     private BigDecimal total;
 
     public Reserva() {
