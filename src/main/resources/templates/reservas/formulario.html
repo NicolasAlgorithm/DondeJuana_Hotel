@@ -1,66 +1,381 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Reserva - Hotel Donde Juana</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${reserva.idReserva != null} ? 'Editar Reserva' : 'Nueva Reserva'">Reserva</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
-        h1 { color: #333; }
-        form { background: white; padding: 24px; border-radius: 8px; max-width: 500px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-        label { display: block; margin-top: 12px; font-weight: bold; color: #444; }
-        input, select { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        .error { color: red; font-size: 0.85em; }
-        .btn { display: inline-block; padding: 8px 18px; border-radius: 4px; text-decoration: none; margin-top: 16px; margin-right: 8px; cursor: pointer; border: none; font-size: 1em; }
-        .btn-primary { background: #0066cc; color: white; }
-        .btn-secondary { background: #666; color: white; }
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Fraunces:opsz,wght@9..144,600&display=swap');
+
+        :root {
+            --bg-top: #f4f7ff;
+            --bg-bottom: #e8f5ee;
+            --panel: #ffffff;
+            --ink: #1c2533;
+            --muted: #6f7d90;
+            --line: #d7deea;
+            --primary: #0b6e4f;
+            --primary-dark: #084f39;
+            --accent: #ffb703;
+            --danger: #b42318;
+            --ok: #0b6e4f;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --shadow: 0 20px 45px rgba(28, 37, 51, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Space Grotesk", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(900px 300px at 10% -5%, #d2e9ff 0%, transparent 60%),
+                radial-gradient(1000px 420px at 95% 105%, #c7f0d9 0%, transparent 65%),
+                linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+            display: grid;
+            place-items: center;
+            padding: 22px;
+        }
+
+        .wrap {
+            width: min(940px, 100%);
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            animation: rise 0.35s ease-out;
+        }
+
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero {
+            padding: 24px 26px;
+            background: linear-gradient(120deg, #0b6e4f, #2a9d8f);
+            color: #fff;
+        }
+
+        .eyebrow {
+            margin: 0 0 8px 0;
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        h1 {
+            margin: 0;
+            font-family: "Fraunces", serif;
+            font-size: clamp(1.35rem, 2.1vw, 2rem);
+            font-weight: 600;
+        }
+
+        .sub {
+            margin: 8px 0 0 0;
+            color: rgba(255, 255, 255, 0.92);
+            font-size: 0.95rem;
+        }
+
+        .content {
+            padding: 24px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field.span-2 {
+            grid-column: span 2;
+        }
+
+        label {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #273243;
+        }
+
+        .req {
+            color: var(--danger);
+        }
+
+        input,
+        select {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-md);
+            padding: 11px 12px;
+            font: inherit;
+            background: #fff;
+            color: var(--ink);
+            transition: border-color .18s, box-shadow .18s;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #4f9cf9;
+            box-shadow: 0 0 0 4px rgba(79, 156, 249, 0.18);
+        }
+
+        .help {
+            color: var(--muted);
+            font-size: 0.83rem;
+        }
+
+        .error {
+            color: var(--danger);
+            font-size: 0.83rem;
+        }
+
+        .msg {
+            margin: 0 0 16px 0;
+            border-radius: 10px;
+            padding: 11px 12px;
+            font-size: 0.92rem;
+            display: none;
+        }
+
+        .msg.error {
+            display: block;
+            background: #fef3f2;
+            color: #7a271a;
+            border: 1px solid #fecdca;
+        }
+
+        .msg.ok {
+            display: block;
+            background: #ecfdf3;
+            color: #0f5132;
+            border: 1px solid #a6f4c5;
+        }
+
+        .actions {
+            margin-top: 18px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 11px;
+            padding: 10px 16px;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform .15s ease, filter .15s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.03);
+        }
+
+        .btn-primary {
+            background: linear-gradient(120deg, var(--primary), var(--primary-dark));
+            color: #fff;
+        }
+
+        .btn-ghost {
+            background: #f4f6fb;
+            color: #243145;
+            border: 1px solid var(--line);
+        }
+
+        .foot-note {
+            margin-top: 14px;
+            color: var(--muted);
+            font-size: 0.83rem;
+        }
+
+        @media (max-width: 760px) {
+            .content { padding: 18px; }
+            .hero { padding: 18px; }
+            .grid { grid-template-columns: 1fr; }
+            .field.span-2 { grid-column: span 1; }
+            .actions .btn { width: 100%; text-align: center; }
+        }
     </style>
 </head>
 <body>
-<h1 th:text="${reserva.idReserva != null} ? 'Editar Reserva' : 'Nueva Reserva'">Reserva</h1>
-<form th:action="@{/reservas/guardar}" th:object="${reserva}" method="post">
-    <input type="hidden" th:field="*{idReserva}" />
-
-    <label>Huesped *</label>
-    <select th:field="*{persona}">
-        <option value="">-- Seleccione un huesped --</option>
-        <option th:each="p : ${personas}"
-                th:value="${p.idPersona}"
-                th:text="${p.nombre} + ' ' + ${p.apellido}">
-        </option>
-    </select>
-    <span class="error" th:if="${#fields.hasErrors('persona')}" th:errors="*{persona}"></span>
-
-    <label>Habitaci&oacute;n *</label>
-    <select th:field="*{habitacion}">
-        <option value="">-- Seleccione una habitaci&oacute;n --</option>
-        <option th:each="h : ${habitaciones}"
-                th:value="${h.idHabitacion}"
-                th:text="'Hab. ' + ${h.numero} + ' - ' + ${h.tipoHabitacion.nombre} + ' ($' + ${#numbers.formatDecimal(h.tipoHabitacion.precioNoche, 1, 2)} + '/noche)'">
-        </option>
-    </select>
-    <span class="error" th:if="${#fields.hasErrors('habitacion')}" th:errors="*{habitacion}"></span>
-
-    <label>Fecha de Entrada *</label>
-    <input type="date" th:field="*{fechaEntrada}" />
-    <span class="error" th:if="${#fields.hasErrors('fechaEntrada')}" th:errors="*{fechaEntrada}"></span>
-
-    <label>Fecha de Salida *</label>
-    <input type="date" th:field="*{fechaSalida}" />
-    <span class="error" th:if="${#fields.hasErrors('fechaSalida')}" th:errors="*{fechaSalida}"></span>
-
-    <label>Estado</label>
-    <select th:field="*{estado}">
-        <option value="">-- Seleccione estado --</option>
-        <option th:each="est : ${estados}" th:value="${est}" th:text="${est}"></option>
-    </select>
-
-    <label>Total (COP)</label>
-    <input type="number" th:field="*{total}" step="0.01" min="0" placeholder="0.00" />
-
-    <div>
-        <button type="submit" class="btn btn-primary">Guardar</button>
-        <a class="btn btn-secondary" th:href="@{/reservas}">Cancelar</a>
+<div class="wrap">
+    <div class="hero">
+        <p class="eyebrow">Donde Juana · Reservas</p>
+        <h1 th:text="${reserva.idReserva != null} ? 'Editar Reserva' : 'Nueva Reserva'">Reserva</h1>
+        <p class="sub">Formulario conectado a la API de reservas para crear o actualizar según corresponda.</p>
     </div>
-</form>
+
+    <div class="content">
+        <div id="apiMessage" class="msg"></div>
+
+        <form id="reservaForm" th:object="${reserva}" novalidate>
+            <input id="idReserva" type="hidden" th:field="*{idReserva}" />
+
+            <div class="grid">
+                <div class="field span-2">
+                    <label for="persona">Huésped <span class="req">*</span></label>
+                    <select id="persona" th:field="*{persona}" required>
+                        <option value="">Seleccione un huésped</option>
+                        <option th:each="p : ${personas}"
+                                th:value="${p.idPersona}"
+                                th:text="${p.nombre + ' ' + p.apellido}">
+                        </option>
+                    </select>
+                    <span class="error" th:if="${#fields.hasErrors('persona')}" th:errors="*{persona}"></span>
+                </div>
+
+                <div class="field span-2">
+                    <label for="habitacion">Habitación <span class="req">*</span></label>
+                    <select id="habitacion" th:field="*{habitacion}" required>
+                        <option value="">Seleccione una habitación</option>
+                        <option th:each="h : ${habitaciones}"
+                                th:value="${h.idHabitacion}"
+                                th:text="${'Hab. ' + h.numero + ' · ' + h.tipoHabitacion.nombre}">
+                        </option>
+                    </select>
+                    <span class="error" th:if="${#fields.hasErrors('habitacion')}" th:errors="*{habitacion}"></span>
+                </div>
+
+                <div class="field">
+                    <label for="fechaEntrada">Fecha entrada <span class="req">*</span></label>
+                    <input id="fechaEntrada" type="date" th:field="*{fechaEntrada}" required />
+                </div>
+
+                <div class="field">
+                    <label for="fechaSalida">Fecha salida <span class="req">*</span></label>
+                    <input id="fechaSalida" type="date" th:field="*{fechaSalida}" required />
+                </div>
+
+                <div class="field">
+                    <label for="estado">Estado</label>
+                    <select id="estado" th:field="*{estado}">
+                        <option value="">CONFIRMADA (por defecto)</option>
+                        <option value="CONFIRMADA">CONFIRMADA</option>
+                        <option value="CHECKIN">CHECKIN</option>
+                        <option value="CHECKOUT">CHECKOUT</option>
+                        <option value="CANCELADA">CANCELADA</option>
+                    </select>
+                    <div class="help">El backend valida estados permitidos.</div>
+                </div>
+
+                <div class="field">
+                    <label for="total">Total (solo visual por ahora)</label>
+                    <input id="total" type="number" step="0.01" min="0" th:field="*{total}" />
+                    <div class="help">No se envía en esta API de ciclo de vida.</div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="btn btn-primary">Guardar en API</button>
+                <a class="btn btn-ghost" th:href="@{/reservas}">Volver a lista</a>
+            </div>
+
+            <p class="foot-note">
+                Usuarios habilitados: ADMINISTRADOR y RECEPCIONISTA (según SecurityConfig).
+            </p>
+        </form>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var form = document.getElementById("reservaForm");
+        var box = document.getElementById("apiMessage");
+
+        function showMsg(text, kind) {
+            box.className = "msg " + kind;
+            box.textContent = text;
+        }
+
+        function clearMsg() {
+            box.className = "msg";
+            box.textContent = "";
+        }
+
+        function isDateRangeValid(inDate, outDate) {
+            return inDate && outDate && (new Date(inDate) < new Date(outDate));
+        }
+
+        form.addEventListener("submit", function (ev) {
+            ev.preventDefault();
+            clearMsg();
+
+            var idReserva = document.getElementById("idReserva").value.trim();
+            var idPersona = document.getElementById("persona").value;
+            var idHabitacion = document.getElementById("habitacion").value;
+            var fechaEntrada = document.getElementById("fechaEntrada").value;
+            var fechaSalida = document.getElementById("fechaSalida").value;
+            var estado = document.getElementById("estado").value;
+
+            if (!idPersona || !idHabitacion || !fechaEntrada || !fechaSalida) {
+                showMsg("Completa todos los campos obligatorios.", "error");
+                return;
+            }
+
+            if (!isDateRangeValid(fechaEntrada, fechaSalida)) {
+                showMsg("La fecha de entrada debe ser menor que la fecha de salida.", "error");
+                return;
+            }
+
+            var payload = {
+                idPersona: Number(idPersona),
+                idHabitacion: Number(idHabitacion),
+                fechaEntrada: fechaEntrada,
+                fechaSalida: fechaSalida,
+                estado: estado || "CONFIRMADA"
+            };
+
+            var isEdit = idReserva.length > 0;
+            var url = isEdit ? ("/api/reservas/" + idReserva) : "/api/reservas";
+            var method = isEdit ? "PUT" : "POST";
+
+            fetch(url, {
+                method: method,
+                headers: { "Content-Type": "application/json" },
+                credentials: "same-origin",
+                body: JSON.stringify(payload)
+            })
+            .then(function (res) {
+                return res.text().then(function (txt) {
+                    var data;
+                    try { data = txt ? JSON.parse(txt) : {}; }
+                    catch (e) { data = { raw: txt }; }
+
+                    if (!res.ok) {
+                        var err = data.error || data.message || "No se pudo guardar la reserva.";
+                        throw new Error(err);
+                    }
+                    return data;
+                });
+            })
+            .then(function () {
+                showMsg("Reserva guardada correctamente. Redirigiendo...", "ok");
+                setTimeout(function () {
+                    window.location.href = "/reservas?ok=1";
+                }, 700);
+            })
+            .catch(function (err) {
+                showMsg(err.message, "error");
+            });
+        });
+    })();
+</script>
 </body>
 </html>
