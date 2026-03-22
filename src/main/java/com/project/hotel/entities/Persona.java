@@ -5,34 +5,36 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
-@Table(name = "PERSONA")
+@Table(name = "HUESPEDES")
 public class Persona {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "persona_seq")
-    @SequenceGenerator(name = "persona_seq", sequenceName = "SEQ_PERSONA", allocationSize = 1)
-    @Column(name = "ID_PERSONA")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "huesped_seq")
+    @SequenceGenerator(name = "huesped_seq", sequenceName = "SEQ_HUESPEDES", allocationSize = 1)
+    @Column(name = "ID_HUESPED")
     private Long idPersona;
 
     @NotBlank
-    @Column(name = "NOMBRE", nullable = false, length = 100)
+    @Column(name = "NOMBRES", nullable = false, length = 150)
     private String nombre;
 
     @NotBlank
-    @Column(name = "APELLIDO", nullable = false, length = 100)
+    @Column(name = "APELLIDOS", nullable = false, length = 150)
     private String apellido;
 
-    @Column(name = "TIPO_DOC", length = 10)
+    @NotBlank
+    @Column(name = "TIPO_DOCUMENTO", nullable = false, length = 20)
     private String tipoDoc;
 
-    @Column(name = "DOCUMENTO", length = 20)
+    @NotBlank
+    @Column(name = "NUMERO_DOCUMENTO", nullable = false, length = 30)
     private String documento;
 
     @Email
     @Column(name = "EMAIL", length = 150)
     private String email;
 
-    @Column(name = "TELEFONO", length = 20)
+    @Column(name = "TELEFONO", length = 30)
     private String telefono;
 
     public Persona() {
