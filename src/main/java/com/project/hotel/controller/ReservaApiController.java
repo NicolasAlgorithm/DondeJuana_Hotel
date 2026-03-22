@@ -71,6 +71,17 @@ public class ReservaApiController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> borrar(@PathVariable Long id) {
+        try {
+            reservaService.borrar(id);
+            return ResponseEntity.noContent().build();
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
     @GetMapping("/disponibilidad")
     public ResponseEntity<?> disponibilidad(
             @RequestParam Long idHabitacion,
