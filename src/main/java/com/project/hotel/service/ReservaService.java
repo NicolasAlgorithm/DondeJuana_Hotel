@@ -1,42 +1,152 @@
 package com.project.hotel.service;
 
+import com.project.hotel.entities.Habitacion;
+import com.project.hotel.entities.Persona;
 import com.project.hotel.entities.Reserva;
+import com.project.hotel.repository.HabitacionRepository;
+import com.project.hotel.repository.PersonaRepository;
 import com.project.hotel.repository.ReservaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class ReservaService {
+@Transactional
+public class ReservaService { private static final String ESTADO_CONFIRMADA = "CONFIRMADA";
+ private static final String ESTADO_CANCELADA = "CANCELADA";
+ private static final String ESTADO_CHECKIN = "CHECKIN";
+ private static final String ESTADO_CHECKOUT = "CHECKOUT";
 
-    private final ReservaRepository reservaRepository;
+ private final ReservaRepository reservaRepository;
+ private final PersonaRepository personaRepository;
+ private final HabitacionRepository habitacionRepository;
 
-    public ReservaService(ReservaRepository reservaRepository) {
-        this.reservaRepository = reservaRepository;
-    }
+ public ReservaService(
+         ReservaRepository reservaRepository,
+         PersonaRepository personaRepository,
+         HabitacionRepository habitacionRepository
+ ) {
+     this.reservaRepository = reservaRepository;
+     this.personaRepository = personaRepository;
+     this.habitacionRepository = habitacionRepository;
+ }
 
-    public List<Reserva> listarTodos() {
-        return reservaRepository.findAll();
-    }
+ @Transactional(readOnly = true)
+ public List<Reserva> listarTodos() {
+     return reservaRepository.findAll();
+ }
 
-    public Optional<Reserva> buscarPorId(Long id) {
-        return reservaRepository.findById(id);
-    }
+ @Transactional(readOnly = true)
+ public Optional<Reserva> buscarPorId(Long id) {
+     return reservaRepository.findById(id);
+ }
 
-    public Reserva guardar(Reserva reserva) {
-        return reservaRepository.save(reserva);
-    }
+ public Reserva guardar(Reserva reserva) {
+     return reservaRepository.save(reserva);
+ }
 
-    public void eliminar(Long id) {
-        reservaRepository.deleteById(id);
-    }
+ public void eliminar(Long id) {
+     reservaRepository.deleteById(id);
+ }
 
-    public List<Reserva> listarPorPersona(Long idPersona) {
-        return reservaRepository.findByPersona_IdPersona(idPersona);
-    }
+ @Transactional(readOnly = true)
+ public List<Reserva> listarPorPersona(Long idPersona) {
+     return reservaRepository.findByPersona_IdPersona(idPersona);
+ }
 
-    public List<Reserva> listarPorEstado(String estado) {
-        return reservaRepository.findByEstado(estado);
-    }
-}
+ @Transactional(readOnly = true)
+ public List<Reserva> listarPorEstado(String estado) {
+     return reservaRepository.findByEstado(estado);
+ }
+
+ public Reserva crear(Long idPersona, Long idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida, String estado) {
+     validarFechas(fechaEntrada, fechaSalida);
+     validarDisponibilidad(idHabitacion, fechaEntrada, fechaSalida, null);
+
+     Persona persona = personaRepository.findById(idPersona)
+             .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada: " + idPersona));
+
+     Habitacion habitacion = habitacionRepository.findById(idHabitacion)
+             .orElseThrow(() -> new IllegalArgumentException("Habitación no encontrada: " + idHabitacion));
+
+     Reserva r = new Reserva();
+     r.setPersona(persona);
+     r.setHabitacion(habitacion);
+     r.setFechaEntrada(fechaEntrada);
+     r.setFechaSalida(fechaSalida);
+     r.setEstado(normalizarEstado(estado, ESTADO_CONFIRMADA));
+
+     return reservaRepository.save(r);
+ }
+
+ public Reserva modificar(Long idReserva, Long idPersona, Long idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida, String estado) {
+     validarFechas(fechaEntrada, fechaSalida);
+     validarDisponibilidad(idHabitacion, fechaEntrada, fechaSalida, idReserva);
+
+     Reserva actual = reservaRepository.findById(idReserva)
+             .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada: " + idReserva));
+
+     Persona persona = personaRepository.findById(idPersona)
+             .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada: " + idPersona));
+
+     Habitacion habitacion = habitacionRepository.findById(idHabitacion)
+             .orElseThrow(() -> new IllegalArgumentException("Habitación no encontrada: " + idHabitacion));
+
+     actual.setPersona(persona);
+     actual.setHabitacion(habitacion);
+     actual.setFechaEntrada(fechaEntrada);
+     actual.setFechaSalida(fechaSalida);
+     actual.setEstado(normalizarEstado(estado, actual.getEstado()));
+
+     return reservaRepository.save(actual);
+ }
+
+ public Reserva cancelar(Long idReserva) {
+     Reserva actual = reservaRepository.findById(idReserva)
+             .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada: " + idReserva));
+
+     String estadoActual = normalizarEstado(actual.getEstado(), ESTADO_CONFIRMADA);
+     if (ESTADO_CHECKOUT.equals(estadoActual)) {
+         throw new IllegalArgumentException("No se puede cancelar una reserva en CHECKOUT");
+     }
+
+     actual.setEstado(ESTADO_CANCELADA);
+     return reservaRepository.save(actual);
+ }
+
+ @Transactional(readOnly = true)
+ public boolean estaDisponible(Long idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida, Long idReservaExcluir) {
+     validarFechas(fechaEntrada, fechaSalida);
+     return !reservaRepository.existeTraslapeActivo(idHabitacion, fechaEntrada, fechaSalida, idReservaExcluir);
+ }
+
+ private void validarDisponibilidad(Long idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida, Long idReservaExcluir) {
+     boolean disponible = estaDisponible(idHabitacion, fechaEntrada, fechaSalida, idReservaExcluir);
+     if (!disponible) {
+         throw new IllegalArgumentException("La habitación no está disponible en el rango de fechas solicitado");
+     }
+ }
+
+ private void validarFechas(LocalDate fechaEntrada, LocalDate fechaSalida) {
+     if (fechaEntrada == null || fechaSalida == null) {
+         throw new IllegalArgumentException("Fecha de entrada y salida son obligatorias");
+     }
+     if (!fechaEntrada.isBefore(fechaSalida)) {
+         throw new IllegalArgumentException("La fecha de entrada debe ser menor que la fecha de salida");
+     }
+ }
+
+ private String normalizarEstado(String estado, String porDefecto) {
+     String valor = (estado == null || estado.isBlank()) ? porDefecto : estado.trim().toUpperCase();
+
+     if (!ESTADO_CONFIRMADA.equals(valor)
+             && !ESTADO_CANCELADA.equals(valor)
+             && !ESTADO_CHECKIN.equals(valor)
+             && !ESTADO_CHECKOUT.equals(valor)) {
+         throw new IllegalArgumentException("Estado inválido. Valores permitidos: CONFIRMADA, CANCELADA, CHECKIN, CHECKOUT");
+     }
+     return valor;
+ }}
