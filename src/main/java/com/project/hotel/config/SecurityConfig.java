@@ -32,12 +32,18 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http,
-                                           DaoAuthenticationProvider authenticationProvider) throws Exception {
+    public SecurityFilterChain filterChain(
+            HttpSecurity http,
+            DaoAuthenticationProvider authenticationProvider
+    ) throws Exception {
+
         http
             .authenticationProvider(authenticationProvider)
+            // Mantiene CSRF para MVC, pero lo ignora para la API REST de reservas.
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/reservas/**"))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/error", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/api/reservas/**").hasAnyRole("ADMINISTRADOR", "RECEPCIONISTA")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
