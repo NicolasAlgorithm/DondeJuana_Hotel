@@ -21,23 +21,25 @@ public class TipoHabitacion {
     @Column(name = "NOMBRE", nullable = false, length = 100)
     private String nombre;
 
+    @NotNull
+    @Column(name = "CAPACIDAD", nullable = false)
+    private Integer capacidad;
+
+    @NotNull
+    @Column(name = "TARIFA_BASE", nullable = false, precision = 12, scale = 2)
+    private BigDecimal tarifaBase;
+
     @Column(name = "DESCRIPCION", length = 255)
     private String descripcion;
 
-    @NotNull
-    @Column(name = "PRECIO_NOCHE", nullable = false, precision = 10, scale = 2)
-    private BigDecimal precioNoche;
+    @NotBlank
+    @Column(name = "ACTIVO", nullable = false, length = 1)
+    private String activo;
 
     @OneToMany(mappedBy = "tipoHabitacion", fetch = FetchType.LAZY)
     private List<Habitacion> habitaciones;
 
     public TipoHabitacion() {
-    }
-
-    public TipoHabitacion(String nombre, String descripcion, BigDecimal precioNoche) {
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.precioNoche = precioNoche;
     }
 
     public Long getIdTipo() {
@@ -56,6 +58,22 @@ public class TipoHabitacion {
         this.nombre = nombre;
     }
 
+    public Integer getCapacidad() {
+        return capacidad;
+    }
+
+    public void setCapacidad(Integer capacidad) {
+        this.capacidad = capacidad;
+    }
+
+    public BigDecimal getTarifaBase() {
+        return tarifaBase;
+    }
+
+    public void setTarifaBase(BigDecimal tarifaBase) {
+        this.tarifaBase = tarifaBase;
+    }
+
     public String getDescripcion() {
         return descripcion;
     }
@@ -64,12 +82,12 @@ public class TipoHabitacion {
         this.descripcion = descripcion;
     }
 
-    public BigDecimal getPrecioNoche() {
-        return precioNoche;
+    public String getActivo() {
+        return activo;
     }
 
-    public void setPrecioNoche(BigDecimal precioNoche) {
-        this.precioNoche = precioNoche;
+    public void setActivo(String activo) {
+        this.activo = activo;
     }
 
     public List<Habitacion> getHabitaciones() {
@@ -78,5 +96,14 @@ public class TipoHabitacion {
 
     public void setHabitaciones(List<Habitacion> habitaciones) {
         this.habitaciones = habitaciones;
+    }
+
+    // Compatibilidad con código existente que usa "precioNoche"
+    public BigDecimal getPrecioNoche() {
+        return tarifaBase;
+    }
+
+    public void setPrecioNoche(BigDecimal precioNoche) {
+        this.tarifaBase = precioNoche;
     }
 }

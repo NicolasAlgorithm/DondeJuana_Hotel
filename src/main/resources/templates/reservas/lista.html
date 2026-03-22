@@ -1,330 +1,108 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reservas · Donde Juana</title>
+    <title>Reservas - Hotel Donde Juana</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Fraunces:opsz,wght@9..144,600&display=swap');
-
-        :root {
-            --bg-a: #f2f7ff;
-            --bg-b: #eefaf3;
-            --panel: #ffffff;
-            --ink: #1f2937;
-            --muted: #66758b;
-            --line: #d8e0ec;
-            --primary: #0a6c4c;
-            --primary-2: #0c8b61;
-            --warn: #b54708;
-            --danger: #b42318;
-            --ok: #0b6e4f;
-            --neutral: #475467;
-            --radius: 16px;
-            --shadow: 0 22px 45px rgba(19, 35, 62, .12);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: "Space Grotesk", sans-serif;
-            color: var(--ink);
-            background:
-                radial-gradient(720px 260px at 12% -10%, #d4e9ff 0%, transparent 58%),
-                radial-gradient(780px 340px at 85% 105%, #d1f0e0 0%, transparent 62%),
-                linear-gradient(180deg, var(--bg-a), var(--bg-b));
-            padding: 22px;
-        }
-
-        .shell {
-            width: min(1180px, 100%);
-            margin: 0 auto;
-            animation: rise .35s ease-out;
-        }
-
-        @keyframes rise {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .head {
-            margin-bottom: 14px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            gap: 14px;
-            align-items: end;
-        }
-
-        .title-wrap p {
-            margin: 0;
-            color: var(--muted);
-            font-size: 0.88rem;
-            letter-spacing: .06em;
-            text-transform: uppercase;
-        }
-
-        h1 {
-            margin: 6px 0 0 0;
-            font-family: "Fraunces", serif;
-            font-size: clamp(1.35rem, 2.3vw, 2rem);
-            font-weight: 600;
-        }
-
-        .toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .btn {
-            border: 0;
-            border-radius: 10px;
-            padding: 9px 13px;
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: inherit;
-            transition: transform .15s ease, filter .15s ease;
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
-            filter: brightness(1.03);
-        }
-
-        .btn-primary {
-            color: #fff;
-            background: linear-gradient(120deg, var(--primary), var(--primary-2));
-        }
-
-        .btn-light {
-            color: #23324a;
-            background: #f5f8ff;
-            border: 1px solid var(--line);
-        }
-
-        .btn-edit {
-            color: #fff;
-            background: #1255cc;
-        }
-
-        .btn-cancel {
-            color: #fff;
-            background: #b54708;
-        }
-
-        .panel {
-            background: var(--panel);
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
-
-        .flash {
-            display: none;
-            padding: 11px 14px;
-            border-bottom: 1px solid var(--line);
-            font-size: 0.92rem;
-        }
-
-        .flash.ok {
-            display: block;
-            color: #0f5132;
-            background: #ecfdf3;
-        }
-
-        .flash.error {
-            display: block;
-            color: #7a271a;
-            background: #fef3f2;
-        }
-
-        .table-wrap {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 940px;
-        }
-
-        th, td {
-            padding: 12px 11px;
-            border-bottom: 1px solid #ebeff6;
-            text-align: left;
-            vertical-align: middle;
-            font-size: .94rem;
-        }
-
-        th {
-            background: #f8fbff;
-            color: #334155;
-            font-weight: 700;
-            letter-spacing: .01em;
-        }
-
-        tr:hover td {
-            background: #fbfdff;
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            border-radius: 999px;
-            padding: 5px 10px;
-            font-size: 0.78rem;
-            font-weight: 700;
-            border: 1px solid transparent;
-        }
-
-        .b-confirmada { background: #ecfdf3; color: #0f5132; border-color: #abefc6; }
-        .b-checkin    { background: #eff8ff; color: #175cd3; border-color: #b2ddff; }
-        .b-checkout   { background: #f9f5ff; color: #6941c6; border-color: #d9d6fe; }
-        .b-cancelada  { background: #fef3f2; color: #912018; border-color: #fecdca; }
-
-        .actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .empty {
-            color: var(--muted);
-            text-align: center;
-            padding: 28px;
-        }
-
-        @media (max-width: 780px) {
-            body { padding: 14px; }
-            .btn { width: 100%; text-align: center; }
-            .toolbar { width: 100%; }
-        }
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
+        h1 { color: #333; }
+        table { border-collapse: collapse; width: 100%; background: white; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #0066cc; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        .btn { display: inline-block; padding: 6px 14px; border-radius: 4px; text-decoration: none; margin: 2px; border: none; cursor: pointer; }
+        .btn-primary { background: #0066cc; color: white; }
+        .btn-warning { background: #f0a500; color: white; }
+        .btn-danger { background: #cc0000; color: white; }
+        .btn-secondary { background: #666; color: white; }
+        .toolbar { margin-bottom: 16px; }
+        .msg { margin-bottom: 12px; padding: 10px; border-radius: 6px; display: none; }
+        .msg.ok { display: block; background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+        .msg.error { display: block; background: #fdecea; color: #b71c1c; border: 1px solid #ef9a9a; }
     </style>
 </head>
 <body>
-<div class="shell">
-    <div class="head">
-        <div class="title-wrap">
-            <p>Donde Juana · Operación</p>
-            <h1>Reservas</h1>
-        </div>
-        <div class="toolbar">
-            <a class="btn btn-primary" th:href="@{/reservas/nuevo}">Nueva reserva</a>
-            <a class="btn btn-light" th:href="@{/}">Inicio</a>
-        </div>
-    </div>
+<h1>Reservas</h1>
 
-    <div class="panel">
-        <div id="flashBox" class="flash"></div>
+<div id="msg" class="msg"></div>
 
-        <div class="table-wrap">
-            <table>
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Huésped</th>
-                    <th>Habitación</th>
-                    <th>Entrada</th>
-                    <th>Salida</th>
-                    <th>Estado</th>
-                    <th>Total</th>
-                    <th>Acciones</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="reserva : ${reservas}">
-                    <td th:text="${reserva.idReserva}"></td>
-                    <td th:text="${reserva.persona != null ? reserva.persona.nombre + ' ' + reserva.persona.apellido : 'Sin huésped'}"></td>
-                    <td th:text="${reserva.habitacion != null ? reserva.habitacion.numero : 'Sin habitación'}"></td>
-                    <td th:text="${reserva.fechaEntrada != null ? reserva.fechaEntrada : '-'}"></td>
-                    <td th:text="${reserva.fechaSalida != null ? reserva.fechaSalida : '-'}"></td>
-                    <td>
-                        <span class="badge"
-                              th:classappend="${#strings.equalsIgnoreCase(reserva.estado, 'CONFIRMADA')} ? ' b-confirmada' :
-                                              (${#strings.equalsIgnoreCase(reserva.estado, 'CHECKIN')} ? ' b-checkin' :
-                                              (${#strings.equalsIgnoreCase(reserva.estado, 'CHECKOUT')} ? ' b-checkout' : ' b-cancelada'))"
-                              th:text="${reserva.estado != null ? reserva.estado : 'SIN_ESTADO'}">
-                        </span>
-                    </td>
-                    <td th:text="${reserva.total != null ? '$' + #numbers.formatDecimal(reserva.total, 1, 2) : '-'}"></td>
-                    <td>
-                        <div class="actions">
-                            <a class="btn btn-edit"
-                               th:href="@{/reservas/editar/{id}(id=${reserva.idReserva})}">
-                                Editar
-                            </a>
-                            <button type="button"
-                                    class="btn btn-cancel"
-                                    th:if="${!#strings.equalsIgnoreCase(reserva.estado, 'CANCELADA')}"
-                                    th:attr="data-id=${reserva.idReserva}"
-                                    onclick="cancelarReserva(this)">
-                                Cancelar
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-
-                <tr th:if="${#lists.isEmpty(reservas)}">
-                    <td colspan="8" class="empty">No hay reservas registradas.</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+<div class="toolbar">
+    <a class="btn btn-primary" th:href="@{/reservas/nuevo}">+ Nueva Reserva</a>
+    <a class="btn btn-secondary" th:href="@{/}">Inicio</a>
 </div>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Huésped</th>
+        <th>Habitación</th>
+        <th>Fecha Inicio</th>
+        <th>Fecha Fin</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="reserva : ${reservas}">
+        <td th:text="${reserva.idReserva}"></td>
+        <td th:text="${reserva.persona.nombre + ' ' + reserva.persona.apellido}"></td>
+        <td th:text="${reserva.habitacion.numero}"></td>
+        <td th:text="${reserva.fechaEntrada}"></td>
+        <td th:text="${reserva.fechaSalida}"></td>
+        <td th:text="${reserva.estado}"></td>
+        <td>
+            <a class="btn btn-warning" th:href="@{/reservas/editar/{id}(id=${reserva.idReserva})}">Editar</a>
+
+            <button class="btn btn-danger"
+                    th:if="${!#strings.equalsIgnoreCase(reserva.estado, 'CANCELADA')}"
+                    th:attr="data-id=${reserva.idReserva}"
+                    onclick="cancelarReserva(this)">
+                Cancelar
+            </button>
+        </td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(reservas)}">
+        <td colspan="7" style="text-align:center; color:#999;">No hay reservas registradas.</td>
+    </tr>
+    </tbody>
+</table>
 
 <script>
     (function () {
-        var flashBox = document.getElementById("flashBox");
-        var params = new URLSearchParams(window.location.search);
+        const msg = document.getElementById("msg");
+        const params = new URLSearchParams(window.location.search);
 
         if (params.get("ok") === "1") {
-            flashBox.className = "flash ok";
-            flashBox.textContent = "Operación completada correctamente.";
+            msg.className = "msg ok";
+            msg.textContent = "Reserva guardada correctamente.";
         }
 
-        window.cancelarReserva = function (button) {
-            var id = button.getAttribute("data-id");
-            if (!id) {
-                return;
-            }
+        window.cancelarReserva = async function (btn) {
+            const id = btn.getAttribute("data-id");
+            if (!id) return;
 
-            if (!confirm("¿Deseas cancelar esta reserva?")) {
-                return;
-            }
+            if (!confirm("¿Cancelar esta reserva?")) return;
 
-            fetch("/api/reservas/" + id + "/cancelar", {
-                method: "PATCH",
-                credentials: "same-origin"
-            })
-            .then(function (res) {
-                return res.text().then(function (txt) {
-                    var data;
-                    try { data = txt ? JSON.parse(txt) : {}; }
-                    catch (e) { data = { raw: txt }; }
+            msg.className = "msg";
+            msg.textContent = "";
 
-                    if (!res.ok) {
-                        var err = data.error || data.message || "No se pudo cancelar la reserva.";
-                        throw new Error(err);
-                    }
-                    return data;
+            try {
+                const res = await fetch("/api/reservas/" + id + "/cancelar", {
+                    method: "PATCH",
+                    credentials: "same-origin"
                 });
-            })
-            .then(function () {
+
+                const body = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    throw new Error(body.error || "No se pudo cancelar la reserva.");
+                }
+
                 window.location.href = "/reservas?ok=1";
-            })
-            .catch(function (err) {
-                flashBox.className = "flash error";
-                flashBox.textContent = err.message;
-            });
+            } catch (e) {
+                msg.className = "msg error";
+                msg.textContent = e.message;
+            }
         };
     })();
 </script>
