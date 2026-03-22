@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,29 +14,24 @@
         .card a { text-decoration: none; color: #0066cc; font-size: 1.1em; font-weight: bold; }
         .card a:hover { text-decoration: underline; }
         .card p { color: #666; font-size: 0.9em; }
-        .db-badge { display: inline-flex; align-items: center; gap: 8px;
-                    padding: 6px 14px; border-radius: 20px; font-size: 0.85em;
-                    font-weight: bold; margin-top: 12px; }
-        .db-ok   { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
-        .db-fail { background: #fdecea; color: #b71c1c; border: 1px solid #ef9a9a; }
-        .db-dot  { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-        .dot-ok   { background: #43a047; }
-        .dot-fail { background: #e53935; }
+        .db-status { margin-top: 24px; padding: 10px 16px; border-radius: 6px;
+                     display: inline-block; font-size: 0.9em; font-weight: 600; }
+        .db-ok  { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+        .db-err { background: #fdecea; color: #b71c1c; border: 1px solid #ef9a9a; }
+        .logout { float: right; font-size: 0.85em; }
+        .logout a { color: #c0392b; text-decoration: none; }
+        .logout a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
+<div class="logout">
+    <span sec:authentication="name"></span>
+    &nbsp;|&nbsp;
+    <a th:href="@{/logout}">Cerrar sesi&oacute;n</a>
+</div>
+
 <h1>&#127968; Hotel Donde Juana</h1>
 <p>Bienvenido al sistema de gesti&oacute;n del hotel.</p>
-
-<!-- DB connection status -->
-<div th:if="${dbOk}" class="db-badge db-ok">
-    <span class="db-dot dot-ok"></span>
-    BD Oracle: OK &mdash; conectado como <span th:text="${dbUser}">HOTEL</span>
-</div>
-<div th:unless="${dbOk}" class="db-badge db-fail">
-    <span class="db-dot dot-fail"></span>
-    BD Oracle: ERROR &mdash; no se pudo conectar
-</div>
 
 <div class="menu">
     <div class="card">
@@ -54,6 +50,12 @@
         <a th:href="@{/reservas}">&#128203; Reservas</a>
         <p>Gestionar reservas</p>
     </div>
+</div>
+
+<div th:class="${dbStatus == 'OK'} ? 'db-status db-ok' : 'db-status db-err'">
+    <span th:if="${dbStatus == 'OK'}">&#9989; DB Status: OK &mdash; </span>
+    <span th:if="${dbStatus != 'OK'}">&#10060; DB Status: ERROR &mdash; </span>
+    <span th:text="${dbDetail}"></span>
 </div>
 </body>
 </html>
