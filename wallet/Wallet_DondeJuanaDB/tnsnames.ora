@@ -1,0 +1,12 @@
+dondejuanadb_high = (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.sa-bogota-1.oraclecloud.com))(connect_data=(service_name=g8486e07d80314a_dondejuanadb_high.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+
+dondejuanadb_medium = (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.sa-bogota-1.oraclecloud.com))(connect_data=(service_name=g8486e07d80314a_dondejuanadb_medium.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+
+dondejuanadb_low = (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.sa-bogota-1.oraclecloud.com))(connect_data=(service_name=g8486e07d80314a_dondejuanadb_low.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+
+dondejuanadb_tp = (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.sa-bogota-1.oraclecloud.com))(connect_data=(service_name=g8486e07d80314a_dondejuanadb_tp.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+
+dondejuanadb_tpurgent = (description= (retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.sa-bogota-1.oraclecloud.com))(connect_data=(service_name=g8486e07d80314a_dondejuanadb_tpurgent.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+
+
+
