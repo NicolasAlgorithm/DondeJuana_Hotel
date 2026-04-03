@@ -29,7 +29,7 @@ if "%JAVA_HOME%"=="" (
   set JAVA_EXE=%JAVA_HOME%\bin\java.exe
 )
 
-%JAVA_EXE% -classpath "%WRAPPER_JAR%" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" org.apache.maven.wrapper.MavenWrapperMain %*
+"%JAVA_EXE%" -classpath "%WRAPPER_JAR%" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" org.apache.maven.wrapper.MavenWrapperMain %*
 set ERROR_CODE=%ERRORLEVEL%
 
 ENDLOCAL & set ERROR_CODE=%ERROR_CODE%

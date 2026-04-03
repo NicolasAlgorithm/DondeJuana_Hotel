@@ -21,4 +21,18 @@ if [ ! -f "$WRAPPER_JAR" ]; then
   fi
 fi
 
-exec java -classpath "$WRAPPER_JAR" "-Dmaven.multiModuleProjectDirectory=$BASEDIR" org.apache.maven.wrapper.MavenWrapperMain "$@"
+if [ -n "$JAVA_HOME" ]; then
+  JAVA_EXE="$JAVA_HOME/bin/java"
+  if [ ! -x "$JAVA_EXE" ]; then
+    echo "Java executable not found or not executable at JAVA_HOME: $JAVA_EXE" >&2
+    exit 1
+  fi
+else
+  JAVA_EXE="java"
+  if ! command -v java >/dev/null 2>&1; then
+    echo "Java executable not found in PATH" >&2
+    exit 1
+  fi
+fi
+
+exec "$JAVA_EXE" -classpath "$WRAPPER_JAR" "-Dmaven.multiModuleProjectDirectory=$BASEDIR" org.apache.maven.wrapper.MavenWrapperMain "$@"

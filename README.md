@@ -15,11 +15,11 @@ Sistema de gestión hotelera con Spring Boot 3, Thymeleaf, Spring Security y Ora
 Descarga el wallet desde la consola de OCI (Oracle Cloud Infrastructure):
 - Autonomous Database → tu instancia → DB Connection → Download wallet
 
-Descomprime el wallet en una carpeta local, por ejemplo:
-- Windows: `C:\oracle\wallet\Wallet_DondeJuanaDB`
-- Linux/Mac: `~/oracle/wallet/Wallet_DondeJuanaDB`
+Descomprime el wallet dentro del proyecto en esta ruta:
+- `wallet/Wallet_DondeJuanaDB`
 
 El wallet contiene archivos como: `cwallet.sso`, `ewallet.p12`, `tnsnames.ora`, `sqlnet.ora`, `ojdbc.properties`, etc.
+La aplicación detecta esta carpeta automáticamente al iniciar.
 
 ### 2. Variables de entorno (recomendado)
 
@@ -27,11 +27,10 @@ Define las siguientes variables de entorno antes de ejecutar la app:
 
 | Variable      | Descripción                        | Ejemplo (Windows)                              |
 |---------------|------------------------------------|------------------------------------------------|
-| `TNS_ADMIN`   | Ruta al directorio del wallet      | `C:\oracle\wallet\Wallet_DondeJuanaDB`         |
 | `DB_USERNAME` | Usuario de conexión en Oracle      | `HOTEL`                                        |
 | `DB_PASSWORD` | Contraseña del usuario de conexión | `tuPassword`                                   |
 
-Si no defines las variables, se usan los valores por defecto en `application.properties`.
+`TNS_ADMIN` quedó como opcional: si existe, la app lo usa; si no, usa `wallet/Wallet_DondeJuanaDB`.
 
 ### 3. Grants y sinónimos en Oracle (REQUERIDO)
 
@@ -58,7 +57,6 @@ GRANT SELECT ON ADMIN.ROLES    TO HOTEL;
 ### Linux / Mac
 
 ```bash
-export TNS_ADMIN=~/oracle/wallet/Wallet_DondeJuanaDB
 export DB_USERNAME=HOTEL
 export DB_PASSWORD=tuPassword
 ./mvnw spring-boot:run
@@ -67,9 +65,16 @@ export DB_PASSWORD=tuPassword
 ### Windows (cmd)
 
 ```cmd
-set TNS_ADMIN=C:\oracle\wallet\Wallet_DondeJuanaDB
 set DB_USERNAME=HOTEL
 set DB_PASSWORD=tuPassword
+.\mvnw.cmd spring-boot:run
+```
+
+### Windows (PowerShell)
+
+```powershell
+$env:DB_USERNAME="HOTEL"
+$env:DB_PASSWORD="tuPassword"
 .\mvnw.cmd spring-boot:run
 ```
 
