@@ -108,6 +108,12 @@ public class HabitacionServiceImpl implements HabitacionService {
         return habitacionRepository.save(actual);
     }
 
+    @Override
+    public void eliminar(Long id) {
+        Habitacion actual = obtenerPorId(id);
+        habitacionRepository.delete(actual);
+    }
+
     private void validarEstado(String estado) {
         if (estado == null || !ESTADOS_VALIDOS.contains(estado.toUpperCase())) {
             throw new IllegalArgumentException(
