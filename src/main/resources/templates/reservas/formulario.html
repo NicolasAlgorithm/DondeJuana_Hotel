@@ -231,10 +231,11 @@
             <div class="grid">
                 <div class="field span-2">
                     <label for="persona">Huésped <span class="req">*</span></label>
-                    <select id="persona" th:field="*{persona}" required>
+                    <select id="persona" name="persona" required>
                         <option value="">Seleccione un huésped</option>
                         <option th:each="p : ${personas}"
                                 th:value="${p.idPersona}"
+                                th:selected="${reserva.persona != null and reserva.persona.idPersona == p.idPersona}"
                                 th:text="${p.nombre + ' ' + p.apellido}">
                         </option>
                     </select>
@@ -243,10 +244,11 @@
 
                 <div class="field span-2">
                     <label for="habitacion">Habitación <span class="req">*</span></label>
-                    <select id="habitacion" th:field="*{habitacion}" required>
+                    <select id="habitacion" name="habitacion" required>
                         <option value="">Seleccione una habitación</option>
                         <option th:each="h : ${habitaciones}"
                                 th:value="${h.idHabitacion}"
+                                th:selected="${reserva.habitacion != null and reserva.habitacion.idHabitacion == h.idHabitacion}"
                                 th:text="${'Hab. ' + h.numero + ' · ' + h.tipoHabitacion.nombre}">
                         </option>
                     </select>
@@ -265,11 +267,11 @@
 
                 <div class="field">
                     <label for="estado">Estado</label>
-                    <select id="estado" th:field="*{estado}">
-                        <option value="">ACTIVA (por defecto)</option>
-                        <option value="ACTIVA">ACTIVA</option>
-                        <option value="CANCELADA">CANCELADA</option>
-                        <option value="CUMPLIDA">CUMPLIDA</option>
+                    <select id="estado" name="estado">
+                        <option value="" th:selected="${reserva.estado == null or reserva.estado == ''}">ACTIVA (por defecto)</option>
+                        <option value="ACTIVA" th:selected="${reserva.estado == 'ACTIVA'}">ACTIVA</option>
+                        <option value="CANCELADA" th:selected="${reserva.estado == 'CANCELADA'}">CANCELADA</option>
+                        <option value="CUMPLIDA" th:selected="${reserva.estado == 'CUMPLIDA'}">CUMPLIDA</option>
                     </select>
                     <div class="help">El backend valida estados permitidos.</div>
                 </div>
@@ -345,6 +347,11 @@
             var url = isEdit ? ("/api/reservas/" + idReserva) : "/api/reservas";
             var method = isEdit ? "PUT" : "POST";
 
+            var submitBtn = form.querySelector('[type="submit"]');
+            var originalLabel = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Guardando\u2026";
+
             fetch(url, {
                 method: method,
                 headers: { "Content-Type": "application/json" },
@@ -372,6 +379,8 @@
             })
             .catch(function (err) {
                 showMsg(err.message, "error");
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalLabel;
             });
         });
     })();
