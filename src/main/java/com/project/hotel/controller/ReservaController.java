@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/reservas")
@@ -53,7 +54,11 @@ public class ReservaController {
 
     @GetMapping("/editar/{id}")
     public String editar(@PathVariable Long id, Model model) {
-        reservaService.buscarPorId(id).ifPresent(r -> model.addAttribute("reserva", r));
+        Optional<Reserva> reservaOpt = reservaService.buscarPorId(id);
+        if (reservaOpt.isEmpty()) {
+            return "redirect:/reservas";
+        }
+        model.addAttribute("reserva", reservaOpt.get());
         model.addAttribute("personas", personaService.listarTodos());
         model.addAttribute("habitaciones", habitacionService.listarTodos());
         model.addAttribute("estados", new String[]{"ACTIVA", "CANCELADA", "CUMPLIDA"});
