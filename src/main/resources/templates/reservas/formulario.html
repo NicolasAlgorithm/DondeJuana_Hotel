@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -199,6 +200,12 @@
             border: 1px solid var(--line);
         }
 
+        .actions .btn-ghost-danger {
+            background: #fff0f0;
+            color: #b42318;
+            border: 1px solid #fecdca;
+        }
+
         .foot-note {
             margin-top: 14px;
             color: var(--muted);
@@ -286,6 +293,10 @@
             <div class="actions">
                 <button type="submit" class="btn btn-primary">Guardar en API</button>
                 <a class="btn btn-ghost" th:href="@{/reservas}">Volver a lista</a>
+                <form th:action="@{/logout}" method="post" style="display:inline;margin:0;padding:0;">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" class="btn btn-ghost-danger">Cerrar sesi&oacute;n</button>
+                </form>
             </div>
 
             <p class="foot-note">
