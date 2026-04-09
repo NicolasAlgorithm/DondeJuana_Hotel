@@ -256,7 +256,8 @@
                         <option th:each="h : ${habitaciones}"
                                 th:value="${h.idHabitacion}"
                                 th:selected="${reserva.habitacion != null and reserva.habitacion.idHabitacion == h.idHabitacion}"
-                                th:text="${'Hab. ' + h.numero + ' · ' + h.tipoHabitacion.nombre}">
+                                th:attr="data-tarifa=${h.tarifaNoche}"
+                                th:text="${'Hab. ' + h.numero + ' · ' + h.tipoHabitacion.nombre + ' ($' + h.tarifaNoche + '/noche)'}">
                         </option>
                     </select>
                     <span class="error" th:if="${#fields.hasErrors('habitacion')}" th:errors="*{habitacion}"></span>
@@ -284,9 +285,9 @@
                 </div>
 
                 <div class="field">
-                    <label for="total">Total (solo visual por ahora)</label>
-                    <input id="total" type="number" step="0.01" min="0" th:field="*{total}" />
-                    <div class="help">No se envía en esta API de ciclo de vida.</div>
+                    <label for="total">Total (calculado automáticamente)</label>
+                    <input id="total" type="number" step="0.01" min="0" th:field="*{total}" readonly />
+                    <div class="help">Calculado: tarifa por noche × número de noches.</div>
                 </div>
             </div>
 
@@ -305,6 +306,37 @@
         </form>
     </div>
 </div>
+
+<script>
+    (function () {
+        var MS_POR_DIA = 1000 * 60 * 60 * 24;
+
+        function calcularTotal() {
+            var habitacionSelect = document.getElementById("habitacion");
+            var selectedOption = habitacionSelect.options[habitacionSelect.selectedIndex];
+            var tarifa = selectedOption ? parseFloat(selectedOption.getAttribute("data-tarifa") || "0") : 0;
+            var fechaEntrada = document.getElementById("fechaEntrada").value;
+            var fechaSalida = document.getElementById("fechaSalida").value;
+            var totalInput = document.getElementById("total");
+
+            if (tarifa > 0 && fechaEntrada && fechaSalida) {
+                var entrada = new Date(fechaEntrada);
+                var salida = new Date(fechaSalida);
+                var noches = Math.round((salida - entrada) / MS_POR_DIA);
+                if (noches >= 1) {
+                    totalInput.value = (tarifa * noches).toFixed(2);
+                    return;
+                }
+            }
+            totalInput.value = "";
+        }
+
+        document.getElementById("habitacion").addEventListener("change", calcularTotal);
+        document.getElementById("fechaEntrada").addEventListener("change", calcularTotal);
+        document.getElementById("fechaSalida").addEventListener("change", calcularTotal);
+        calcularTotal();
+    })();
+</script>
 
 <script>
     (function () {
