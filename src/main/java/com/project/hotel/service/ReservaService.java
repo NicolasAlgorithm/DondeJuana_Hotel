@@ -123,7 +123,7 @@ public class ReservaService {
         Reserva actual = reservaRepository.findById(idReserva)
                 .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada: " + idReserva));
 
-        String estadoActual = normalizarEstado(actual.getEstado(), ESTADO_ACTIVA);
+        String estadoActual = normalizarEstadoActual(actual.getEstado());
         if (ESTADO_CANCELADA.equals(estadoActual)) {
             throw new IllegalArgumentException("No se puede hacer check-in de una reserva CANCELADA");
         }
@@ -139,12 +139,15 @@ public class ReservaService {
         Reserva actual = reservaRepository.findById(idReserva)
                 .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada: " + idReserva));
 
-        String estadoActual = normalizarEstado(actual.getEstado(), ESTADO_ACTIVA);
+        String estadoActual = normalizarEstadoActual(actual.getEstado());
         if (ESTADO_CANCELADA.equals(estadoActual)) {
             throw new IllegalArgumentException("No se puede hacer check-out de una reserva CANCELADA");
         }
         if (ESTADO_CUMPLIDA.equals(estadoActual)) {
             throw new IllegalArgumentException("La reserva ya está en check-out (CUMPLIDA)");
+        }
+        if (!ESTADO_ACTIVA.equals(estadoActual)) {
+            throw new IllegalArgumentException("Solo se puede hacer check-out de una reserva ACTIVA");
         }
 
         actual.setEstado(ESTADO_CUMPLIDA);
@@ -194,5 +197,12 @@ public class ReservaService {
         }
 
         throw new IllegalArgumentException("Estado inválido. Valores permitidos en BD: ACTIVA, CANCELADA, CUMPLIDA");
+    }
+
+    private String normalizarEstadoActual(String estado) {
+        if (estado == null || estado.isBlank()) {
+            return "";
+        }
+        return normalizarEstado(estado, estado);
     }
 }

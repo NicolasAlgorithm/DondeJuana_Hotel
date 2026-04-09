@@ -159,6 +159,18 @@ class ReservaServiceTest {
     }
 
     @Test
+    void checkIn_cambiaEstadoAActiva_cuandoReservaTieneEstadoVacio() {
+        Reserva r = new Reserva();
+        r.setEstado("");
+        when(reservaRepository.findById(1L)).thenReturn(Optional.of(r));
+        when(reservaRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Reserva result = reservaService.registrarCheckIn(1L);
+
+        assertEquals("ACTIVA", result.getEstado());
+    }
+
+    @Test
     void checkOut_cambiaEstadoACumplida_cuandoReservaEstaActiva() {
         Reserva r = new Reserva();
         r.setEstado("ACTIVA");
@@ -174,6 +186,15 @@ class ReservaServiceTest {
     void checkOut_lanzaExcepcion_cuandoReservaYaEstaCumplida() {
         Reserva r = new Reserva();
         r.setEstado("CUMPLIDA");
+        when(reservaRepository.findById(1L)).thenReturn(Optional.of(r));
+
+        assertThrows(IllegalArgumentException.class, () -> reservaService.registrarCheckOut(1L));
+    }
+
+    @Test
+    void checkOut_lanzaExcepcion_cuandoReservaNoEstaActiva() {
+        Reserva r = new Reserva();
+        r.setEstado(null);
         when(reservaRepository.findById(1L)).thenReturn(Optional.of(r));
 
         assertThrows(IllegalArgumentException.class, () -> reservaService.registrarCheckOut(1L));
