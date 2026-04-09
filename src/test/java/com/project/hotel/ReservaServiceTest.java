@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -73,9 +74,12 @@ class ReservaServiceTest {
         LocalDate entrada = LocalDate.of(2025, 6, 1);
         LocalDate salida  = LocalDate.of(2025, 6, 5);
 
+        Habitacion habitacion = new Habitacion();
+        habitacion.setTarifaNoche(new BigDecimal("80.00"));
+
         when(reservaRepository.existeTraslapeActivo(anyLong(), any(), any(), any())).thenReturn(false);
         when(personaRepository.findById(1L)).thenReturn(Optional.of(new Persona()));
-        when(habitacionRepository.findById(1L)).thenReturn(Optional.of(new Habitacion()));
+        when(habitacionRepository.findById(1L)).thenReturn(Optional.of(habitacion));
         when(reservaRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Reserva result = reservaService.crear(1L, 1L, entrada, salida, "CONFIRMADA");
@@ -143,5 +147,54 @@ class ReservaServiceTest {
         reservaService.borrar(1L);
 
         verify(reservaRepository, times(1)).delete(r);
+    }
+
+    // ── total calculado ────────────────────────────────────────────────────
+
+    @Test
+    void crear_calculaTotalCorrectamente() {
+        LocalDate entrada = LocalDate.of(2025, 6, 1);
+        LocalDate salida  = LocalDate.of(2025, 6, 4); // 3 noches
+
+        Habitacion habitacion = new Habitacion();
+        habitacion.setTarifaNoche(new BigDecimal("100.00"));
+
+        when(reservaRepository.existeTraslapeActivo(anyLong(), any(), any(), any())).thenReturn(false);
+        when(personaRepository.findById(1L)).thenReturn(Optional.of(new Persona()));
+        when(habitacionRepository.findById(1L)).thenReturn(Optional.of(habitacion));
+        when(reservaRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Reserva result = reservaService.crear(1L, 1L, entrada, salida, "ACTIVA");
+
+        assertEquals(new BigDecimal("300.00"), result.getTotal());
+    }
+
+    @Test
+    void crear_calculaTotalUnaNoches() {
+        LocalDate entrada = LocalDate.of(2025, 6, 1);
+        LocalDate salida  = LocalDate.of(2025, 6, 2); // 1 noche
+
+        Habitacion habitacion = new Habitacion();
+        habitacion.setTarifaNoche(new BigDecimal("150.50"));
+
+        when(reservaRepository.existeTraslapeActivo(anyLong(), any(), any(), any())).thenReturn(false);
+        when(personaRepository.findById(1L)).thenReturn(Optional.of(new Persona()));
+        when(habitacionRepository.findById(1L)).thenReturn(Optional.of(habitacion));
+        when(reservaRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Reserva result = reservaService.crear(1L, 1L, entrada, salida, "ACTIVA");
+
+        assertEquals(new BigDecimal("150.50"), result.getTotal());
+    }
+
+    @Test
+    void crear_lanzaExcepcion_cuandoFechasIgualesMensajeMinimo1Noche() {
+        LocalDate fecha = LocalDate.of(2025, 6, 10);
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> reservaService.crear(1L, 1L, fecha, fecha, "ACTIVA"));
+
+        assertTrue(ex.getMessage().contains("1 noche") || ex.getMessage().contains("al menos"),
+                "El mensaje debe indicar el mínimo de 1 noche");
     }
 }
