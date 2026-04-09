@@ -119,6 +119,38 @@ public class ReservaService {
         return reservaRepository.save(actual);
     }
 
+    public Reserva registrarCheckIn(Long idReserva) {
+        Reserva actual = reservaRepository.findById(idReserva)
+                .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada: " + idReserva));
+
+        String estadoActual = normalizarEstado(actual.getEstado(), ESTADO_ACTIVA);
+        if (ESTADO_CANCELADA.equals(estadoActual)) {
+            throw new IllegalArgumentException("No se puede hacer check-in de una reserva CANCELADA");
+        }
+        if (ESTADO_CUMPLIDA.equals(estadoActual)) {
+            throw new IllegalArgumentException("No se puede hacer check-in de una reserva CUMPLIDA");
+        }
+
+        actual.setEstado(ESTADO_ACTIVA);
+        return reservaRepository.save(actual);
+    }
+
+    public Reserva registrarCheckOut(Long idReserva) {
+        Reserva actual = reservaRepository.findById(idReserva)
+                .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada: " + idReserva));
+
+        String estadoActual = normalizarEstado(actual.getEstado(), ESTADO_ACTIVA);
+        if (ESTADO_CANCELADA.equals(estadoActual)) {
+            throw new IllegalArgumentException("No se puede hacer check-out de una reserva CANCELADA");
+        }
+        if (ESTADO_CUMPLIDA.equals(estadoActual)) {
+            throw new IllegalArgumentException("La reserva ya está en check-out (CUMPLIDA)");
+        }
+
+        actual.setEstado(ESTADO_CUMPLIDA);
+        return reservaRepository.save(actual);
+    }
+
     public void borrar(Long idReserva) {
         Reserva actual = reservaRepository.findById(idReserva)
                 .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada: " + idReserva));

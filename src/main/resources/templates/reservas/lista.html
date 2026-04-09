@@ -119,6 +119,16 @@
             background: #b54708;
         }
 
+        .btn-checkin {
+            color: #fff;
+            background: #1570ef;
+        }
+
+        .btn-checkout {
+            color: #fff;
+            background: #6941c6;
+        }
+
         .btn-logout {
             color: #fff;
             background: #b42318;
@@ -275,8 +285,22 @@
                                 Editar
                             </a>
                             <button type="button"
+                                    class="btn btn-checkin"
+                                    th:if="${!#strings.equalsIgnoreCase(reserva.estado, 'ACTIVA') and !#strings.equalsIgnoreCase(reserva.estado, 'CUMPLIDA') and !#strings.equalsIgnoreCase(reserva.estado, 'CANCELADA')}"
+                                    th:attr="data-id=${reserva.idReserva}"
+                                    onclick="checkInReserva(this)">
+                                Check-in
+                            </button>
+                            <button type="button"
+                                    class="btn btn-checkout"
+                                    th:if="${#strings.equalsIgnoreCase(reserva.estado, 'ACTIVA')}"
+                                    th:attr="data-id=${reserva.idReserva}"
+                                    onclick="checkOutReserva(this)">
+                                Check-out
+                            </button>
+                            <button type="button"
                                     class="btn btn-cancel"
-                                    th:if="${!#strings.equalsIgnoreCase(reserva.estado, 'CANCELADA')}"
+                                    th:if="${!#strings.equalsIgnoreCase(reserva.estado, 'CANCELADA') and !#strings.equalsIgnoreCase(reserva.estado, 'CUMPLIDA')}"
                                     th:attr="data-id=${reserva.idReserva}"
                                     onclick="cancelarReserva(this)">
                                 Cancelar
@@ -304,17 +328,8 @@
             flashBox.textContent = "Operación completada correctamente.";
         }
 
-        window.cancelarReserva = function (button) {
-            var id = button.getAttribute("data-id");
-            if (!id) {
-                return;
-            }
-
-            if (!confirm("¿Deseas cancelar esta reserva?")) {
-                return;
-            }
-
-            fetch("/api/reservas/" + id + "/cancelar", {
+        function ejecutarCambioEstado(id, endpoint, mensajeError) {
+            return fetch("/api/reservas/" + id + "/" + endpoint, {
                 method: "PATCH",
                 credentials: "same-origin"
             })
@@ -325,12 +340,25 @@
                     catch (e) { data = { raw: txt }; }
 
                     if (!res.ok) {
-                        var err = data.error || data.message || "No se pudo cancelar la reserva.";
+                        var err = data.error || data.message || mensajeError;
                         throw new Error(err);
                     }
                     return data;
                 });
-            })
+            });
+        }
+
+        window.cancelarReserva = function (button) {
+            var id = button.getAttribute("data-id");
+            if (!id) {
+                return;
+            }
+
+            if (!confirm("¿Deseas cancelar esta reserva?")) {
+                return;
+            }
+
+            ejecutarCambioEstado(id, "cancelar", "No se pudo cancelar la reserva.")
             .then(function () {
                 window.location.href = "/reservas?ok=1";
             })
@@ -338,6 +366,46 @@
                 flashBox.className = "flash error";
                 flashBox.textContent = err.message;
             });
+        };
+
+        window.checkInReserva = function (button) {
+            var id = button.getAttribute("data-id");
+            if (!id) {
+                return;
+            }
+
+            if (!confirm("¿Confirmas apertura de estadía (check-in)?")) {
+                return;
+            }
+
+            ejecutarCambioEstado(id, "checkin", "No se pudo registrar el check-in.")
+                .then(function () {
+                    window.location.href = "/reservas?ok=1";
+                })
+                .catch(function (err) {
+                    flashBox.className = "flash error";
+                    flashBox.textContent = err.message;
+                });
+        };
+
+        window.checkOutReserva = function (button) {
+            var id = button.getAttribute("data-id");
+            if (!id) {
+                return;
+            }
+
+            if (!confirm("¿Confirmas cierre de estadía (check-out)?")) {
+                return;
+            }
+
+            ejecutarCambioEstado(id, "checkout", "No se pudo registrar el check-out.")
+                .then(function () {
+                    window.location.href = "/reservas?ok=1";
+                })
+                .catch(function (err) {
+                    flashBox.className = "flash error";
+                    flashBox.textContent = err.message;
+                });
         };
     })();
 </script>

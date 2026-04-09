@@ -126,6 +126,38 @@ class ReservaServiceTest {
         assertThrows(IllegalArgumentException.class, () -> reservaService.cancelar(99L));
     }
 
+    // ── check-in / check-out ────────────────────────────────────────────────
+
+    @Test
+    void checkIn_lanzaExcepcion_cuandoReservaEsCancelada() {
+        Reserva r = new Reserva();
+        r.setEstado("CANCELADA");
+        when(reservaRepository.findById(1L)).thenReturn(Optional.of(r));
+
+        assertThrows(IllegalArgumentException.class, () -> reservaService.registrarCheckIn(1L));
+    }
+
+    @Test
+    void checkOut_cambiaEstadoACumplida_cuandoReservaEstaActiva() {
+        Reserva r = new Reserva();
+        r.setEstado("ACTIVA");
+        when(reservaRepository.findById(1L)).thenReturn(Optional.of(r));
+        when(reservaRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Reserva result = reservaService.registrarCheckOut(1L);
+
+        assertEquals("CUMPLIDA", result.getEstado());
+    }
+
+    @Test
+    void checkOut_lanzaExcepcion_cuandoReservaYaEstaCumplida() {
+        Reserva r = new Reserva();
+        r.setEstado("CUMPLIDA");
+        when(reservaRepository.findById(1L)).thenReturn(Optional.of(r));
+
+        assertThrows(IllegalArgumentException.class, () -> reservaService.registrarCheckOut(1L));
+    }
+
     // ── borrar ─────────────────────────────────────────────────────────────
 
     @Test
