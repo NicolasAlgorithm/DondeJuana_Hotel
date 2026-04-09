@@ -286,7 +286,7 @@
                             </a>
                             <button type="button"
                                     class="btn btn-checkin"
-                                    th:if="${!#strings.equalsIgnoreCase(reserva.estado, 'ACTIVA') and !#strings.equalsIgnoreCase(reserva.estado, 'CUMPLIDA') and !#strings.equalsIgnoreCase(reserva.estado, 'CANCELADA')}"
+                                    th:if="${reserva.estado == null or reserva.estado == ''}"
                                     th:attr="data-id=${reserva.idReserva}"
                                     onclick="checkInReserva(this)">
                                 Check-in

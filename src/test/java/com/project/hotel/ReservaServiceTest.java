@@ -149,7 +149,7 @@ class ReservaServiceTest {
     @Test
     void checkIn_cambiaEstadoAActiva_cuandoReservaEsValida() {
         Reserva r = new Reserva();
-        r.setEstado("ACTIVA");
+        r.setEstado(null);
         when(reservaRepository.findById(1L)).thenReturn(Optional.of(r));
         when(reservaRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
