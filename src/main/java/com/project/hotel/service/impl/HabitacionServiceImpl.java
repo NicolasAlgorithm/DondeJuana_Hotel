@@ -16,7 +16,7 @@ import com.project.hotel.service.HabitacionService;
 public class HabitacionServiceImpl implements HabitacionService {
 
     private static final Set<String> ESTADOS_VALIDOS =
-            Set.of("DISPONIBLE", "OCUPADA", "MANTENIMIENTO");
+            Set.of("DISPONIBLE", "RESERVADA", "OCUPADA", "MANTENIMIENTO");
 
     private final HabitacionRepository habitacionRepository;
 
@@ -117,7 +117,7 @@ public class HabitacionServiceImpl implements HabitacionService {
     private void validarEstado(String estado) {
         if (estado == null || !ESTADOS_VALIDOS.contains(estado.toUpperCase())) {
             throw new IllegalArgumentException(
-                    "Estado invalido. Valores permitidos: DISPONIBLE, OCUPADA, MANTENIMIENTO"
+                    "Estado invalido. Valores permitidos: DISPONIBLE, RESERVADA, OCUPADA, MANTENIMIENTO"
             );
         }
     }

@@ -11,6 +11,8 @@
         label { display: block; margin-top: 12px; font-weight: bold; color: #444; }
         input, select, textarea { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
         .error { color: red; font-size: 0.85em; }
+        .alert-error { background: #fdecea; color: #b71c1c; border: 1px solid #ef9a9a;
+                       padding: 10px 14px; border-radius: 4px; margin-bottom: 12px; }
         .btn { display: inline-block; padding: 8px 18px; border-radius: 4px; text-decoration: none; margin-top: 16px; margin-right: 8px; cursor: pointer; border: none; font-size: 1em; }
         .btn-primary { background: #0066cc; color: white; }
         .btn-secondary { background: #666; color: white; }
@@ -30,6 +32,7 @@
     </form>
 </div>
 <h1 th:text="${habitacion.idHabitacion != null} ? 'Editar Habitacion' : 'Nueva Habitacion'">Habitacion</h1>
+<div th:if="${error != null}" class="alert-error" th:text="${error}"></div>
 <form class="main-form" th:action="@{/habitaciones/guardar}" th:object="${habitacion}" method="post">
     <input type="hidden" th:field="*{idHabitacion}" />
 
@@ -38,14 +41,13 @@
     <span class="error" th:if="${#fields.hasErrors('numero')}" th:errors="*{numero}"></span>
 
     <label>Tipo de Habitacion *</label>
-    <select th:field="*{tipoHabitacion}">
+    <select th:field="*{idTipoHabitacion}">
         <option value="">-- Seleccione un tipo --</option>
         <option th:each="tipo : ${tipos}"
                 th:value="${tipo.idTipo}"
                 th:text="${tipo.nombre + ' - $' + #numbers.formatDecimal(tipo.precioNoche, 1, 2)}">
         </option>
     </select>
-    <span class="error" th:if="${#fields.hasErrors('tipoHabitacion')}" th:errors="*{tipoHabitacion}"></span>
 
     <label>Estado</label>
     <select th:field="*{estado}">
@@ -63,3 +65,4 @@
 </form>
 </body>
 </html>
+
