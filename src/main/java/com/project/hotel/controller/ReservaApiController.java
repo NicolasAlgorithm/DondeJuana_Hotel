@@ -111,6 +111,34 @@ public class ReservaApiController {
         }
     }
 
+    @PatchMapping("/{id}/checkin")
+    public ResponseEntity<?> checkIn(@PathVariable Long id) {
+        try {
+            Reserva actualizada = reservaService.registrarCheckIn(id);
+            return ResponseEntity.ok(actualizada);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error interno al registrar check-in: " + rootMessage(e)));
+        }
+    }
+
+    @PatchMapping("/{id}/checkout")
+    public ResponseEntity<?> checkOut(@PathVariable Long id) {
+        try {
+            Reserva actualizada = reservaService.registrarCheckOut(id);
+            return ResponseEntity.ok(actualizada);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error interno al registrar check-out: " + rootMessage(e)));
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> borrar(@PathVariable Long id) {
         try {
