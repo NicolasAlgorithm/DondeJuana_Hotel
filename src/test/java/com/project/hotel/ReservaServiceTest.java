@@ -170,7 +170,7 @@ class ReservaServiceTest {
     }
 
     @Test
-    void crear_calculaTotalUnaNoches() {
+    void crear_calculaTotalUnaNoche() {
         LocalDate entrada = LocalDate.of(2025, 6, 1);
         LocalDate salida  = LocalDate.of(2025, 6, 2); // 1 noche
 
