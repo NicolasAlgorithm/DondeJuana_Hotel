@@ -110,7 +110,8 @@ public class HabitacionServiceImpl implements HabitacionService {
 
     @Override
     public void eliminar(Long id) {
-        habitacionRepository.deleteById(id);
+        Habitacion actual = obtenerPorId(id);
+        habitacionRepository.delete(actual);
     }
 
     private void validarEstado(String estado) {
