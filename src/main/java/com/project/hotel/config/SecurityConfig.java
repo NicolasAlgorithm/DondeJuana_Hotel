@@ -39,11 +39,12 @@ public class SecurityConfig {
 
         http
             .authenticationProvider(authenticationProvider)
-            // Mantiene CSRF para MVC, pero lo ignora para la API REST de reservas.
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/reservas/**"))
+            // Mantiene CSRF para MVC, pero lo ignora para las APIs REST.
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/reservas/**", "/api/calendario/**"))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/error", "/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/api/reservas/**").hasAnyRole("ADMINISTRADOR", "RECEPCIONISTA")
+                .requestMatchers("/api/calendario/**").hasAnyRole("ADMINISTRADOR", "RECEPCIONISTA")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
