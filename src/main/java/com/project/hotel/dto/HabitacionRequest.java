@@ -24,7 +24,7 @@ public class HabitacionRequest {
     private BigDecimal tarifaNoche;
 
     @NotBlank
-    private String estado; // DISPONIBLE | OCUPADA | MANTENIMIENTO
+    private String estado; // DISPONIBLE | RESERVADA | OCUPADA | MANTENIMIENTO
 
     public String getCodigo() { return codigo; }
     public void setCodigo(String codigo) { this.codigo = codigo; }
