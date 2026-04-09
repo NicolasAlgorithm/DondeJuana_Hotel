@@ -24,6 +24,31 @@ public class ReservaApiController {
         this.reservaService = reservaService;
     }
 
+    // GET /api/reservas — lista todas las reservas
+    @GetMapping
+    public ResponseEntity<?> listar() {
+        try {
+            return ResponseEntity.ok(reservaService.listarTodos());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error interno al listar reservas: " + rootMessage(e)));
+        }
+    }
+
+    // GET /api/reservas/{id} — obtiene una reserva por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<?> obtener(@PathVariable Long id) {
+        try {
+            return reservaService.buscarPorId(id)
+                    .<ResponseEntity<?>>map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(Map.of("error", "Reserva no encontrada: " + id)));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error interno al obtener reserva: " + rootMessage(e)));
+        }
+    }
+
     @PostMapping
     public ResponseEntity<?> crear(@Valid @RequestBody ReservaCreateRequest request) {
         try {
