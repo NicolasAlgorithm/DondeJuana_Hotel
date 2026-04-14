@@ -9,6 +9,7 @@ import com.project.hotel.repository.ReservaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,12 +41,16 @@ public class ReservaService {
 
     @Transactional(readOnly = true)
     public List<Reserva> listarTodos() {
-        return reservaRepository.findAll();
+        List<Reserva> reservas = reservaRepository.findAll();
+        reservas.forEach(this::calcularYAsignarTotal);
+        return reservas;
     }
 
     @Transactional(readOnly = true)
     public Optional<Reserva> buscarPorId(Long id) {
-        return reservaRepository.findById(id);
+        Optional<Reserva> opt = reservaRepository.findById(id);
+        opt.ifPresent(this::calcularYAsignarTotal);
+        return opt;
     }
 
     public Reserva guardar(Reserva reserva) {
@@ -83,7 +88,9 @@ public class ReservaService {
         r.setFechaSalida(fechaSalida);
         r.setEstado(normalizarEstado(estado, ESTADO_ACTIVA));
 
-        return reservaRepository.save(r);
+        Reserva saved = reservaRepository.save(r);
+        calcularYAsignarTotal(saved);
+        return saved;
     }
 
     public Reserva modificar(Long idReserva, Long idPersona, Long idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida, String estado) {
@@ -105,7 +112,9 @@ public class ReservaService {
         actual.setFechaSalida(fechaSalida);
         actual.setEstado(normalizarEstado(estado, actual.getEstado()));
 
-        return reservaRepository.save(actual);
+        Reserva saved = reservaRepository.save(actual);
+        calcularYAsignarTotal(saved);
+        return saved;
     }
 
     public Reserva cancelar(Long idReserva) {
@@ -238,5 +247,14 @@ public class ReservaService {
             return "";
         }
         return normalizarEstado(estado, estado);
+    }
+
+    private void calcularYAsignarTotal(Reserva r) {
+        if (r.getFechaEntrada() != null && r.getFechaSalida() != null
+                && r.getFechaSalida().isAfter(r.getFechaEntrada())
+                && r.getHabitacion() != null && r.getHabitacion().getTarifaNoche() != null) {
+            long noches = ChronoUnit.DAYS.between(r.getFechaEntrada(), r.getFechaSalida());
+            r.setTotal(r.getHabitacion().getTarifaNoche().multiply(BigDecimal.valueOf(noches)));
+        }
     }
 }
