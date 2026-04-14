@@ -147,57 +147,69 @@ class ReservaServiceTest {
     }
 
     @Test
-    void checkIn_cambiaEstadoAActiva_cuandoReservaEsValida() {
+    void checkIn_cambiaEstadoAEnEstadia_yRegistraFechaHoraSimulada_cuandoReservaEsValida() {
         Reserva r = new Reserva();
         r.setEstado(null);
+        r.setFechaEntrada(LocalDate.of(2025, 6, 1));
         when(reservaRepository.findById(1L)).thenReturn(Optional.of(r));
         when(reservaRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Reserva result = reservaService.registrarCheckIn(1L);
 
-        assertEquals("ACTIVA", result.getEstado());
+        assertEquals("EN_ESTADIA", result.getEstado());
+        assertEquals(LocalDate.of(2025, 6, 1).atTime(15, 0), result.getFechaHoraCheckIn());
     }
 
     @Test
-    void checkIn_cambiaEstadoAActiva_cuandoReservaTieneEstadoVacio() {
+    void checkIn_cambiaEstadoAEnEstadia_cuandoReservaTieneEstadoVacio() {
         Reserva r = new Reserva();
         r.setEstado("");
+        r.setFechaEntrada(LocalDate.of(2025, 6, 2));
         when(reservaRepository.findById(1L)).thenReturn(Optional.of(r));
         when(reservaRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         Reserva result = reservaService.registrarCheckIn(1L);
 
-        assertEquals("ACTIVA", result.getEstado());
+        assertEquals("EN_ESTADIA", result.getEstado());
+        assertEquals(LocalDate.of(2025, 6, 2).atTime(15, 0), result.getFechaHoraCheckIn());
     }
 
     @Test
-    void checkOut_cambiaEstadoACumplida_cuandoReservaEstaActiva() {
+    void checkOut_cambiaEstadoACumplida_cuandoReservaEstaEnEstadia() {
         Reserva r = new Reserva();
-        r.setEstado("ACTIVA");
+        r.setEstado("EN_ESTADIA");
+        r.setFechaEntrada(LocalDate.of(2025, 6, 1));
+        r.setFechaSalida(LocalDate.of(2025, 6, 5));
         when(reservaRepository.findById(1L)).thenReturn(Optional.of(r));
         when(reservaRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        Reserva result = reservaService.registrarCheckOut(1L);
+        Reserva result = reservaService.registrarCheckOut(1L, LocalDate.of(2025, 6, 4));
 
         assertEquals("CUMPLIDA", result.getEstado());
+        assertEquals(LocalDate.of(2025, 6, 4), result.getFechaSalidaReal());
+        assertEquals(LocalDate.of(2025, 6, 4), result.getFechaSalida());
     }
 
     @Test
     void checkOut_lanzaExcepcion_cuandoReservaYaEstaCumplida() {
         Reserva r = new Reserva();
         r.setEstado("CUMPLIDA");
+        r.setFechaEntrada(LocalDate.of(2025, 6, 1));
+        r.setFechaSalida(LocalDate.of(2025, 6, 5));
         when(reservaRepository.findById(1L)).thenReturn(Optional.of(r));
 
-        assertThrows(IllegalArgumentException.class, () -> reservaService.registrarCheckOut(1L));
+        assertThrows(IllegalArgumentException.class, () -> reservaService.registrarCheckOut(1L, null));
     }
 
     @Test
-    void checkOut_lanzaExcepcion_cuandoReservaNoEstaActiva() {
+    void checkOut_lanzaExcepcion_cuandoReservaNoEstaEnEstadia() {
         Reserva r = new Reserva();
-        r.setEstado(null);
+        r.setEstado("ACTIVA");
+        r.setFechaEntrada(LocalDate.of(2025, 6, 1));
+        r.setFechaSalida(LocalDate.of(2025, 6, 5));
         when(reservaRepository.findById(1L)).thenReturn(Optional.of(r));
 
-        assertThrows(IllegalArgumentException.class, () -> reservaService.registrarCheckOut(1L));
+        assertThrows(IllegalArgumentException.class, () -> reservaService.registrarCheckOut(1L, null));
     }
 
     // ── borrar ─────────────────────────────────────────────────────────────

@@ -558,11 +558,22 @@
         return fetch(url, { credentials: "same-origin" })
             .then(function(res){
                 return res.text().then(function(txt){
-                    var data = {};
-                    try { data = txt ? JSON.parse(txt) : {}; } catch(e){}
-                    if(!res.ok){
-                        throw new Error(data.error || ("Error HTTP " + res.status));
+                    var contentType = (res.headers.get("content-type") || "").toLowerCase();
+                    var data = null;
+
+                    if (txt && contentType.indexOf("application/json") >= 0) {
+                        try { data = JSON.parse(txt); } catch (e) { data = null; }
                     }
+
+                    if (!res.ok) {
+                        var msg = (data && data.error) ? data.error : ("Error HTTP " + res.status);
+                        throw new Error(msg);
+                    }
+
+                    if (!data) {
+                        throw new Error("La sesión expiró o la API no devolvió JSON válido en " + url);
+                    }
+
                     return data;
                 });
             });
@@ -802,8 +813,15 @@
             fetchJson("/api/tipos-habitacion"),
             fetchJson("/api/habitaciones")
         ]).then(function(arr){
-            var tipos = arr[0] || [];
-            var habs = arr[1] || [];
+            var tiposRaw = arr[0];
+            var habsRaw = arr[1];
+
+            var tipos = Array.isArray(tiposRaw) ? tiposRaw : (Array.isArray(tiposRaw.content) ? tiposRaw.content : []);
+            var habs = Array.isArray(habsRaw) ? habsRaw : (Array.isArray(habsRaw.content) ? habsRaw.content : []);
+
+            if (!Array.isArray(tipos) || tipos.length === 0 && typeof tiposRaw === "object" && !Array.isArray(tiposRaw)) {
+                throw new Error("Respuesta inválida en /api/tipos-habitacion");
+            }
 
             tipos.forEach(function(t){
                 var op = document.createElement("option");

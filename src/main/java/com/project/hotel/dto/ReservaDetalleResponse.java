@@ -1,6 +1,7 @@
 package com.project.hotel.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class ReservaDetalleResponse {
 
@@ -12,6 +13,8 @@ public class ReservaDetalleResponse {
     private LocalDate fechaEntrada;
     private LocalDate fechaSalida;
     private String estado;
+    private LocalDate fechaSalidaReal;
+    private LocalDateTime fechaHoraCheckIn;
 
     public Long getIdReserva() {
         return idReserva;
@@ -75,5 +78,21 @@ public class ReservaDetalleResponse {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public LocalDate getFechaSalidaReal() {
+        return fechaSalidaReal;
+    }
+
+    public void setFechaSalidaReal(LocalDate fechaSalidaReal) {
+        this.fechaSalidaReal = fechaSalidaReal;
+    }
+
+    public LocalDateTime getFechaHoraCheckIn() {
+        return fechaHoraCheckIn;
+    }
+
+    public void setFechaHoraCheckIn(LocalDateTime fechaHoraCheckIn) {
+        this.fechaHoraCheckIn = fechaHoraCheckIn;
     }
 }

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "RESERVAS")
@@ -36,6 +37,12 @@ public class Reserva {
 
     @Column(name = "ESTADO", length = 20)
     private String estado;
+
+    @Column(name = "FECHA_HORA_CHECKIN")
+    private LocalDateTime fechaHoraCheckIn;
+
+    @Column(name = "FECHA_SALIDA_REAL")
+    private LocalDate fechaSalidaReal;
 
     // La tabla RESERVAS no tiene columna TOTAL; se deja solo para no romper vistas/formularios.
     @Transient
@@ -107,5 +114,21 @@ public class Reserva {
 
     public void setTotal(BigDecimal total) {
         this.total = total;
+    }
+
+    public LocalDateTime getFechaHoraCheckIn() {
+        return fechaHoraCheckIn;
+    }
+
+    public void setFechaHoraCheckIn(LocalDateTime fechaHoraCheckIn) {
+        this.fechaHoraCheckIn = fechaHoraCheckIn;
+    }
+
+    public LocalDate getFechaSalidaReal() {
+        return fechaSalidaReal;
+    }
+
+    public void setFechaSalidaReal(LocalDate fechaSalidaReal) {
+        this.fechaSalidaReal = fechaSalidaReal;
     }
 }
