@@ -62,6 +62,11 @@
         <a th:href="@{/calendario}">&#128467; Calendario Interactivo</a>
         <p>Ocupaci&oacute;n por fecha, filtros y detalle de reservas</p>
     </div>
+
+    <div class="card" sec:authorize="hasAnyAuthority('ROLE_ADMINISTRADOR','ROLE_RECEPCIONISTA')">
+        <a th:href="@{/panel-administrativo}">&#128202; Panel Administrativo</a>
+        <p>Reporte de ocupaci&oacute;n e ingresos</p>
+    </div>
 </div>
 
 <div th:class="${dbStatus == 'OK'} ? 'db-status db-ok' : 'db-status db-err'">

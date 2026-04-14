@@ -47,6 +47,7 @@ public class SecurityConfig {
 
                 .requestMatchers(HttpMethod.GET, "/").hasAuthority("dashboard.ver")
                 .requestMatchers(HttpMethod.GET, "/calendario").hasAuthority("calendario.ver")
+                .requestMatchers(HttpMethod.GET, "/panel-administrativo").hasAnyAuthority("ROLE_ADMINISTRADOR", "ROLE_RECEPCIONISTA")
 
                 .requestMatchers(HttpMethod.GET, "/personas").hasAuthority("persona.ver")
                 .requestMatchers(HttpMethod.GET, "/personas/nuevo").hasAuthority("persona.crear")
