@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario Interactivo - Hotel Donde Juana</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Literata:opsz,wght@7..72,600&display=swap');
+
+        :root{
+            --bg-a:#f6fbff;
+            --bg-b:#edf8f0;
+            --panel:#ffffff;
+            --ink:#162036;
+            --muted:#667085;
+            --line:#d7e3ef;
+            --brand:#0a7a5b;
+            --brand-2:#13a37a;
+            --danger:#b42318;
+            --ok:#16803c;
+            --warn:#b54708;
+            --soft-shadow:0 14px 34px rgba(16,24,40,.10);
+            --radius:16px;
+        }
+
+        *{box-sizing:border-box}
+
+        body{
+            margin:0;
+            min-height:100vh;
+            font-family:"Sora",sans-serif;
+            color:var(--ink);
+            background:
+                radial-gradient(900px 320px at 12% -8%, #d7e9ff 0%, transparent 60%),
+                radial-gradient(900px 320px at 88% 108%, #cff1df 0%, transparent 60%),
+                linear-gradient(180deg, var(--bg-a), var(--bg-b));
+            padding:20px;
+        }
+
+        .shell{
+            width:min(1400px,100%);
+            margin:0 auto;
+            animation:fadeUp .35s ease-out;
+        }
+
+        @keyframes fadeUp{
+            from{opacity:0;transform:translateY(10px)}
+            to{opacity:1;transform:translateY(0)}
+        }
+
+        .top{
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-end;
+            gap:12px;
+            flex-wrap:wrap;
+            margin-bottom:14px;
+        }
+
+        .top p{
+            margin:0;
+            color:var(--muted);
+            font-size:.78rem;
+            text-transform:uppercase;
+            letter-spacing:.09em;
+            font-weight:700;
+        }
+
+        .top h1{
+            margin:7px 0 0 0;
+            font-family:"Literata",serif;
+            font-size:clamp(1.3rem,2.3vw,2rem);
+            font-weight:600;
+        }
+
+        .actions{
+            display:flex;
+            gap:8px;
+            flex-wrap:wrap;
+        }
+
+        .btn{
+            border:0;
+            border-radius:10px;
+            padding:9px 14px;
+            font:inherit;
+            font-weight:700;
+            cursor:pointer;
+            text-decoration:none;
+            transition:transform .14s ease, filter .14s ease;
+        }
+
+        .btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
+        .btn-main{background:linear-gradient(120deg,var(--brand),var(--brand-2));color:#fff}
+        .btn-light{background:#f7fbff;border:1px solid var(--line);color:#23324d}
+        .btn-danger{background:var(--danger);color:#fff}
+
+        .panel{
+            background:var(--panel);
+            border:1px solid var(--line);
+            border-radius:var(--radius);
+            box-shadow:var(--soft-shadow);
+            overflow:hidden;
+        }
+
+        .filters{
+            display:grid;
+            grid-template-columns:1.2fr 1fr 1fr 1fr 1fr 1fr;
+            gap:10px;
+            padding:14px;
+            border-bottom:1px solid var(--line);
+        }
+
+        .field{display:flex;flex-direction:column;gap:6px}
+        .field label{font-size:.77rem;color:var(--muted);font-weight:700}
+
+        .field select,.field input{
+            border:1px solid #ccd9e6;
+            border-radius:10px;
+            padding:9px 10px;
+            font:inherit;
+            background:#fff;
+            color:#1f2c44;
+        }
+
+        .mode-controls{
+            display:flex;
+            gap:8px;
+            flex-wrap:wrap;
+        }
+
+        .mode-block{
+            display:none;
+            width:100%;
+            padding:0 14px 14px 14px;
+            gap:10px;
+            flex-wrap:wrap;
+        }
+
+        .mode-block.active{display:flex}
+
+        .mode-item{
+            display:flex;
+            flex-direction:column;
+            gap:6px;
+            min-width:200px;
+        }
+
+        .mode-item label{font-size:.77rem;color:var(--muted);font-weight:700}
+        .mode-item input,.mode-item select{
+            border:1px solid #ccd9e6;
+            border-radius:10px;
+            padding:9px 10px;
+            font:inherit;
+            background:#fff;
+        }
+
+        .status{
+            border-top:1px solid var(--line);
+            padding:10px 14px;
+            font-size:.9rem;
+        }
+
+        .status.ok{background:#ecfdf3;color:#146c3a}
+        .status.error{background:#fef2f2;color:#912018}
+        .status.info{background:#eff6ff;color:#0f4f8c}
+
+        .legend{
+            display:flex;
+            gap:8px;
+            flex-wrap:wrap;
+            padding:12px 14px 8px 14px;
+        }
+
+        .chip{
+            display:inline-flex;
+            align-items:center;
+            gap:6px;
+            border:1px solid var(--line);
+            border-radius:999px;
+            padding:6px 10px;
+            font-size:.76rem;
+            font-weight:700;
+            background:#fff;
+        }
+
+        .dot{width:10px;height:10px;border-radius:50%}
+
+        .content{
+            display:grid;
+            grid-template-columns:minmax(780px,1fr) 320px;
+            gap:12px;
+            padding:10px 14px 14px 14px;
+        }
+
+        .agenda-wrap{
+            border:1px solid var(--line);
+            border-radius:12px;
+            overflow:auto;
+            background:#fff;
+            max-height:72vh;
+        }
+
+        .axis{
+            min-width:1050px;
+            border-bottom:1px solid #ebf1f7;
+            background:#f8fbff;
+            position:sticky;
+            top:0;
+            z-index:2;
+            padding:10px 12px 10px 240px;
+        }
+
+        .axis-line{
+            position:relative;
+            height:42px;
+            border:1px solid #dbe6f0;
+            border-radius:10px;
+            background:linear-gradient(180deg,#ffffff,#f7fbff);
+            overflow:hidden;
+        }
+
+        .tick{
+            position:absolute;
+            top:0;
+            bottom:0;
+            border-left:1px dashed #d7e1ec;
+        }
+
+        .tick span{
+            position:absolute;
+            top:4px;
+            left:4px;
+            font-size:.66rem;
+            color:#4a5c78;
+            font-weight:700;
+            white-space:nowrap;
+        }
+
+        .rows{
+            min-width:1050px;
+        }
+
+        .row{
+            display:grid;
+            grid-template-columns:240px 1fr;
+            border-bottom:1px solid #edf2f7;
+            min-height:64px;
+        }
+
+        .room{
+            padding:10px;
+            border-right:1px solid #edf2f7;
+            background:#fbfdff;
+        }
+
+        .room .name{font-size:.9rem;font-weight:800}
+        .room .sub{margin-top:3px;font-size:.73rem;color:var(--muted)}
+
+        .timeline{
+            position:relative;
+            min-height:64px;
+            padding:8px 10px;
+            background:
+                repeating-linear-gradient(
+                    to right,
+                    rgba(164,182,203,.18) 0,
+                    rgba(164,182,203,.18) 1px,
+                    transparent 1px,
+                    transparent calc(100% / 14)
+                );
+        }
+
+        .segment{
+            position:absolute;
+            top:12px;
+            height:40px;
+            border-radius:12px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:0 10px;
+            font-size:.72rem;
+            font-weight:800;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+            border:1px solid transparent;
+        }
+
+        .seg-reserva{
+            background:#ef4444;
+            color:#fff;
+            border-color:#dc2626;
+            cursor:pointer;
+            box-shadow:0 4px 12px rgba(220,38,38,.30);
+        }
+
+        .seg-reserva:hover{filter:brightness(.95)}
+
+        .seg-mantenimiento{
+            background:#fef3c7;
+            color:#92400e;
+            border-color:#fcd34d;
+        }
+
+        .seg-fuera{
+            background:#e5e7eb;
+            color:#4b5563;
+            border-color:#d1d5db;
+        }
+
+        .side{
+            border:1px solid var(--line);
+            border-radius:12px;
+            background:#fff;
+            padding:12px;
+        }
+
+        .side h3{
+            margin:0 0 10px 0;
+            font-size:1rem;
+            font-family:"Literata",serif;
+        }
+
+        .meta{
+            margin:0;
+            padding:0;
+            list-style:none;
+            display:grid;
+            gap:8px;
+        }
+
+        .meta li{
+            border-bottom:1px dashed #e4ebf3;
+            padding-bottom:7px;
+            font-size:.84rem;
+        }
+
+        .meta b{color:#253452}
+
+        .empty{
+            color:var(--muted);
+            text-align:center;
+            padding:24px;
+            font-size:.92rem;
+        }
+
+        @media (max-width:1200px){
+            .content{grid-template-columns:1fr}
+        }
+
+        @media (max-width:980px){
+            body{padding:12px}
+            .filters{grid-template-columns:repeat(2,minmax(0,1fr))}
+            .btn{width:100%;text-align:center}
+            .actions{width:100%}
+        }
+    </style>
+</head>
+<body>
+<div class="shell">
+    <div class="top">
+        <div>
+            <p>Donde Juana · Operación</p>
+            <h1>Agenda de Reservas</h1>
+        </div>
+        <div class="actions">
+            <a class="btn btn-light" th:href="@{/reservas}">Reservas</a>
+            <a class="btn btn-light" th:href="@{/}">Inicio</a>
+            <form th:action="@{/logout}" method="post" style="display:inline;margin:0;padding:0;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button type="submit" class="btn btn-danger">Cerrar sesión</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="filters">
+            <div class="field">
+                <label>Vista</label>
+                <select id="vistaModo">
+                    <option value="dia">Día</option>
+                    <option value="semana" selected>Semana</option>
+                    <option value="mes">Mes</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Tipo habitación</label>
+                <select id="tipo">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Piso</label>
+                <select id="piso">
+                    <option value="">Todos</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Acción</label>
+                <button type="button" class="btn btn-main" id="btnAplicar">Aplicar vista</button>
+            </div>
+
+            <div class="field">
+                <label>Rápido</label>
+                <button type="button" class="btn btn-light" id="btnHoy">Ir a hoy</button>
+            </div>
+
+            <div class="field">
+                <label>Rápido</label>
+                <button type="button" class="btn btn-light" id="btnMesActual">Mes actual</button>
+            </div>
+        </div>
+
+        <div id="bloqueDia" class="mode-block">
+            <div class="mode-item">
+                <label>Día</label>
+                <input type="date" id="diaFecha">
+            </div>
+        </div>
+
+        <div id="bloqueSemana" class="mode-block active">
+            <div class="mode-item">
+                <label>Mes</label>
+                <input type="month" id="semanaMes">
+            </div>
+            <div class="mode-item">
+                <label>Semana del mes</label>
+                <select id="semanaNumero">
+                    <option value="1">Semana 1</option>
+                    <option value="2">Semana 2</option>
+                    <option value="3">Semana 3</option>
+                    <option value="4">Semana 4</option>
+                    <option value="5">Semana 5</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="bloqueMes" class="mode-block">
+            <div class="mode-item">
+                <label>Mes</label>
+                <input type="month" id="mesValor">
+            </div>
+        </div>
+
+        <div class="legend">
+            <span class="chip"><span class="dot" style="background:#22c55e"></span>Disponible</span>
+            <span class="chip"><span class="dot" style="background:#ef4444"></span>Reserva</span>
+            <span class="chip"><span class="dot" style="background:#f59e0b"></span>Mantenimiento</span>
+            <span class="chip"><span class="dot" style="background:#9ca3af"></span>Fuera de servicio</span>
+        </div>
+
+        <div id="status" class="status info">Selecciona vista y período.</div>
+
+        <div class="content">
+            <div class="agenda-wrap">
+                <div id="axis" class="axis"></div>
+                <div id="rows" class="rows">
+                    <div class="empty">Sin datos aún.</div>
+                </div>
+            </div>
+
+            <aside class="side">
+                <h3>Detalle rápido</h3>
+                <ul class="meta" id="detalle">
+                    <li>Haz clic en una barra roja de reserva.</li>
+                    <li>Verás entrada, salida y estado actual del sistema.</li>
+                </ul>
+            </aside>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    var el = {
+        modo: document.getElementById("vistaModo"),
+        tipo: document.getElementById("tipo"),
+        piso: document.getElementById("piso"),
+        btnAplicar: document.getElementById("btnAplicar"),
+        btnHoy: document.getElementById("btnHoy"),
+        btnMesActual: document.getElementById("btnMesActual"),
+        bDia: document.getElementById("bloqueDia"),
+        bSemana: document.getElementById("bloqueSemana"),
+        bMes: document.getElementById("bloqueMes"),
+        diaFecha: document.getElementById("diaFecha"),
+        semanaMes: document.getElementById("semanaMes"),
+        semanaNumero: document.getElementById("semanaNumero"),
+        mesValor: document.getElementById("mesValor"),
+        axis: document.getElementById("axis"),
+        rows: document.getElementById("rows"),
+        status: document.getElementById("status"),
+        detalle: document.getElementById("detalle")
+    };
+
+    function toISO(d){
+        var m = String(d.getMonth() + 1).padStart(2, "0");
+        var day = String(d.getDate()).padStart(2, "0");
+        return d.getFullYear() + "-" + m + "-" + day;
+    }
+
+    function parseISO(iso){
+        return new Date(iso + "T00:00:00");
+    }
+
+    function addDays(iso, days){
+        var d = parseISO(iso);
+        d.setDate(d.getDate() + days);
+        return toISO(d);
+    }
+
+    function monthToRange(yyyyMM){
+        var y = Number(yyyyMM.split("-")[0]);
+        var m = Number(yyyyMM.split("-")[1]) - 1;
+        var start = new Date(y, m, 1);
+        var end = new Date(y, m + 1, 1);
+        return { inicio: toISO(start), fin: toISO(end) };
+    }
+
+    function weekOfMonthRange(yyyyMM, week){
+        var y = Number(yyyyMM.split("-")[0]);
+        var m = Number(yyyyMM.split("-")[1]) - 1;
+        var first = new Date(y, m, 1);
+        var start = new Date(y, m, 1 + ((week - 1) * 7));
+        var nextMonth = new Date(y, m + 1, 1);
+
+        if (start >= nextMonth) {
+            start = new Date(nextMonth);
+            start.setDate(start.getDate() - 7);
+        }
+
+        var end = new Date(start);
+        end.setDate(end.getDate() + 7);
+        if (end > nextMonth) end = nextMonth;
+
+        if (start < first) start = first;
+        return { inicio: toISO(start), fin: toISO(end) };
+    }
+
+    function showStatus(type, msg){
+        el.status.className = "status " + type;
+        el.status.textContent = msg;
+    }
+
+    function safe(v){
+        return String(v === null || v === undefined ? "" : v)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+    }
+
+    function fetchJson(url){
+        return fetch(url, { credentials: "same-origin" })
+            .then(function(res){
+                return res.text().then(function(txt){
+                    var data = {};
+                    try { data = txt ? JSON.parse(txt) : {}; } catch(e){}
+                    if(!res.ok){
+                        throw new Error(data.error || ("Error HTTP " + res.status));
+                    }
+                    return data;
+                });
+            });
+    }
+
+    function toggleModeBlocks(){
+        el.bDia.classList.remove("active");
+        el.bSemana.classList.remove("active");
+        el.bMes.classList.remove("active");
+
+        if(el.modo.value === "dia") el.bDia.classList.add("active");
+        if(el.modo.value === "semana") el.bSemana.classList.add("active");
+        if(el.modo.value === "mes") el.bMes.classList.add("active");
+    }
+
+    function currentMonthValue(){
+        var d = new Date();
+        return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+    }
+
+    function initDefaults(){
+        var today = toISO(new Date());
+        el.diaFecha.value = today;
+        el.semanaMes.value = currentMonthValue();
+        el.semanaNumero.value = "1";
+        el.mesValor.value = currentMonthValue();
+    }
+
+    function computeRange(){
+        if(el.modo.value === "dia"){
+            var d = el.diaFecha.value;
+            if(!d) throw new Error("Selecciona un día.");
+            return { inicio: d, fin: addDays(d, 1) };
+        }
+
+        if(el.modo.value === "semana"){
+            if(!el.semanaMes.value) throw new Error("Selecciona el mes para la semana.");
+            var w = Number(el.semanaNumero.value || "1");
+            return weekOfMonthRange(el.semanaMes.value, w);
+        }
+
+        if(el.modo.value === "mes"){
+            if(!el.mesValor.value) throw new Error("Selecciona un mes.");
+            return monthToRange(el.mesValor.value);
+        }
+
+        throw new Error("Modo inválido.");
+    }
+
+    function buildSegments(dias){
+        var segs = [];
+        var cur = null;
+
+        function closeCur(){
+            if(cur){
+                segs.push(cur);
+                cur = null;
+            }
+        }
+
+        for(var i=0;i<dias.length;i++){
+            var d = dias[i];
+            var kind = "libre";
+            var key = "libre";
+
+            if(d.idReserva){
+                kind = "reserva";
+                key = "R" + d.idReserva;
+            }else if(d.estado === "MANTENIMIENTO"){
+                kind = "mantenimiento";
+                key = "M";
+            }else if(d.estado === "FUERA_DE_SERVICIO"){
+                kind = "fuera";
+                key = "F";
+            }
+
+            if(kind === "libre"){
+                closeCur();
+                continue;
+            }
+
+            if(!cur || cur.key !== key){
+                closeCur();
+                cur = {
+                    key:key,
+                    kind:kind,
+                    start:i,
+                    end:i,
+                    reservaId:d.idReserva || null
+                };
+            }else{
+                cur.end = i;
+            }
+        }
+
+        closeCur();
+        return segs;
+    }
+
+    function formatLabel(iso){
+        var d = parseISO(iso);
+        return d.toLocaleDateString("es-CO",{day:"2-digit",month:"2-digit"});
+    }
+
+    function drawAxis(resp){
+        var dias = resp.totalDias || 0;
+        var html = [];
+        html.push('<div class="axis-line">');
+
+        for(var i=0;i<dias;i++){
+            var pct = (i * 100) / dias;
+            var fecha = addDays(resp.fechaInicio, i);
+            html.push('<div class="tick" style="left:'+ pct +'%;"><span>'+ safe(formatLabel(fecha)) +'</span></div>');
+        }
+
+        html.push('</div>');
+        el.axis.innerHTML = html.join("");
+    }
+
+    function drawRows(resp){
+        if(!resp.habitaciones || resp.habitaciones.length === 0){
+            el.rows.innerHTML = '<div class="empty">No hay habitaciones para este período/filtro.</div>';
+            return;
+        }
+
+        var days = resp.totalDias || 1;
+        var html = [];
+
+        for(var r=0;r<resp.habitaciones.length;r++){
+            var h = resp.habitaciones[r];
+            var segs = buildSegments(h.dias || []);
+
+            html.push('<div class="row">');
+            html.push('<div class="room">');
+            html.push('<div class="name">Hab ' + safe(h.numero) + ' - ' + safe(h.codigo || "-") + '</div>');
+            html.push('<div class="sub">Piso ' + safe(h.piso) + ' | ' + safe(h.nombreTipoHabitacion || "Sin tipo") + '</div>');
+            html.push('</div>');
+
+            html.push('<div class="timeline">');
+
+            for(var s=0;s<segs.length;s++){
+                var seg = segs[s];
+                var left = (seg.start * 100) / days;
+                var width = ((seg.end - seg.start + 1) * 100) / days;
+                var cls = "segment ";
+                var text = "";
+                var attrs = "";
+
+                if(seg.kind === "reserva"){
+                    cls += "seg-reserva";
+                    text = "R#" + seg.reservaId;
+                    attrs = ' data-reserva="' + seg.reservaId + '"';
+                }else if(seg.kind === "mantenimiento"){
+                    cls += "seg-mantenimiento";
+                    text = "Mantenimiento";
+                }else{
+                    cls += "seg-fuera";
+                    text = "Fuera";
+                }
+
+                html.push(
+                    '<div class="' + cls + '" style="left:' + left + '%;width:' + width + '%;"' + attrs + '>' +
+                    safe(text) +
+                    '</div>'
+                );
+            }
+
+            html.push('</div>');
+            html.push('</div>');
+        }
+
+        el.rows.innerHTML = html.join("");
+
+        Array.from(el.rows.querySelectorAll(".seg-reserva")).forEach(function(node){
+            node.addEventListener("click", function(){
+                var id = node.getAttribute("data-reserva");
+                if(!id) return;
+                loadReservaDetalle(id);
+            });
+        });
+    }
+
+    function loadReservaDetalle(idReserva){
+        showStatus("info","Cargando detalle de reserva #" + idReserva + "...");
+        fetchJson("/api/reservas/" + idReserva + "?_=" + Date.now())
+            .then(function(r){
+                var entrada = r.fechaEntrada ? safe(r.fechaEntrada) : "-";
+                var salida = r.fechaSalida ? safe(r.fechaSalida) : "-";
+                var estado = r.estado ? safe(r.estado) : "-";
+                var huesped = r.nombreHuesped ? safe(r.nombreHuesped) : "Sin dato";
+                var hab = r.numeroHabitacion ? ("Hab " + safe(r.numeroHabitacion)) : "Sin dato";
+
+                el.detalle.innerHTML = ''
+                    + '<li><b>Reserva:</b> #' + safe(r.idReserva) + '</li>'
+                    + '<li><b>Huésped:</b> ' + huesped + '</li>'
+                    + '<li><b>Habitación:</b> ' + hab + '</li>'
+                    + '<li><b>Entrada:</b> ' + entrada + '</li>'
+                    + '<li><b>Salida:</b> ' + salida + '</li>'
+                    + '<li><b>Estado:</b> ' + estado + '</li>'
+                    + '<li><a href="/reservas/editar/' + safe(r.idReserva) + '">Ir a editar reserva</a></li>';
+
+                showStatus("ok","Detalle de reserva actualizado.");
+            })
+            .catch(function(e){
+                showStatus("error", e.message || "No se pudo cargar el detalle.");
+            });
+    }
+
+    function applyView(){
+        try{
+            var range = computeRange();
+            var qs = new URLSearchParams();
+            qs.set("fechaInicio", range.inicio);
+            qs.set("fechaFin", range.fin);
+            if(el.tipo.value) qs.set("idTipoHabitacion", el.tipo.value);
+            if(el.piso.value) qs.set("piso", el.piso.value);
+
+            showStatus("info","Consultando calendario...");
+            fetchJson("/api/calendario?" + qs.toString())
+                .then(function(resp){
+                    drawAxis(resp);
+                    drawRows(resp);
+                    showStatus("ok","Vista cargada del " + range.inicio + " al " + range.fin + ".");
+                })
+                .catch(function(e){
+                    el.axis.innerHTML = "";
+                    el.rows.innerHTML = '<div class="empty">No fue posible cargar datos.</div>';
+                    showStatus("error", e.message || "Error al consultar.");
+                });
+        }catch(err){
+            showStatus("error", err.message || "Parámetros inválidos.");
+        }
+    }
+
+    function loadFilters(){
+        return Promise.all([
+            fetchJson("/api/tipos-habitacion"),
+            fetchJson("/api/habitaciones")
+        ]).then(function(arr){
+            var tipos = arr[0] || [];
+            var habs = arr[1] || [];
+
+            tipos.forEach(function(t){
+                var op = document.createElement("option");
+                op.value = t.idTipo;
+                op.textContent = t.nombre + " (#" + t.idTipo + ")";
+                el.tipo.appendChild(op);
+            });
+
+            var pisos = Array.from(new Set(
+                habs
+                    .map(function (h) { return h.piso; })
+                    .filter(function (p) { return p !== null && p !== undefined; })
+            )).sort(function (a, b) { return a - b; });
+
+            pisos.forEach(function (p) {
+                var op = document.createElement("option");
+                op.value = p;
+                op.textContent = "Piso " + p;
+                el.piso.appendChild(op);
+            });
+        });
+    }
+
+    el.modo.addEventListener("change", toggleModeBlocks);
+    el.btnAplicar.addEventListener("click", applyView);
+
+    el.btnHoy.addEventListener("click", function(){
+        el.modo.value = "dia";
+        toggleModeBlocks();
+        el.diaFecha.value = toISO(new Date());
+        applyView();
+    });
+
+    el.btnMesActual.addEventListener("click", function(){
+        el.modo.value = "mes";
+        toggleModeBlocks();
+        el.mesValor.value = currentMonthValue();
+        applyView();
+    });
+
+    initDefaults();
+    toggleModeBlocks();
+
+    loadFilters()
+        .then(function(){ applyView(); })
+        .catch(function(e){
+            showStatus("error", "No se pudieron cargar filtros: " + (e.message || "error"));
+        });
+})();
+</script>
+</body>
+</html>

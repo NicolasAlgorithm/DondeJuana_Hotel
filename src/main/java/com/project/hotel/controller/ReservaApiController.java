@@ -1,11 +1,13 @@
 package com.project.hotel.controller;
 
 import com.project.hotel.dto.ReservaCreateRequest;
+import com.project.hotel.dto.ReservaDetalleResponse;
 import com.project.hotel.dto.ReservaUpdateRequest;
 import com.project.hotel.entities.Reserva;
 import com.project.hotel.service.ReservaService;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +42,9 @@ public class ReservaApiController {
     public ResponseEntity<?> obtener(@PathVariable Long id) {
         try {
             return reservaService.buscarPorId(id)
-                    .<ResponseEntity<?>>map(ResponseEntity::ok)
+                    .<ResponseEntity<?>>map(r -> ResponseEntity.ok()
+                            .cacheControl(CacheControl.noStore())
+                            .body(toDetalleResponse(r)))
                     .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
                             .body(Map.of("error", "Reserva no encontrada: " + id)));
         } catch (Exception e) {
@@ -189,5 +193,27 @@ public class ReservaApiController {
             cause = cause.getCause();
         }
         return cause.getMessage() != null ? cause.getMessage() : t.getMessage();
+    }
+
+    private ReservaDetalleResponse toDetalleResponse(Reserva r) {
+        ReservaDetalleResponse dto = new ReservaDetalleResponse();
+        dto.setIdReserva(r.getIdReserva());
+        dto.setFechaEntrada(r.getFechaEntrada());
+        dto.setFechaSalida(r.getFechaSalida());
+        dto.setEstado(r.getEstado());
+
+        if (r.getPersona() != null) {
+            dto.setIdPersona(r.getPersona().getIdPersona());
+            String nombre = (r.getPersona().getNombre() != null ? r.getPersona().getNombre() : "");
+            String apellido = (r.getPersona().getApellido() != null ? r.getPersona().getApellido() : "");
+            dto.setNombreHuesped((nombre + " " + apellido).trim());
+        }
+
+        if (r.getHabitacion() != null) {
+            dto.setIdHabitacion(r.getHabitacion().getIdHabitacion());
+            dto.setNumeroHabitacion(r.getHabitacion().getNumero());
+        }
+
+        return dto;
     }
 }
