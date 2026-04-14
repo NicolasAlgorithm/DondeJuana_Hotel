@@ -9,7 +9,9 @@ import com.project.hotel.repository.ReservaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -80,6 +82,7 @@ public class ReservaService {
         r.setFechaEntrada(fechaEntrada);
         r.setFechaSalida(fechaSalida);
         r.setEstado(normalizarEstado(estado, ESTADO_ACTIVA));
+        r.setTotal(calcularTotal(habitacion, fechaEntrada, fechaSalida));
 
         return reservaRepository.save(r);
     }
@@ -102,6 +105,7 @@ public class ReservaService {
         actual.setFechaEntrada(fechaEntrada);
         actual.setFechaSalida(fechaSalida);
         actual.setEstado(normalizarEstado(estado, actual.getEstado()));
+        actual.setTotal(calcularTotal(habitacion, fechaEntrada, fechaSalida));
 
         return reservaRepository.save(actual);
     }
@@ -143,8 +147,13 @@ public class ReservaService {
             throw new IllegalArgumentException("Fecha de entrada y salida son obligatorias");
         }
         if (!fechaEntrada.isBefore(fechaSalida)) {
-            throw new IllegalArgumentException("La fecha de entrada debe ser menor que la fecha de salida");
+            throw new IllegalArgumentException("La fecha de salida debe ser al menos 1 noche después de la fecha de entrada");
         }
+    }
+
+    private BigDecimal calcularTotal(Habitacion habitacion, LocalDate fechaEntrada, LocalDate fechaSalida) {
+        long noches = ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
+        return habitacion.getTarifaNoche().multiply(BigDecimal.valueOf(noches));
     }
 
     private String normalizarEstado(String estado, String porDefecto) {

@@ -37,8 +37,7 @@ public class Reserva {
     @Column(name = "ESTADO", length = 20)
     private String estado;
 
-    // La tabla RESERVAS no tiene columna TOTAL; se deja solo para no romper vistas/formularios.
-    @Transient
+    @Column(name = "TOTAL", precision = 12, scale = 2)
     private BigDecimal total;
 
     public Reserva() {
