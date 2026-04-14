@@ -61,7 +61,7 @@ public class PersonaApiController {
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody PersonaRequest request) {
         return personaService.buscarPorId(id)
-                .map(p -> {
+                .<ResponseEntity<?>>map(p -> {
                     mapToEntity(p, request);
                     return ResponseEntity.ok(personaService.guardar(p));
                 })

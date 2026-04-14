@@ -62,7 +62,7 @@ public class TipoHabitacionApiController {
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody TipoHabitacionRequest request) {
         return tipoHabitacionService.buscarPorId(id)
-                .map(tipo -> {
+                .<ResponseEntity<?>>map(tipo -> {
                     mapToEntity(tipo, request);
                     return ResponseEntity.ok(tipoHabitacionService.guardar(tipo));
                 })
