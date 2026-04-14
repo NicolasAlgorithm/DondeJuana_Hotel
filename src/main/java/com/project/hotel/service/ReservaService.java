@@ -119,6 +119,41 @@ public class ReservaService {
         return reservaRepository.save(actual);
     }
 
+    public Reserva registrarCheckIn(Long idReserva) {
+        Reserva actual = reservaRepository.findById(idReserva)
+                .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada: " + idReserva));
+
+        String estadoActual = normalizarEstadoActual(actual.getEstado());
+        if (ESTADO_CANCELADA.equals(estadoActual)) {
+            throw new IllegalArgumentException("No se puede hacer check-in de una reserva CANCELADA");
+        }
+        if (ESTADO_CUMPLIDA.equals(estadoActual)) {
+            throw new IllegalArgumentException("No se puede hacer check-in de una reserva CUMPLIDA");
+        }
+
+        actual.setEstado(ESTADO_ACTIVA);
+        return reservaRepository.save(actual);
+    }
+
+    public Reserva registrarCheckOut(Long idReserva) {
+        Reserva actual = reservaRepository.findById(idReserva)
+                .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada: " + idReserva));
+
+        String estadoActual = normalizarEstadoActual(actual.getEstado());
+        if (ESTADO_CANCELADA.equals(estadoActual)) {
+            throw new IllegalArgumentException("No se puede hacer check-out de una reserva CANCELADA");
+        }
+        if (ESTADO_CUMPLIDA.equals(estadoActual)) {
+            throw new IllegalArgumentException("La reserva ya está en check-out (CUMPLIDA)");
+        }
+        if (!ESTADO_ACTIVA.equals(estadoActual)) {
+            throw new IllegalArgumentException("Solo se puede hacer check-out de una reserva ACTIVA");
+        }
+
+        actual.setEstado(ESTADO_CUMPLIDA);
+        return reservaRepository.save(actual);
+    }
+
     public void borrar(Long idReserva) {
         Reserva actual = reservaRepository.findById(idReserva)
                 .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada: " + idReserva));
@@ -162,5 +197,12 @@ public class ReservaService {
         }
 
         throw new IllegalArgumentException("Estado inválido. Valores permitidos en BD: ACTIVA, CANCELADA, CUMPLIDA");
+    }
+
+    private String normalizarEstadoActual(String estado) {
+        if (estado == null || estado.isBlank()) {
+            return "";
+        }
+        return normalizarEstado(estado, estado);
     }
 }

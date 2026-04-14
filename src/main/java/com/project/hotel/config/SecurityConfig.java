@@ -39,12 +39,11 @@ public class SecurityConfig {
 
         http
             .authenticationProvider(authenticationProvider)
-            // Mantiene CSRF para MVC, pero lo ignora para las APIs REST.
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/reservas/**", "/api/calendario/**"))
+            // Ignora CSRF para todos los endpoints REST /api/** (Postman / clientes REST)
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/error", "/css/**", "/js/**", "/images/**").permitAll()
-                .requestMatchers("/api/reservas/**").hasAnyRole("ADMINISTRADOR", "RECEPCIONISTA")
-                .requestMatchers("/api/calendario/**").hasAnyRole("ADMINISTRADOR", "RECEPCIONISTA")
+                .requestMatchers("/api/**").hasAnyRole("ADMINISTRADOR", "RECEPCIONISTA")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -53,6 +52,8 @@ public class SecurityConfig {
                 .failureUrl("/login?error=true")
                 .permitAll()
             )
+            // HTTP Basic Auth habilitado para clientes REST (Postman) en /api/**
+            .httpBasic(basic -> basic.realmName("DondeJuana Hotel API"))
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout=true")

@@ -13,4 +13,5 @@ public interface HabitacionService {
     Habitacion obtenerPorId(Long id);
     Habitacion actualizar(Long id, HabitacionRequest request);
     Habitacion actualizarEstado(Long id, String estado);
+    void eliminar(Long id);
 }

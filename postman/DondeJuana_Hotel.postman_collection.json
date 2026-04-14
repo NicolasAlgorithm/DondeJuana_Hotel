@@ -1,0 +1,1075 @@
+{
+  "info": {
+    "name": "DondeJuana Hotel API",
+    "_postman_id": "dondejuana-hotel-2026-endpoints",
+    "description": "Colección completa de pruebas de endpoints para el backend del Hotel Donde Juana.\n\nAutenticación: HTTP Basic Auth (usuario admin / admin123)\nURL base: http://localhost:8080\n\nMódulos cubiertos:\n- Auth (login form)\n- Tipos de Habitación (/api/tipos-habitacion)\n- Habitaciones (/api/habitaciones)\n- Huéspedes / Personas (/api/personas)\n- Reservas (/api/reservas)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "basic",
+    "basic": [
+      { "key": "username", "value": "{{username}}", "type": "string" },
+      { "key": "password", "value": "{{password}}", "type": "string" }
+    ]
+  },
+  "item": [
+    {
+      "name": "00. Auth",
+      "item": [
+        {
+          "name": "Login exitoso (form)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "username", "value": "{{username}}", "type": "text" },
+                { "key": "password", "value": "{{password}}", "type": "text" }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            },
+            "description": "POST /login con credenciales válidas. Espera redirect (302) o 200. Postman guarda automáticamente la cookie JSESSIONID."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login retorna 200 o 302', function () {",
+                  "  pm.expect([200, 302]).to.include(pm.response.code);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login fallido (credenciales incorrectas)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "username", "value": "admin", "type": "text" },
+                { "key": "password", "value": "wrong_password", "type": "text" }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            },
+            "description": "POST /login con contraseña incorrecta. Espera redirect a /login?error=true."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Login fallido redirige a login?error', function () {",
+                  "  pm.expect([200, 302]).to.include(pm.response.code);",
+                  "  if (pm.response.code === 302) {",
+                  "    pm.expect(pm.response.headers.get('Location')).to.include('error');",
+                  "  }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Basic Auth - Acceso sin credenciales (401)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/personas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "personas"]
+            },
+            "description": "GET /api/personas sin autenticación. Espera 401 Unauthorized."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Sin credenciales retorna 401', function () {",
+                  "  pm.expect(pm.response.code).to.equal(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01. Tipos de Habitación",
+      "item": [
+        {
+          "name": "Listar tipos de habitación",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/tipos-habitacion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tipos-habitacion"]
+            },
+            "description": "GET /api/tipos-habitacion — Lista todos los tipos de habitación. Espera 200 con array JSON."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Respuesta es array JSON', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear tipo de habitación",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Suite Deluxe TEST\",\n  \"descripcion\": \"Suite de prueba para Postman\",\n  \"tarifaBase\": 250000.00\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tipos-habitacion",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tipos-habitacion"]
+            },
+            "description": "POST /api/tipos-habitacion — Crea un nuevo tipo. Espera 201 Created con el objeto creado."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201 Created', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Respuesta contiene idTipo', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('idTipo');",
+                  "  pm.collectionVariables.set('tipoId', body.idTipo);",
+                  "  console.log('tipoId guardado:', body.idTipo);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener tipo de habitación por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/tipos-habitacion/{{tipoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tipos-habitacion", "{{tipoId}}"]
+            },
+            "description": "GET /api/tipos-habitacion/{id} — Obtiene un tipo por ID. Espera 200."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Respuesta contiene nombre', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('nombre');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar tipo de habitación",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Suite Deluxe TEST (actualizada)\",\n  \"descripcion\": \"Suite actualizada por Postman\",\n  \"tarifaBase\": 300000.00\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tipos-habitacion/{{tipoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tipos-habitacion", "{{tipoId}}"]
+            },
+            "description": "PUT /api/tipos-habitacion/{id} — Actualiza un tipo existente. Espera 200."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Nombre actualizado', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.nombre).to.include('actualizada');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tipo no encontrado (404)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/tipos-habitacion/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tipos-habitacion", "999999"]
+            },
+            "description": "GET /api/tipos-habitacion/999999 — ID inexistente. Espera 404 con campo 'error'."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Respuesta tiene campo error', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('error');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Eliminar tipo de habitación",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/tipos-habitacion/{{tipoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tipos-habitacion", "{{tipoId}}"]
+            },
+            "description": "DELETE /api/tipos-habitacion/{id} — Elimina un tipo. Espera 204 No Content."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204 No Content', function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02. Habitaciones",
+      "item": [
+        {
+          "name": "Listar habitaciones",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/habitaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "habitaciones"]
+            },
+            "description": "GET /api/habitaciones — Lista todas las habitaciones. Espera 200 con array JSON."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Respuesta es array JSON', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear habitación",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"TEST-101\",\n  \"numero\": \"101-TEST\",\n  \"piso\": 1,\n  \"idTipoHabitacion\": {{tipoHabitacionSeedId}},\n  \"tarifaNoche\": 180000.00,\n  \"estado\": \"DISPONIBLE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/habitaciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "habitaciones"]
+            },
+            "description": "POST /api/habitaciones — Crea una habitación. Requiere un idTipoHabitacion válido (usar tipoHabitacionSeedId del environment). Espera 201 Created."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201 Created', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Respuesta contiene idHabitacion', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('idHabitacion');",
+                  "  pm.collectionVariables.set('habitacionId', body.idHabitacion);",
+                  "  console.log('habitacionId guardado:', body.idHabitacion);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener habitación por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/habitaciones/{{habitacionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "habitaciones", "{{habitacionId}}"]
+            },
+            "description": "GET /api/habitaciones/{id} — Obtiene una habitación por ID. Espera 200."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Respuesta contiene codigo', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('codigo');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar habitación",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"codigo\": \"TEST-101-UPD\",\n  \"numero\": \"101-TEST\",\n  \"piso\": 1,\n  \"idTipoHabitacion\": {{tipoHabitacionSeedId}},\n  \"tarifaNoche\": 200000.00,\n  \"estado\": \"DISPONIBLE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/habitaciones/{{habitacionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "habitaciones", "{{habitacionId}}"]
+            },
+            "description": "PUT /api/habitaciones/{id} — Actualiza una habitación. Espera 200."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Codigo actualizado', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.codigo).to.include('UPD');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar estado habitación",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"MANTENIMIENTO\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/habitaciones/{{habitacionId}}/estado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "habitaciones", "{{habitacionId}}", "estado"]
+            },
+            "description": "PATCH /api/habitaciones/{id}/estado — Cambia el estado de la habitación. Valores: DISPONIBLE, OCUPADA, MANTENIMIENTO. Espera 200."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Estado actualizado a MANTENIMIENTO', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.estado).to.equal('MANTENIMIENTO');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Estado inválido (400)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"INVALIDO\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/habitaciones/{{habitacionId}}/estado",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "habitaciones", "{{habitacionId}}", "estado"]
+            },
+            "description": "PATCH con estado inválido. Espera 400 Bad Request con campo 'error'."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Respuesta tiene campo error', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('error');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Habitación no encontrada (404)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/habitaciones/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "habitaciones", "999999"]
+            },
+            "description": "GET /api/habitaciones/999999 — ID inexistente. Espera 404 con campo 'error'."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Respuesta tiene campo error', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('error');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Eliminar habitación",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/habitaciones/{{habitacionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "habitaciones", "{{habitacionId}}"]
+            },
+            "description": "DELETE /api/habitaciones/{id} — Elimina una habitación. Espera 204 No Content."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204 No Content', function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03. Huéspedes (Personas)",
+      "item": [
+        {
+          "name": "Listar huéspedes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/personas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "personas"]
+            },
+            "description": "GET /api/personas — Lista todos los huéspedes. Espera 200 con array JSON."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Respuesta es array JSON', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear huésped",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Juan\",\n  \"apellido\": \"Pérez Test\",\n  \"tipoDoc\": \"CC\",\n  \"documento\": \"12345TEST\",\n  \"email\": \"juan.perez.test@correo.com\",\n  \"telefono\": \"3001234567\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/personas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "personas"]
+            },
+            "description": "POST /api/personas — Crea un nuevo huésped. Espera 201 Created."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201 Created', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Respuesta contiene idPersona', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('idPersona');",
+                  "  pm.collectionVariables.set('personaId', body.idPersona);",
+                  "  console.log('personaId guardado:', body.idPersona);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener huésped por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/personas/{{personaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "personas", "{{personaId}}"]
+            },
+            "description": "GET /api/personas/{id} — Obtiene un huésped por ID. Espera 200."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Respuesta contiene documento', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('documento');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Actualizar huésped",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Juan Actualizado\",\n  \"apellido\": \"Pérez Test\",\n  \"tipoDoc\": \"CC\",\n  \"documento\": \"12345TEST\",\n  \"email\": \"juan.updated@correo.com\",\n  \"telefono\": \"3009876543\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/personas/{{personaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "personas", "{{personaId}}"]
+            },
+            "description": "PUT /api/personas/{id} — Actualiza un huésped. Espera 200."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Nombre actualizado', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.nombre).to.include('Actualizado');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Huésped no encontrado (404)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/personas/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "personas", "999999"]
+            },
+            "description": "GET /api/personas/999999 — ID inexistente. Espera 404."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Respuesta tiene campo error', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('error');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear huésped - campos vacíos (400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"\",\n  \"apellido\": \"\",\n  \"tipoDoc\": \"\",\n  \"documento\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/personas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "personas"]
+            },
+            "description": "POST con campos @NotBlank vacíos. Espera 400 Bad Request."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Eliminar huésped",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/personas/{{personaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "personas", "{{personaId}}"]
+            },
+            "description": "DELETE /api/personas/{id} — Elimina un huésped. Espera 204 No Content."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204 No Content', function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04. Reservas",
+      "item": [
+        {
+          "name": "Listar reservas",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/reservas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservas"]
+            },
+            "description": "GET /api/reservas — Lista todas las reservas. Espera 200 con array JSON."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Respuesta es array JSON', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Verificar disponibilidad habitación",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/reservas/disponibilidad?idHabitacion={{habitacionSeedId}}&fechaEntrada=2027-01-10&fechaSalida=2027-01-15",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservas", "disponibilidad"],
+              "query": [
+                { "key": "idHabitacion", "value": "{{habitacionSeedId}}" },
+                { "key": "fechaEntrada", "value": "2027-01-10" },
+                { "key": "fechaSalida", "value": "2027-01-15" }
+              ]
+            },
+            "description": "GET /api/reservas/disponibilidad — Verifica disponibilidad de una habitación en un rango de fechas. Espera 200 con campo 'disponible'."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Respuesta contiene campo disponible', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('disponible');",
+                  "  pm.expect(body).to.have.property('idHabitacion');",
+                  "  pm.expect(body).to.have.property('fechaEntrada');",
+                  "  pm.expect(body).to.have.property('fechaSalida');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear reserva",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idPersona\": {{personaSeedId}},\n  \"idHabitacion\": {{habitacionSeedId}},\n  \"fechaEntrada\": \"2027-01-10\",\n  \"fechaSalida\": \"2027-01-15\",\n  \"estado\": \"ACTIVA\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reservas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservas"]
+            },
+            "description": "POST /api/reservas — Crea una nueva reserva. Usa IDs de seed (personaSeedId, habitacionSeedId). Espera 201 Created."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 201 Created', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test('Respuesta contiene idReserva', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('idReserva');",
+                  "  pm.collectionVariables.set('reservaId', body.idReserva);",
+                  "  console.log('reservaId guardado:', body.idReserva);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener reserva por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/reservas/{{reservaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservas", "{{reservaId}}"]
+            },
+            "description": "GET /api/reservas/{id} — Obtiene una reserva por ID. Espera 200."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Respuesta contiene estado', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('estado');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Modificar reserva",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idPersona\": {{personaSeedId}},\n  \"idHabitacion\": {{habitacionSeedId}},\n  \"fechaEntrada\": \"2027-01-12\",\n  \"fechaSalida\": \"2027-01-17\",\n  \"estado\": \"ACTIVA\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reservas/{{reservaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservas", "{{reservaId}}"]
+            },
+            "description": "PUT /api/reservas/{id} — Modifica una reserva existente. Espera 200."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Reserva actualizada', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.fechaEntrada).to.include('2027-01-12');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancelar reserva",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/api/reservas/{{reservaId}}/cancelar",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservas", "{{reservaId}}", "cancelar"]
+            },
+            "description": "PATCH /api/reservas/{id}/cancelar — Cancela una reserva activa. Espera 200 con estado CANCELADA."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Estado es CANCELADA', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.estado).to.equal('CANCELADA');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reserva no encontrada (404)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/reservas/999999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservas", "999999"]
+            },
+            "description": "GET /api/reservas/999999 — ID inexistente. Espera 404."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 404', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test('Respuesta tiene campo error', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('error');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Crear reserva - fechas inválidas (400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idPersona\": {{personaSeedId}},\n  \"idHabitacion\": {{habitacionSeedId}},\n  \"fechaEntrada\": \"2027-05-20\",\n  \"fechaSalida\": \"2027-05-15\",\n  \"estado\": \"ACTIVA\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reservas",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservas"]
+            },
+            "description": "POST con fechaEntrada > fechaSalida. Espera 400 Bad Request con campo 'error'."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 400 por fechas inválidas', function () {",
+                  "  pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test('Respuesta tiene campo error', function () {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('error');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Eliminar reserva",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/reservas/{{reservaId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reservas", "{{reservaId}}"]
+            },
+            "description": "DELETE /api/reservas/{id} — Elimina una reserva. Espera 204 No Content."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 204 No Content', function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "tipoId", "value": "", "type": "string" },
+    { "key": "habitacionId", "value": "", "type": "string" },
+    { "key": "personaId", "value": "", "type": "string" },
+    { "key": "reservaId", "value": "", "type": "string" }
+  ]
+}
