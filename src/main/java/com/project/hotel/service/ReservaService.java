@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,7 +20,8 @@ import java.util.Optional;
 public class ReservaService {
 
     // Estados reales en BD (constraint SYS_C0033032)
-    private static final String ESTADO_ACTIVA = "ACTIVA";
+    private static final String ESTADO_ACTIVA = "ACTIVA";          // Reservada
+    private static final String ESTADO_EN_ESTADIA = "EN_ESTADIA";  // Check-in realizado
     private static final String ESTADO_CANCELADA = "CANCELADA";
     private static final String ESTADO_CUMPLIDA = "CUMPLIDA";
 
@@ -140,12 +141,17 @@ public class ReservaService {
         if (ESTADO_CUMPLIDA.equals(estadoActual)) {
             throw new IllegalArgumentException("No se puede hacer check-in de una reserva CUMPLIDA");
         }
+        if (ESTADO_EN_ESTADIA.equals(estadoActual)) {
+            throw new IllegalArgumentException("La reserva ya tiene check-in registrado");
+        }
 
-        actual.setEstado(ESTADO_ACTIVA);
+        // Simulación: ingreso exacto en la fecha reservada, 15:00
+        actual.setFechaHoraCheckIn(actual.getFechaEntrada().atTime(15, 0));
+        actual.setEstado(ESTADO_EN_ESTADIA);
         return reservaRepository.save(actual);
     }
 
-    public Reserva registrarCheckOut(Long idReserva) {
+    public Reserva registrarCheckOut(Long idReserva, LocalDate fechaSalidaReal) {
         Reserva actual = reservaRepository.findById(idReserva)
                 .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada: " + idReserva));
 
@@ -156,11 +162,30 @@ public class ReservaService {
         if (ESTADO_CUMPLIDA.equals(estadoActual)) {
             throw new IllegalArgumentException("La reserva ya está en check-out (CUMPLIDA)");
         }
-        if (!ESTADO_ACTIVA.equals(estadoActual)) {
-            throw new IllegalArgumentException("Solo se puede hacer check-out de una reserva ACTIVA");
+        if (!ESTADO_EN_ESTADIA.equals(estadoActual)) {
+            throw new IllegalArgumentException("Solo se puede hacer check-out de reservas EN_ESTADIA");
         }
 
+        LocalDate salidaEfectiva = (fechaSalidaReal != null) ? fechaSalidaReal : actual.getFechaSalida();
+
+        if (salidaEfectiva.isBefore(actual.getFechaEntrada())) {
+            throw new IllegalArgumentException("La salida real no puede ser menor que la fecha de entrada");
+        }
+
+        // Si salió después de lo planeado, valida que no pise otra reserva
+        if (salidaEfectiva.isAfter(actual.getFechaSalida())) {
+            validarDisponibilidad(
+                    actual.getHabitacion().getIdHabitacion(),
+                    actual.getFechaEntrada(),
+                    salidaEfectiva,
+                    actual.getIdReserva()
+            );
+        }
+
+        actual.setFechaSalidaReal(salidaEfectiva);
+        actual.setFechaSalida(salidaEfectiva); // Actualiza rango efectivo para calendarios/disponibilidad
         actual.setEstado(ESTADO_CUMPLIDA);
+
         return reservaRepository.save(actual);
     }
 
@@ -195,18 +220,26 @@ public class ReservaService {
     private String normalizarEstado(String estado, String porDefecto) {
         String valor = (estado == null || estado.isBlank()) ? porDefecto : estado.trim();
 
-        // Acepta valores de UI y los traduce al constraint real de BD
-        if (valor.equalsIgnoreCase("ACTIVA") || valor.equalsIgnoreCase("CONFIRMADA") || valor.equalsIgnoreCase("CHECKIN")) {
+        if (valor.equalsIgnoreCase("ACTIVA")
+                || valor.equalsIgnoreCase("CONFIRMADA")
+                || valor.equalsIgnoreCase("RESERVADA")) {
             return ESTADO_ACTIVA;
+        }
+        if (valor.equalsIgnoreCase("EN_ESTADIA")
+                || valor.equalsIgnoreCase("CHECKIN")
+                || valor.equalsIgnoreCase("CHECK_IN")) {
+            return ESTADO_EN_ESTADIA;
         }
         if (valor.equalsIgnoreCase("CANCELADA")) {
             return ESTADO_CANCELADA;
         }
-        if (valor.equalsIgnoreCase("CUMPLIDA") || valor.equalsIgnoreCase("CHECKOUT")) {
+        if (valor.equalsIgnoreCase("CUMPLIDA")
+                || valor.equalsIgnoreCase("CHECKOUT")
+                || valor.equalsIgnoreCase("CHECK_OUT")) {
             return ESTADO_CUMPLIDA;
         }
 
-        throw new IllegalArgumentException("Estado inválido. Valores permitidos en BD: ACTIVA, CANCELADA, CUMPLIDA");
+        throw new IllegalArgumentException("Estado inválido. Valores permitidos: ACTIVA, EN_ESTADIA, CANCELADA, CUMPLIDA");
     }
 
     private String normalizarEstadoActual(String estado) {

@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "TIPOS_HABITACION")
 public class TipoHabitacion {
@@ -28,6 +30,7 @@ public class TipoHabitacion {
     @Column(name = "TARIFA_BASE", nullable = false, precision = 10, scale = 2)
     private BigDecimal tarifaBase;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "tipoHabitacion", fetch = FetchType.LAZY)
     private List<Habitacion> habitaciones;
 

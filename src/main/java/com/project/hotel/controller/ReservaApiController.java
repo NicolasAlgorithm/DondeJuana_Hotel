@@ -16,6 +16,8 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.util.Map;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 @RestController
 @RequestMapping("/api/reservas")
 public class ReservaApiController {
@@ -130,9 +132,12 @@ public class ReservaApiController {
     }
 
     @PatchMapping("/{id}/checkout")
-    public ResponseEntity<?> checkOut(@PathVariable Long id) {
+    public ResponseEntity<?> checkOut(
+            @PathVariable Long id,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaSalidaReal
+    ) {
         try {
-            Reserva actualizada = reservaService.registrarCheckOut(id);
+            Reserva actualizada = reservaService.registrarCheckOut(id, fechaSalidaReal);
             return ResponseEntity.ok(actualizada);
 
         } catch (IllegalArgumentException e) {

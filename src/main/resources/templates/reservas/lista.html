@@ -272,8 +272,10 @@
                     <td th:text="${reserva.fechaSalida != null ? reserva.fechaSalida : '-'}"></td>
                     <td>
                         <span class="badge"
-                              th:classappend="${#strings.equalsIgnoreCase(reserva.estado, 'ACTIVA')} ? ' b-confirmada' :
-                      (${#strings.equalsIgnoreCase(reserva.estado, 'CUMPLIDA')} ? ' b-checkout' : ' b-cancelada')"
+                              th:classappend="
+        ${#strings.equalsIgnoreCase(reserva.estado, 'ACTIVA')} ? ' b-confirmada' :
+        (${#strings.equalsIgnoreCase(reserva.estado, 'EN_ESTADIA')} ? ' b-checkin' :
+        (${#strings.equalsIgnoreCase(reserva.estado, 'CUMPLIDA')} ? ' b-checkout' : ' b-cancelada'))"
                               th:text="${reserva.estado != null ? reserva.estado : 'SIN_ESTADO'}">
                         </span>
                     </td>
@@ -286,15 +288,15 @@
                             </a>
                             <button type="button"
                                     class="btn btn-checkin"
-                                    th:if="${reserva.estado == null or reserva.estado == ''}"
+                                    th:if="${#strings.equalsIgnoreCase(reserva.estado, 'ACTIVA')}"
                                     th:attr="data-id=${reserva.idReserva}"
                                     onclick="checkInReserva(this)">
                                 Check-in
                             </button>
                             <button type="button"
                                     class="btn btn-checkout"
-                                    th:if="${#strings.equalsIgnoreCase(reserva.estado, 'ACTIVA')}"
-                                    th:attr="data-id=${reserva.idReserva}"
+                                    th:if="${#strings.equalsIgnoreCase(reserva.estado, 'EN_ESTADIA')}"
+                                    th:attr="data-id=${reserva.idReserva},data-fecha-salida=${reserva.fechaSalida}"
                                     onclick="checkOutReserva(this)">
                                 Check-out
                             </button>
@@ -390,22 +392,35 @@
 
         window.checkOutReserva = function (button) {
             var id = button.getAttribute("data-id");
-            if (!id) {
+            var salidaProgramada = button.getAttribute("data-fecha-salida") || "";
+            if (!id) return;
+
+            var fechaElegida = prompt(
+                "Fecha de salida real (YYYY-MM-DD). Puede ser antes o después de la programada:",
+                salidaProgramada
+            );
+
+            if (fechaElegida === null) return;
+            fechaElegida = fechaElegida.trim();
+
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaElegida)) {
+                flashBox.className = "flash error";
+                flashBox.textContent = "Formato inválido. Usa YYYY-MM-DD.";
                 return;
             }
 
-            if (!confirm("¿Confirmas cierre de estadía (check-out)?")) {
-                return;
-            }
-
-            ejecutarCambioEstado(id, "checkout", "No se pudo registrar el check-out.")
-                .then(function () {
-                    window.location.href = "/reservas?ok=1";
-                })
-                .catch(function (err) {
-                    flashBox.className = "flash error";
-                    flashBox.textContent = err.message;
-                });
+            ejecutarCambioEstado(
+                id,
+                "checkout?fechaSalidaReal=" + encodeURIComponent(fechaElegida),
+                "No se pudo registrar el check-out."
+            )
+            .then(function () {
+                window.location.href = "/reservas?ok=1";
+            })
+            .catch(function (err) {
+                flashBox.className = "flash error";
+                flashBox.textContent = err.message;
+            });
         };
     })();
 </script>
