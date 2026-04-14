@@ -37,7 +37,8 @@ public class Reserva {
     @Column(name = "ESTADO", length = 20)
     private String estado;
 
-    @Column(name = "TOTAL", precision = 12, scale = 2)
+    // La tabla RESERVAS no tiene columna TOTAL; se usa solo para UI/comprobante.
+    @Transient
     private BigDecimal total;
 
     public Reserva() {
