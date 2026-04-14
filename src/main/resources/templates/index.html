@@ -54,6 +54,10 @@
         <a th:href="@{/reservas}">&#128203; Reservas</a>
         <p>Gestionar reservas</p>
     </div>
+    <div class="card">
+        <a th:href="@{/calendario}">&#128467; Calendario Interactivo</a>
+        <p>Ocupacion por fecha, filtros y detalle de reservas</p>
+    </div>
 </div>
 
 <div th:class="${dbStatus == 'OK'} ? 'db-status db-ok' : 'db-status db-err'">
