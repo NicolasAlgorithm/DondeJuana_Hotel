@@ -93,6 +93,6 @@ public class MvcpersonasApplication {
             throw new IllegalStateException(message);
         }
 
-        log.info("Oracle DB credentials detected from environment variable {}.", ENV_DB_USERNAME);
+        log.info("Oracle DB user in use: {}", username);
     }
 }

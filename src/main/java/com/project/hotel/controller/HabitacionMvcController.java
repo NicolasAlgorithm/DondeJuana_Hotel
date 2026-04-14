@@ -58,11 +58,9 @@ public class HabitacionMvcController {
     public String guardar(@ModelAttribute Habitacion habitacion, Model model) {
         try {
             HabitacionRequest request = new HabitacionRequest();
-            // getDescripcion()/setDescripcion() in Habitacion proxies to the 'codigo' field
             request.setCodigo(habitacion.getDescripcion());
             request.setNumero(habitacion.getNumero());
             request.setPiso(habitacion.getPiso());
-            // idTipoHabitacion is a convenience getter/setter on Habitacion
             request.setIdTipoHabitacion(habitacion.getIdTipoHabitacion());
             request.setEstado(habitacion.getEstado() != null ? habitacion.getEstado() : "DISPONIBLE");
 
@@ -92,12 +90,12 @@ public class HabitacionMvcController {
         return "redirect:/habitaciones";
     }
 
-    @GetMapping("/eliminar/{id}")
+    @PostMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id) {
         try {
             habitacionService.eliminar(id);
         } catch (IllegalArgumentException e) {
-            // Room not found — ignore and redirect
+            // Ignore and redirect
         }
         return "redirect:/habitaciones";
     }

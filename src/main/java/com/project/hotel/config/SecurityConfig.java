@@ -48,23 +48,30 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/").hasAuthority("dashboard.ver")
                 .requestMatchers(HttpMethod.GET, "/calendario").hasAuthority("calendario.ver")
 
-                .requestMatchers(HttpMethod.GET, "/personas/**").hasAuthority("persona.ver")
+                .requestMatchers(HttpMethod.GET, "/personas").hasAuthority("persona.ver")
+                .requestMatchers(HttpMethod.GET, "/personas/nuevo").hasAuthority("persona.crear")
+                .requestMatchers(HttpMethod.GET, "/personas/editar/**").hasAuthority("persona.editar")
                 .requestMatchers(HttpMethod.POST, "/personas/guardar").hasAnyAuthority("persona.crear", "persona.editar")
-                .requestMatchers(HttpMethod.GET, "/personas/eliminar/**").hasAuthority("persona.eliminar")
+                .requestMatchers(HttpMethod.POST, "/personas/eliminar/**").hasAuthority("persona.eliminar")
 
-                .requestMatchers(HttpMethod.GET, "/tipos-habitacion/**").hasAuthority("tipohabitacion.ver")
+                .requestMatchers(HttpMethod.GET, "/tipos-habitacion").hasAuthority("tipohabitacion.ver")
+                .requestMatchers(HttpMethod.GET, "/tipos-habitacion/nuevo").hasAuthority("tipohabitacion.crear")
+                .requestMatchers(HttpMethod.GET, "/tipos-habitacion/editar/**").hasAuthority("tipohabitacion.editar")
                 .requestMatchers(HttpMethod.POST, "/tipos-habitacion/guardar").hasAnyAuthority("tipohabitacion.crear", "tipohabitacion.editar")
-                .requestMatchers(HttpMethod.GET, "/tipos-habitacion/eliminar/**").hasAuthority("tipohabitacion.eliminar")
+                .requestMatchers(HttpMethod.POST, "/tipos-habitacion/eliminar/**").hasAuthority("tipohabitacion.eliminar")
 
                 .requestMatchers(HttpMethod.GET, "/habitaciones").hasAuthority("habitacion.ver")
                 .requestMatchers(HttpMethod.GET, "/habitaciones/nuevo").hasAuthority("habitacion.crear")
                 .requestMatchers(HttpMethod.GET, "/habitaciones/editar/**").hasAuthority("habitacion.editar")
                 .requestMatchers(HttpMethod.POST, "/habitaciones/guardar").hasAnyAuthority("habitacion.crear", "habitacion.editar")
                 .requestMatchers(HttpMethod.POST, "/habitaciones/*/estado").hasAuthority("habitacion.estado.cambiar")
-                .requestMatchers(HttpMethod.GET, "/habitaciones/eliminar/**").hasAuthority("habitacion.eliminar")
+                .requestMatchers(HttpMethod.POST, "/habitaciones/eliminar/**").hasAuthority("habitacion.eliminar")
 
-                .requestMatchers(HttpMethod.GET, "/reservas/**").hasAuthority("reserva.ver")
+                .requestMatchers(HttpMethod.GET, "/reservas").hasAuthority("reserva.ver")
+                .requestMatchers(HttpMethod.GET, "/reservas/nuevo").hasAuthority("reserva.crear")
+                .requestMatchers(HttpMethod.GET, "/reservas/editar/**").hasAuthority("reserva.editar")
                 .requestMatchers(HttpMethod.POST, "/reservas/guardar").hasAnyAuthority("reserva.crear", "reserva.editar")
+                .requestMatchers(HttpMethod.POST, "/reservas/eliminar/**").hasAuthority("reserva.eliminar")
 
                 .requestMatchers(HttpMethod.GET, "/api/calendario/**").hasAuthority("calendario.ver")
 

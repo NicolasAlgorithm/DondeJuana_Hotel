@@ -4,11 +4,12 @@ import com.project.hotel.entities.Reserva;
 import com.project.hotel.service.HabitacionService;
 import com.project.hotel.service.PersonaService;
 import com.project.hotel.service.ReservaService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
+
 import java.util.Optional;
 
 @Controller
@@ -65,7 +66,7 @@ public class ReservaController {
         return "reservas/formulario";
     }
 
-    @GetMapping("/eliminar/{id}")
+    @PostMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id) {
         reservaService.eliminar(id);
         return "redirect:/reservas";

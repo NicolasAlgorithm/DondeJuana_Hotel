@@ -65,5 +65,8 @@
         <a class="btn btn-secondary" th:href="@{/personas}">Cancelar</a>
     </div>
 </form>
+<div th:if="${dbError}" style="background:#fdecea;color:#b71c1c;border:1px solid #ef9a9a;padding:10px 12px;border-radius:6px;margin-bottom:12px;">
+    <span th:text="${dbError}"></span>
+</div>
 </body>
 </html>
