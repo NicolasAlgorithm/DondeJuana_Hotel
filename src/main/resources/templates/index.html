@@ -38,25 +38,29 @@
 <p>Bienvenido al sistema de gesti&oacute;n del hotel.</p>
 
 <div class="menu">
-    <div class="card">
+    <div class="card" sec:authorize="hasAuthority('persona.ver')">
         <a th:href="@{/personas}">&#128100; Hu&eacute;spedes</a>
         <p>Gestionar clientes del hotel</p>
     </div>
-    <div class="card">
+
+    <div class="card" sec:authorize="hasAuthority('tipohabitacion.ver')">
         <a th:href="@{/tipos-habitacion}">&#128197; Tipos de Habitaci&oacute;n</a>
         <p>Gestionar tipos y precios</p>
     </div>
-    <div class="card">
+
+    <div class="card" sec:authorize="hasAuthority('habitacion.ver')">
         <a th:href="@{/habitaciones}">&#128719; Habitaciones</a>
         <p>Gestionar habitaciones</p>
     </div>
-    <div class="card">
+
+    <div class="card" sec:authorize="hasAuthority('reserva.ver')">
         <a th:href="@{/reservas}">&#128203; Reservas</a>
         <p>Gestionar reservas</p>
     </div>
-    <div class="card">
+
+    <div class="card" sec:authorize="hasAuthority('calendario.ver')">
         <a th:href="@{/calendario}">&#128467; Calendario Interactivo</a>
-        <p>Ocupacion por fecha, filtros y detalle de reservas</p>
+        <p>Ocupaci&oacute;n por fecha, filtros y detalle de reservas</p>
     </div>
 </div>
 

@@ -11,15 +11,14 @@
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
         th { background-color: #0066cc; color: white; }
         tr:nth-child(even) { background-color: #f2f2f2; }
-        a.btn { display: inline-block; padding: 6px 14px; border-radius: 4px; text-decoration: none; margin: 2px; }
-        a.btn-primary { background: #0066cc; color: white; }
-        a.btn-warning { background: #f0a500; color: white; }
-        a.btn-danger { background: #cc0000; color: white; }
-        a.btn-secondary { background: #666; color: white; }
+        .btn { display: inline-block; padding: 6px 14px; border-radius: 4px; text-decoration: none; margin: 2px; border: none; cursor: pointer; font-size: 0.95em; }
+        .btn-primary { background: #0066cc; color: white; }
+        .btn-warning { background: #f0a500; color: white; }
+        .btn-danger { background: #cc0000; color: white; }
+        .btn-secondary { background: #666; color: white; }
         .toolbar { margin-bottom: 16px; }
         .logout { float: right; font-size: 0.85em; margin-bottom: 8px; }
-        .logout-btn { color: #c0392b; text-decoration: none; background: none;
-                      border: none; padding: 0; cursor: pointer; font-size: inherit; }
+        .logout-btn { color: #c0392b; text-decoration: none; background: none; border: none; padding: 0; cursor: pointer; font-size: inherit; }
         .logout-btn:hover { text-decoration: underline; }
     </style>
 </head>
@@ -32,11 +31,16 @@
         <button type="submit" class="logout-btn">Cerrar sesi&oacute;n</button>
     </form>
 </div>
+
 <h1>Huespedes</h1>
+
 <div class="toolbar">
-    <a class="btn btn-primary" th:href="@{/personas/nuevo}">+ Nuevo Huesped</a>
+    <a class="btn btn-primary"
+       sec:authorize="hasAuthority('persona.crear')"
+       th:href="@{/personas/nuevo}">+ Nuevo Huesped</a>
     <a class="btn btn-secondary" th:href="@{/}">Inicio</a>
 </div>
+
 <table>
     <thead>
     <tr>
@@ -60,11 +64,21 @@
         <td th:text="${persona.email}"></td>
         <td th:text="${persona.telefono}"></td>
         <td>
-            <a class="btn btn-warning" th:href="@{/personas/editar/{id}(id=${persona.idPersona})}">Editar</a>
-            <a class="btn btn-danger" th:href="@{/personas/eliminar/{id}(id=${persona.idPersona})}"
-               onclick="return confirm('¿Eliminar este huesped?')">Eliminar</a>
+            <a class="btn btn-warning"
+               sec:authorize="hasAuthority('persona.editar')"
+               th:href="@{/personas/editar/{id}(id=${persona.idPersona})}">Editar</a>
+
+            <form sec:authorize="hasAuthority('persona.eliminar')"
+                  th:action="@{/personas/eliminar/{id}(id=${persona.idPersona})}"
+                  method="post"
+                  style="display:inline;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="btn btn-danger"
+                        onclick="return confirm('¿Eliminar este huesped?')">Eliminar</button>
+            </form>
         </td>
     </tr>
+
     <tr th:if="${#lists.isEmpty(personas)}">
         <td colspan="8" style="text-align:center; color:#999;">No hay huespedes registrados.</td>
     </tr>

@@ -3,12 +3,13 @@ package com.project.hotel.service;
 import com.project.hotel.entities.Rol;
 import com.project.hotel.entities.Usuario;
 import com.project.hotel.repository.UsuarioRepository;
-
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -38,12 +39,20 @@ public class DbUserDetailsService implements UserDetailsService {
             throw new DisabledException("Rol inactivo para usuario: " + username);
         }
 
-        String authority = "ROLE_" + rol.getNombre();
+        List<GrantedAuthority> authorities = new ArrayList<>();
+
+        String roleAuthority = "ROLE_" + rol.getNombre();
+        authorities.add(new SimpleGrantedAuthority(roleAuthority));
+
+        List<String> permisos = usuarioRepository.findPermisosByUsername(username);
+        for (String permiso : permisos) {
+            authorities.add(new SimpleGrantedAuthority(permiso));
+        }
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(u.getUsername())
                 .password(u.getPasswordHash())
-                .authorities(List.of(new SimpleGrantedAuthority(authority)))
+                .authorities(authorities)
                 .build();
     }
 }

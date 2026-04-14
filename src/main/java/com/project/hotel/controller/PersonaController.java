@@ -2,11 +2,12 @@ package com.project.hotel.controller;
 
 import com.project.hotel.entities.Persona;
 import com.project.hotel.service.PersonaService;
+import jakarta.validation.Valid;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/personas")
@@ -35,8 +36,17 @@ public class PersonaController {
         if (result.hasErrors()) {
             return "personas/formulario";
         }
-        personaService.guardar(persona);
-        return "redirect:/personas";
+
+        try {
+            personaService.guardar(persona);
+            return "redirect:/personas";
+        } catch (DataIntegrityViolationException e) {
+            model.addAttribute("dbError", "No se pudo guardar el huésped por una restricción de base de datos (documento duplicado o dato inválido).");
+            return "personas/formulario";
+        } catch (Exception e) {
+            model.addAttribute("dbError", "Error inesperado al guardar el huésped: " + e.getMessage());
+            return "personas/formulario";
+        }
     }
 
     @GetMapping("/editar/{id}")
@@ -45,7 +55,7 @@ public class PersonaController {
         return "personas/formulario";
     }
 
-    @GetMapping("/eliminar/{id}")
+    @PostMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id) {
         personaService.eliminar(id);
         return "redirect:/personas";

@@ -2,11 +2,11 @@ package com.project.hotel.controller;
 
 import com.project.hotel.entities.TipoHabitacion;
 import com.project.hotel.service.TipoHabitacionService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/tipos-habitacion")
@@ -45,7 +45,7 @@ public class TipoHabitacionController {
         return "tipos-habitacion/formulario";
     }
 
-    @GetMapping("/eliminar/{id}")
+    @PostMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id) {
         tipoHabitacionService.eliminar(id);
         return "redirect:/tipos-habitacion";

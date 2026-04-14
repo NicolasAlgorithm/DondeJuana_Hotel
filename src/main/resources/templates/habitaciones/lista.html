@@ -46,7 +46,9 @@
 </div>
 <h1>Habitaciones <span id="polling-indicator"></span></h1>
 <div class="toolbar">
-    <a class="btn btn-primary" th:href="@{/habitaciones/nuevo}">+ Nueva Habitacion</a>
+    <a class="btn btn-primary"
+       sec:authorize="hasAuthority('habitacion.crear')"
+       th:href="@{/habitaciones/nuevo}">+ Nueva Habitacion</a>
     <a class="btn btn-secondary" th:href="@{/}">Inicio</a>
 </div>
 <table id="tabla-habitaciones">
@@ -76,7 +78,8 @@
         </td>
         <td th:text="${habitacion.descripcion}"></td>
         <td>
-            <form th:action="@{/habitaciones/{id}/estado(id=${habitacion.idHabitacion})}"
+            <form sec:authorize="hasAuthority('habitacion.estado.cambiar')"
+                  th:action="@{/habitaciones/{id}/estado(id=${habitacion.idHabitacion})}"
                   method="post" class="estado-form">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <select name="estado" th:data-current="${habitacion.estado}">
@@ -87,9 +90,19 @@
                 </select>
                 <button type="submit" class="btn-sm">Cambiar</button>
             </form>
-            <a class="btn btn-warning" th:href="@{/habitaciones/editar/{id}(id=${habitacion.idHabitacion})}">Editar</a>
-            <a class="btn btn-danger" th:href="@{/habitaciones/eliminar/{id}(id=${habitacion.idHabitacion})}"
-               onclick="return confirm('¿Eliminar esta habitacion?')">Eliminar</a>
+
+            <a class="btn btn-warning"
+               sec:authorize="hasAuthority('habitacion.editar')"
+               th:href="@{/habitaciones/editar/{id}(id=${habitacion.idHabitacion})}">Editar</a>
+
+            <form sec:authorize="hasAuthority('habitacion.eliminar')"
+                  th:action="@{/habitaciones/eliminar/{id}(id=${habitacion.idHabitacion})}"
+                  method="post"
+                  style="display:inline;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="btn btn-danger"
+                        onclick="return confirm('¿Eliminar esta habitacion?')">Eliminar</button>
+            </form>
         </td>
     </tr>
     <tr th:if="${#lists.isEmpty(habitaciones)}">
