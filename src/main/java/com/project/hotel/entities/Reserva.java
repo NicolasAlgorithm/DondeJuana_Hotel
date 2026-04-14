@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 @Table(name = "RESERVAS")
@@ -107,5 +108,17 @@ public class Reserva {
 
     public void setTotal(BigDecimal total) {
         this.total = total;
+    }
+
+    @Transient
+    public BigDecimal getTotalCalculado() {
+        if (fechaEntrada == null || fechaSalida == null || habitacion == null || habitacion.getTarifaNoche() == null) {
+            return null;
+        }
+        long noches = ChronoUnit.DAYS.between(fechaEntrada, fechaSalida);
+        if (noches <= 0) {
+            return null;
+        }
+        return habitacion.getTarifaNoche().multiply(BigDecimal.valueOf(noches));
     }
 }

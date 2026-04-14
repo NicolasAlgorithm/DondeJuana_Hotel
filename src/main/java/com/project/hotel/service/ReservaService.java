@@ -9,9 +9,7 @@ import com.project.hotel.repository.ReservaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,14 +38,12 @@ public class ReservaService {
 
     @Transactional(readOnly = true)
     public List<Reserva> listarTodos() {
-        List<Reserva> reservas = reservaRepository.findAll();
-        reservas.forEach(this::asignarTotalCalculado);
-        return reservas;
+        return reservaRepository.findAll();
     }
 
     @Transactional(readOnly = true)
     public Optional<Reserva> buscarPorId(Long id) {
-        return reservaRepository.findById(id).map(this::asignarTotalCalculado);
+        return reservaRepository.findById(id);
     }
 
     public Reserva guardar(Reserva reserva) {
@@ -60,16 +56,12 @@ public class ReservaService {
 
     @Transactional(readOnly = true)
     public List<Reserva> listarPorPersona(Long idPersona) {
-        List<Reserva> reservas = reservaRepository.findByPersona_IdPersona(idPersona);
-        reservas.forEach(this::asignarTotalCalculado);
-        return reservas;
+        return reservaRepository.findByPersona_IdPersona(idPersona);
     }
 
     @Transactional(readOnly = true)
     public List<Reserva> listarPorEstado(String estado) {
-        List<Reserva> reservas = reservaRepository.findByEstado(normalizarEstado(estado, ESTADO_ACTIVA));
-        reservas.forEach(this::asignarTotalCalculado);
-        return reservas;
+        return reservaRepository.findByEstado(normalizarEstado(estado, ESTADO_ACTIVA));
     }
 
     public Reserva crear(Long idPersona, Long idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida, String estado) {
@@ -212,28 +204,5 @@ public class ReservaService {
             return "";
         }
         return normalizarEstado(estado, estado);
-    }
-
-    private Reserva asignarTotalCalculado(Reserva reserva) {
-        if (reserva == null) {
-            return null;
-        }
-        reserva.setTotal(calcularTotal(reserva));
-        return reserva;
-    }
-
-    private BigDecimal calcularTotal(Reserva reserva) {
-        if (reserva.getFechaEntrada() == null || reserva.getFechaSalida() == null || reserva.getHabitacion() == null) {
-            return null;
-        }
-        BigDecimal tarifaNoche = reserva.getHabitacion().getTarifaNoche();
-        if (tarifaNoche == null) {
-            return null;
-        }
-        long noches = ChronoUnit.DAYS.between(reserva.getFechaEntrada(), reserva.getFechaSalida());
-        if (noches <= 0) {
-            return BigDecimal.ZERO;
-        }
-        return tarifaNoche.multiply(BigDecimal.valueOf(noches));
     }
 }

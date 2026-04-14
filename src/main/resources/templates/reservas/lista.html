@@ -277,7 +277,7 @@
                               th:text="${reserva.estado != null ? reserva.estado : 'SIN_ESTADO'}">
                         </span>
                     </td>
-                    <td th:text="${reserva.total != null ? '$' + #numbers.formatDecimal(reserva.total, 1, 2) : '-'}"></td>
+                    <td th:text="${reserva.totalCalculado != null ? '$' + #numbers.formatDecimal(reserva.totalCalculado, 1, 2) : (reserva.total != null ? '$' + #numbers.formatDecimal(reserva.total, 1, 2) : '-')}"></td>
                     <td>
                         <div class="actions">
                             <a class="btn btn-edit"
