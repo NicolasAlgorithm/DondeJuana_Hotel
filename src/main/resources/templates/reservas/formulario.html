@@ -255,8 +255,9 @@
                         <option value="">Seleccione una habitación</option>
                         <option th:each="h : ${habitaciones}"
                                 th:value="${h.idHabitacion}"
+                                th:attr="data-tarifa=${h.tarifaNoche}"
                                 th:selected="${reserva.habitacion != null and reserva.habitacion.idHabitacion == h.idHabitacion}"
-                                th:text="${'Hab. ' + h.numero + ' · ' + h.tipoHabitacion.nombre}">
+                                th:text="${'Hab. ' + h.numero + ' · ' + h.tipoHabitacion.nombre + ' ($' + h.tarifaNoche + '/noche)'}">
                         </option>
                     </select>
                     <span class="error" th:if="${#fields.hasErrors('habitacion')}" th:errors="*{habitacion}"></span>
@@ -284,9 +285,11 @@
                 </div>
 
                 <div class="field">
-                    <label for="total">Total (solo visual por ahora)</label>
-                    <input id="total" type="number" step="0.01" min="0" th:field="*{total}" />
-                    <div class="help">No se envía en esta API de ciclo de vida.</div>
+                    <label for="total">Total estimado</label>
+                    <input id="total" type="text" readonly
+                           th:value="${reserva.total != null ? '$' + #numbers.formatDecimal(reserva.total, 1, 2) : ''}"
+                           placeholder="Se calcula automáticamente" style="background:#f4f6fb;color:#334155;cursor:default;" />
+                    <div class="help">Calculado: noches &times; tarifa por noche.</div>
                 </div>
             </div>
 
@@ -303,6 +306,24 @@
                 Usuarios habilitados: ADMINISTRADOR y RECEPCIONISTA (según SecurityConfig).
             </p>
         </form>
+
+        <!-- Comprobante básico (visible tras guardar) -->
+        <div id="comprobante" style="display:none;margin-top:22px;border:1px solid #a6f4c5;border-radius:14px;background:#f0fdf4;padding:20px 24px;">
+            <p style="margin:0 0 10px 0;font-size:0.78rem;letter-spacing:.08em;text-transform:uppercase;color:#0a6c4c;font-weight:700;">🧾 Comprobante de Reserva</p>
+            <table style="width:100%;border-collapse:collapse;font-size:.94rem;">
+                <tr><td style="padding:5px 0;color:#475467;width:40%">ID Reserva</td><td id="cmp-id" style="padding:5px 0;font-weight:600;">—</td></tr>
+                <tr><td style="padding:5px 0;color:#475467;">Huésped</td><td id="cmp-huesped" style="padding:5px 0;font-weight:600;">—</td></tr>
+                <tr><td style="padding:5px 0;color:#475467;">Habitación</td><td id="cmp-habitacion" style="padding:5px 0;font-weight:600;">—</td></tr>
+                <tr><td style="padding:5px 0;color:#475467;">Fecha entrada</td><td id="cmp-entrada" style="padding:5px 0;font-weight:600;">—</td></tr>
+                <tr><td style="padding:5px 0;color:#475467;">Fecha salida</td><td id="cmp-salida" style="padding:5px 0;font-weight:600;">—</td></tr>
+                <tr><td style="padding:5px 0;color:#475467;">Noches</td><td id="cmp-noches" style="padding:5px 0;font-weight:600;">—</td></tr>
+                <tr><td style="padding:5px 0;color:#475467;">Tarifa / noche</td><td id="cmp-tarifa" style="padding:5px 0;font-weight:600;">—</td></tr>
+                <tr style="border-top:2px solid #a6f4c5;">
+                    <td style="padding:8px 0 0 0;color:#0a6c4c;font-weight:700;font-size:1.05rem;">Total</td>
+                    <td id="cmp-total" style="padding:8px 0 0 0;font-weight:700;font-size:1.15rem;color:#0a6c4c;">—</td>
+                </tr>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -310,6 +331,10 @@
     (function () {
         var form = document.getElementById("reservaForm");
         var box = document.getElementById("apiMessage");
+        var totalInput = document.getElementById("total");
+        var habitacionSel = document.getElementById("habitacion");
+        var fechaEntradaInput = document.getElementById("fechaEntrada");
+        var fechaSalidaInput = document.getElementById("fechaSalida");
 
         function showMsg(text, kind) {
             box.className = "msg " + kind;
@@ -325,15 +350,46 @@
             return inDate && outDate && (new Date(inDate) < new Date(outDate));
         }
 
+        function calcularNoches(fechaEntrada, fechaSalida) {
+            var d1 = new Date(fechaEntrada);
+            var d2 = new Date(fechaSalida);
+            return Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+        }
+
+        function formatCurrency(amount) {
+            return "$" + amount.toLocaleString("es-CO", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function actualizarTotal() {
+            var selectedOption = habitacionSel.options[habitacionSel.selectedIndex];
+            var tarifa = selectedOption ? parseFloat(selectedOption.getAttribute("data-tarifa")) : NaN;
+            var fechaEntrada = fechaEntradaInput.value;
+            var fechaSalida = fechaSalidaInput.value;
+
+            if (!isNaN(tarifa) && tarifa > 0 && isDateRangeValid(fechaEntrada, fechaSalida)) {
+                var noches = calcularNoches(fechaEntrada, fechaSalida);
+                totalInput.value = formatCurrency(noches * tarifa);
+            } else {
+                totalInput.value = "";
+            }
+        }
+
+        habitacionSel.addEventListener("change", actualizarTotal);
+        fechaEntradaInput.addEventListener("change", actualizarTotal);
+        fechaSalidaInput.addEventListener("change", actualizarTotal);
+
+        // Recalculate on load if editing and dates are already set
+        actualizarTotal();
+
         form.addEventListener("submit", function (ev) {
             ev.preventDefault();
             clearMsg();
 
             var idReserva = document.getElementById("idReserva").value.trim();
             var idPersona = document.getElementById("persona").value;
-            var idHabitacion = document.getElementById("habitacion").value;
-            var fechaEntrada = document.getElementById("fechaEntrada").value;
-            var fechaSalida = document.getElementById("fechaSalida").value;
+            var idHabitacion = habitacionSel.value;
+            var fechaEntrada = fechaEntradaInput.value;
+            var fechaSalida = fechaSalidaInput.value;
             var estado = document.getElementById("estado").value;
 
             if (!idPersona || !idHabitacion || !fechaEntrada || !fechaSalida) {
@@ -382,11 +438,32 @@
                     return data;
                 });
             })
-            .then(function () {
-                showMsg("Reserva guardada correctamente. Redirigiendo...", "ok");
+            .then(function (data) {
+                showMsg("Reserva guardada correctamente.", "ok");
+
+                // Mostrar comprobante
+                var selectedPersonaOpt = document.getElementById("persona").options[document.getElementById("persona").selectedIndex];
+                var selectedHabOpt = habitacionSel.options[habitacionSel.selectedIndex];
+                var tarifa = parseFloat(selectedHabOpt.getAttribute("data-tarifa")) || 0;
+                var noches = calcularNoches(fechaEntrada, fechaSalida);
+                var total = noches * tarifa;
+
+                document.getElementById("cmp-id").textContent = data.idReserva || (isEdit ? idReserva : "—");
+                document.getElementById("cmp-huesped").textContent = selectedPersonaOpt ? selectedPersonaOpt.text : "—";
+                document.getElementById("cmp-habitacion").textContent = selectedHabOpt ? selectedHabOpt.text : "—";
+                document.getElementById("cmp-entrada").textContent = fechaEntrada;
+                document.getElementById("cmp-salida").textContent = fechaSalida;
+                document.getElementById("cmp-noches").textContent = noches;
+                document.getElementById("cmp-tarifa").textContent = formatCurrency(tarifa);
+                document.getElementById("cmp-total").textContent = formatCurrency(total);
+                document.getElementById("comprobante").style.display = "block";
+
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalLabel;
+
                 setTimeout(function () {
                     window.location.href = "/reservas?ok=1";
-                }, 700);
+                }, 3500);
             })
             .catch(function (err) {
                 showMsg(err.message, "error");
