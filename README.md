@@ -113,6 +113,28 @@ El repositorio usa **JUnit 5 + Mockito** con `spring-boot-starter-test`.
   - `HabitacionMvcController` *(nuevo en esta PR)*
   - `IndexController` *(nuevo en esta PR)*
 
+## Pruebas E2E (integración)
+
+Se agregó la suite `E2EFlujosIntegracionTest` para validar de extremo a extremo:
+
+- Login (éxito, error y sesión)
+- Reserva (creación y consulta)
+- Check-in / Check-out (transición completa de estado)
+- Pago (validación de monto total al completar el flujo)
+- Reportes (ocupación en calendario)
+
+### Script para ejecutar solo E2E
+
+```bash
+./mvnw test -Pe2e
+```
+
+### Script alternativo (clase puntual)
+
+```bash
+./mvnw test -Dtest=E2EFlujosIntegracionTest
+```
+
 ## Estructura del proyecto
 
 ```
