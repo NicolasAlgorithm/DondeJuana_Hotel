@@ -1,0 +1,184 @@
+{
+    "metrics": {
+        "http_reqs": {
+            "count": 102,
+            "rate": 17.43185741670332
+        },
+        "data_sent": {
+            "count": 28778,
+            "rate": 4918.176399391061
+        },
+        "http_req_duration{endpoint:crear_reserva}": {
+            "avg": 3661.5629,
+            "min": 2693.7535,
+            "med": 3660.11445,
+            "max": 4490.2361,
+            "p(90)": 4361.9003,
+            "p(95)": 4438.276295000001,
+            "thresholds": {
+                "p(95)<1500": true,
+                "p(99)<3000": true
+            }
+        },
+        "http_req_duration": {
+            "min": 360.6888,
+            "med": 3653.77265,
+            "max": 4490.2361,
+            "p(90)": 4359.70258,
+            "p(95)": 4436.77359,
+            "avg": 3602.727333333333
+        },
+        "http_req_receiving": {
+            "med": 0.35055000000000003,
+            "max": 88.5978,
+            "p(90)": 1.1090900000000004,
+            "p(95)": 1.3255999999999994,
+            "avg": 1.31296568627451,
+            "min": 0
+        },
+        "http_req_blocked": {
+            "p(95)": 14.16187499999999,
+            "avg": 4.534298039215688,
+            "min": 0,
+            "med": 2.3798500000000002,
+            "max": 18.9324,
+            "p(90)": 12.041250000000005
+        },
+        "http_req_tls_handshaking": {
+            "min": 0,
+            "med": 0,
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0
+        },
+        "vus_max": {
+            "value": 100,
+            "min": 100,
+            "max": 100
+        },
+        "http_req_connecting": {
+            "avg": 4.170808823529412,
+            "min": 0,
+            "med": 2.0221,
+            "max": 18.5358,
+            "p(90)": 11.078980000000003,
+            "p(95)": 13.164324999999995
+        },
+        "data_received": {
+            "count": 101411,
+            "rate": 17331.196985150003
+        },
+        "checks": {
+            "passes": 100,
+            "fails": 0,
+            "value": 1
+        },
+        "iterations": {
+            "count": 100,
+            "rate": 17.09005629088561
+        },
+        "http_req_failed{endpoint:crear_reserva}": {
+            "fails": 100,
+            "passes": 0,
+            "thresholds": {
+                "rate<0.05": false
+            },
+            "value": 0
+        },
+        "http_req_waiting": {
+            "avg": 3600.0584774509794,
+            "min": 359.3433,
+            "med": 3650.46765,
+            "max": 4489.7023,
+            "p(90)": 4359.19988,
+            "p(95)": 4436.19299
+        },
+        "reservas_status_201": {
+            "count": 100,
+            "rate": 17.09005629088561
+        },
+        "iteration_duration": {
+            "med": 3682.4481,
+            "max": 4523.0292,
+            "p(90)": 4388.97635,
+            "p(95)": 4459.734455,
+            "avg": 3687.7483239999983,
+            "min": 2726.1377
+        },
+        "http_req_duration{expected_response:true}": {
+            "max": 4490.2361,
+            "p(90)": 4359.70258,
+            "p(95)": 4436.77359,
+            "avg": 3602.727333333333,
+            "min": 360.6888,
+            "med": 3653.77265
+        },
+        "http_req_sending": {
+            "p(90)": 4.2495,
+            "p(95)": 5.620264999999995,
+            "avg": 1.355890196078431,
+            "min": 0,
+            "med": 0,
+            "max": 9.8725
+        },
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 102,
+            "value": 0
+        },
+        "vus": {
+            "value": 55,
+            "min": 0,
+            "max": 100
+        }
+    },
+    "setup_data": {
+        "habitacionIds": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24
+        ],
+        "personaIds": [
+            6,
+            1
+        ],
+        "runOffsetDays": 765
+    },
+    "root_group": {
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "crear reserva: status 201": {
+                    "name": "crear reserva: status 201",
+                    "path": "::crear reserva: status 201",
+                    "id": "3288e68a06b72cfdb5df71c427515a1e",
+                    "passes": 100,
+                    "fails": 0
+                }
+            }
+    }
+}
