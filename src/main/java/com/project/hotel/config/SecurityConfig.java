@@ -56,29 +56,33 @@ public class SecurityConfig {
             .securityMatcher("/api/**")
             .authenticationProvider(authenticationProvider)
             .csrf(csrf -> csrf.disable())
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.POST, "/api/auth/token").permitAll()
 
-                .requestMatchers(HttpMethod.GET, "/api/calendario/**").hasAuthority("calendario.ver")
+                .requestMatchers(HttpMethod.GET, "/api/calendario/**")
+                    .hasAnyAuthority("calendario.ver", "ROLE_ADMINISTRADOR", "ROLE_RECEPCIONISTA")
 
                 .requestMatchers(HttpMethod.GET, "/api/personas/**").hasAuthority("persona.ver")
                 .requestMatchers(HttpMethod.POST, "/api/personas").hasAuthority("persona.crear")
                 .requestMatchers(HttpMethod.PUT, "/api/personas/*").hasAuthority("persona.editar")
                 .requestMatchers(HttpMethod.DELETE, "/api/personas/*").hasAuthority("persona.eliminar")
 
-                .requestMatchers(HttpMethod.GET, "/api/tipos-habitacion/**").hasAuthority("tipohabitacion.ver")
+                .requestMatchers(HttpMethod.GET, "/api/tipos-habitacion/**")
+                    .hasAnyAuthority("tipohabitacion.ver", "ROLE_ADMINISTRADOR", "ROLE_RECEPCIONISTA")
                 .requestMatchers(HttpMethod.POST, "/api/tipos-habitacion").hasAuthority("tipohabitacion.crear")
                 .requestMatchers(HttpMethod.PUT, "/api/tipos-habitacion/*").hasAuthority("tipohabitacion.editar")
                 .requestMatchers(HttpMethod.DELETE, "/api/tipos-habitacion/*").hasAuthority("tipohabitacion.eliminar")
 
-                .requestMatchers(HttpMethod.GET, "/api/habitaciones/**").hasAuthority("habitacion.ver")
+                .requestMatchers(HttpMethod.GET, "/api/habitaciones/**")
+                    .hasAnyAuthority("habitacion.ver", "ROLE_ADMINISTRADOR", "ROLE_RECEPCIONISTA")
                 .requestMatchers(HttpMethod.POST, "/api/habitaciones").hasAuthority("habitacion.crear")
                 .requestMatchers(HttpMethod.PUT, "/api/habitaciones/*").hasAuthority("habitacion.editar")
                 .requestMatchers(HttpMethod.PATCH, "/api/habitaciones/*/estado").hasAuthority("habitacion.estado.cambiar")
                 .requestMatchers(HttpMethod.DELETE, "/api/habitaciones/*").hasAuthority("habitacion.eliminar")
 
-                .requestMatchers(HttpMethod.GET, "/api/reservas/**").hasAuthority("reserva.ver")
+                .requestMatchers(HttpMethod.GET, "/api/reservas/**")
+                    .hasAnyAuthority("reserva.ver", "ROLE_ADMINISTRADOR", "ROLE_RECEPCIONISTA")
                 .requestMatchers(HttpMethod.POST, "/api/reservas").hasAuthority("reserva.crear")
                 .requestMatchers(HttpMethod.PUT, "/api/reservas/*").hasAuthority("reserva.editar")
                 .requestMatchers(HttpMethod.PATCH, "/api/reservas/*/cancelar").hasAuthority("reserva.cancelar")
@@ -113,8 +117,10 @@ public class SecurityConfig {
                 .requestMatchers("/login", "/error", "/css/**", "/js/**", "/images/**").permitAll()
 
                 .requestMatchers(HttpMethod.GET, "/").hasAuthority("dashboard.ver")
-                .requestMatchers(HttpMethod.GET, "/calendario").hasAuthority("calendario.ver")
-                .requestMatchers(HttpMethod.GET, "/panel-administrativo").hasAnyAuthority("ROLE_ADMINISTRADOR", "ROLE_RECEPCIONISTA")
+                .requestMatchers(HttpMethod.GET, "/calendario")
+                    .hasAnyAuthority("calendario.ver", "ROLE_ADMINISTRADOR", "ROLE_RECEPCIONISTA")
+                .requestMatchers(HttpMethod.GET, "/panel-administrativo")
+                    .hasAnyAuthority("ROLE_ADMINISTRADOR", "ROLE_RECEPCIONISTA")
 
                 .requestMatchers(HttpMethod.GET, "/personas").hasAuthority("persona.ver")
                 .requestMatchers(HttpMethod.GET, "/personas/nuevo").hasAuthority("persona.crear")
@@ -172,7 +178,7 @@ public class SecurityConfig {
     private void applySecureHeaders(HttpSecurity http) throws Exception {
         http.headers(headers -> {
             headers.contentSecurityPolicy(csp -> csp.policyDirectives(
-                    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
+                    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; " +
                     "img-src 'self' data:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'"
             ));
             headers.referrerPolicy(ref -> ref.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER));
