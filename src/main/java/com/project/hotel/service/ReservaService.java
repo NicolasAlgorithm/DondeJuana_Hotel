@@ -6,7 +6,6 @@ import com.project.hotel.entities.Reserva;
 import com.project.hotel.repository.HabitacionRepository;
 import com.project.hotel.repository.PersonaRepository;
 import com.project.hotel.repository.ReservaRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,8 +76,10 @@ public class ReservaService {
         validarFechas(fechaEntrada, fechaSalida);
         validarDisponibilidadSinRevalidarFechas(idHabitacion, fechaEntrada, fechaSalida, null);
 
-        Persona persona = obtenerReferenciaPersona(idPersona);
-        Habitacion habitacion = obtenerReferenciaHabitacion(idHabitacion);
+        Persona persona = personaRepository.findById(idPersona)
+            .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada: " + idPersona));
+        Habitacion habitacion = habitacionRepository.findById(idHabitacion)
+            .orElseThrow(() -> new IllegalArgumentException("Habitación no encontrada: " + idHabitacion));
 
         Reserva r = new Reserva();
         r.setPersona(persona);
@@ -99,8 +100,10 @@ public class ReservaService {
         Reserva actual = reservaRepository.findById(idReserva)
                 .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada: " + idReserva));
 
-        Persona persona = obtenerReferenciaPersona(idPersona);
-        Habitacion habitacion = obtenerReferenciaHabitacion(idHabitacion);
+        Persona persona = personaRepository.findById(idPersona)
+            .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada: " + idPersona));
+        Habitacion habitacion = habitacionRepository.findById(idHabitacion)
+            .orElseThrow(() -> new IllegalArgumentException("Habitación no encontrada: " + idHabitacion));
 
         actual.setPersona(persona);
         actual.setHabitacion(habitacion);
@@ -206,22 +209,6 @@ public class ReservaService {
         boolean disponible = !reservaRepository.existeTraslapeActivo(idHabitacion, fechaEntrada, fechaSalida, idReservaExcluir);
         if (!disponible) {
             throw new IllegalArgumentException("La habitación no está disponible en el rango de fechas solicitado");
-        }
-    }
-
-    private Persona obtenerReferenciaPersona(Long idPersona) {
-        try {
-            return personaRepository.getReferenceById(idPersona);
-        } catch (EntityNotFoundException e) {
-            throw new IllegalArgumentException("Persona no encontrada: " + idPersona);
-        }
-    }
-
-    private Habitacion obtenerReferenciaHabitacion(Long idHabitacion) {
-        try {
-            return habitacionRepository.getReferenceById(idHabitacion);
-        } catch (EntityNotFoundException e) {
-            throw new IllegalArgumentException("Habitación no encontrada: " + idHabitacion);
         }
     }
 
