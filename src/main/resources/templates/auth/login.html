@@ -4,19 +4,7 @@
     <meta charset="UTF-8">
     <title>Login - Donde Juana</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body { font-family: Arial, sans-serif; background:#f4f6f8; margin:0; }
-        .container { max-width:380px; margin:70px auto; background:#fff; padding:24px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,.1); }
-        h2 { margin-top:0; text-align:center; }
-        .form-group { margin-bottom:14px; }
-        label { display:block; margin-bottom:6px; font-weight:600; }
-        input { width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; }
-        button { width:100%; padding:10px; border:none; border-radius:6px; background:#1e88e5; color:#fff; font-weight:600; cursor:pointer; }
-        button:hover { background:#1565c0; }
-        .msg { margin-top:10px; padding:10px; border-radius:6px; font-size:14px; }
-        .error { background:#fdecea; color:#b71c1c; }
-        .ok { background:#e8f5e9; color:#1b5e20; }
-    </style>
+    <link rel="stylesheet" href="/css/ui.css" th:href="">
 </head>
 <body>
 <div class="container">
@@ -34,7 +22,7 @@
             <input id="password" name="password" type="password" required>
         </div>
 
-        <button type="submit">Entrar</button>
+        <button type="submit" class="btn btn-primary">Entrar</button>
     </form>
 
     <div th:if="${param.error}" class="msg error">

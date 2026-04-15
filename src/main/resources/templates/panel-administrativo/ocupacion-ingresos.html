@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrativo - Ocupación e Ingresos</title>
+    <link rel="stylesheet" href="/css/ui.css" th:href="">
     <title th:text="${esAdmin} ? 'Panel Administrativo - Ocupación e Ingresos' : 'Panel Administrativo - Ocupación'">Panel Administrativo - Ocupación e Ingresos</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 28px; background: #f5f5f5; color: #1f2937; }
@@ -18,6 +20,21 @@
     </style>
 </head>
 <body>
+<div class="app-shell">
+    <div class="app-header">
+        <div>
+            <h1>Panel Administrativo</h1>
+            <p>Ocupaci&oacute;n e ingresos por per&iacute;odo</p>
+        </div>
+        <div class="actions">
+            <form method="get" th:action="@{/panel-administrativo}" class="actions">
+                <label for="fecha">Fecha base:</label>
+                <input id="fecha" type="date" name="fecha" th:value="${fechaConsulta}">
+                <button class="btn btn-primary" type="submit">Actualizar</button>
+            </form>
+            <a class="btn btn-secondary" th:href="@{/}">Inicio</a>
+        </div>
+    </div>
 <div class="top">
     <div>
         <h1>Panel Administrativo</h1>
@@ -33,6 +50,18 @@
     </div>
 </div>
 
+    <section class="panel section-panel" th:with="r=${reporteDiario}">
+        <h2>Reporte diario</h2>
+        <p th:text="${r.fechaInicio}"></p>
+        <div class="grid metric-grid">
+            <div class="panel card-panel"><div class="label">Ocupaci&oacute;n</div><div class="value" th:text="${r.ocupacionPorcentaje + '%'}"></div></div>
+            <div class="panel card-panel"><div class="label">Noches ocupadas</div><div class="value" th:text="${r.nochesOcupadas}"></div></div>
+            <div class="panel card-panel"><div class="label">Noches disponibles</div><div class="value" th:text="${r.nochesDisponibles}"></div></div>
+            <div class="panel card-panel"><div class="label">Ingresos</div><div class="value" th:text="${'$ ' + #numbers.formatDecimal(r.ingresos, 1, 'POINT', 2, 'COMMA')}"></div></div>
+            <div class="panel card-panel"><div class="label">Reservas</div><div class="value" th:text="${r.reservasEnPeriodo}"></div></div>
+        </div>
+        <p class="empty" th:if="${r.sinDatos}">Sin datos de reservas para este d&iacute;a.</p>
+    </section>
 <section class="panel" th:with="r=${reporteDiario}">
     <h2>Reporte diario</h2>
     <p th:text="${r.fechaInicio}"></p>
@@ -46,31 +75,31 @@
     <p class="empty" th:if="${r.sinDatos}">Sin datos de reservas para este día.</p>
 </section>
 
-<section class="panel" th:if="${esAdmin}" th:with="r=${reporteSemanal}">
-    <h2>Reporte semanal</h2>
-    <p th:text="${r.fechaInicio + ' - ' + r.fechaFin}"></p>
-    <div class="grid">
-        <div class="metric"><div class="label">Ocupación</div><div class="value" th:text="${r.ocupacionPorcentaje + '%'}"></div></div>
-        <div class="metric"><div class="label">Noches ocupadas</div><div class="value" th:text="${r.nochesOcupadas}"></div></div>
-        <div class="metric"><div class="label">Noches disponibles</div><div class="value" th:text="${r.nochesDisponibles}"></div></div>
-        <div class="metric"><div class="label">Ingresos</div><div class="value" th:text="${'$ ' + #numbers.formatDecimal(r.ingresos, 1, 'POINT', 2, 'COMMA')}"></div></div>
-        <div class="metric"><div class="label">Reservas</div><div class="value" th:text="${r.reservasEnPeriodo}"></div></div>
-    </div>
-    <p class="empty" th:if="${r.sinDatos}">Sin datos de reservas para esta semana.</p>
-</section>
+    <section class="panel section-panel" th:if="${esAdmin}" th:with="r=${reporteSemanal}">
+        <h2>Reporte semanal</h2>
+        <p th:text="${r.fechaInicio + ' - ' + r.fechaFin}"></p>
+        <div class="grid metric-grid">
+            <div class="panel card-panel"><div class="label">Ocupaci&oacute;n</div><div class="value" th:text="${r.ocupacionPorcentaje + '%'}"></div></div>
+            <div class="panel card-panel"><div class="label">Noches ocupadas</div><div class="value" th:text="${r.nochesOcupadas}"></div></div>
+            <div class="panel card-panel"><div class="label">Noches disponibles</div><div class="value" th:text="${r.nochesDisponibles}"></div></div>
+            <div class="panel card-panel"><div class="label">Ingresos</div><div class="value" th:text="${'$ ' + #numbers.formatDecimal(r.ingresos, 1, 'POINT', 2, 'COMMA')}"></div></div>
+            <div class="panel card-panel"><div class="label">Reservas</div><div class="value" th:text="${r.reservasEnPeriodo}"></div></div>
+        </div>
+        <p class="empty" th:if="${r.sinDatos}">Sin datos de reservas para esta semana.</p>
+    </section>
 
-<section class="panel" th:if="${esAdmin}" th:with="r=${reporteMensual}">
-    <h2>Reporte mensual</h2>
-    <p th:text="${r.fechaInicio + ' - ' + r.fechaFin}"></p>
-    <div class="grid">
-        <div class="metric"><div class="label">Ocupación</div><div class="value" th:text="${r.ocupacionPorcentaje + '%'}"></div></div>
-        <div class="metric"><div class="label">Noches ocupadas</div><div class="value" th:text="${r.nochesOcupadas}"></div></div>
-        <div class="metric"><div class="label">Noches disponibles</div><div class="value" th:text="${r.nochesDisponibles}"></div></div>
-        <div class="metric"><div class="label">Ingresos</div><div class="value" th:text="${'$ ' + #numbers.formatDecimal(r.ingresos, 1, 'POINT', 2, 'COMMA')}"></div></div>
-        <div class="metric"><div class="label">Reservas</div><div class="value" th:text="${r.reservasEnPeriodo}"></div></div>
-    </div>
-    <p class="empty" th:if="${r.sinDatos}">Sin datos de reservas para este mes.</p>
-</section>
-
+    <section class="panel section-panel" th:if="${esAdmin}" th:with="r=${reporteMensual}">
+        <h2>Reporte mensual</h2>
+        <p th:text="${r.fechaInicio + ' - ' + r.fechaFin}"></p>
+        <div class="grid metric-grid">
+            <div class="panel card-panel"><div class="label">Ocupaci&oacute;n</div><div class="value" th:text="${r.ocupacionPorcentaje + '%'}"></div></div>
+            <div class="panel card-panel"><div class="label">Noches ocupadas</div><div class="value" th:text="${r.nochesOcupadas}"></div></div>
+            <div class="panel card-panel"><div class="label">Noches disponibles</div><div class="value" th:text="${r.nochesDisponibles}"></div></div>
+            <div class="panel card-panel"><div class="label">Ingresos</div><div class="value" th:text="${'$ ' + #numbers.formatDecimal(r.ingresos, 1, 'POINT', 2, 'COMMA')}"></div></div>
+            <div class="panel card-panel"><div class="label">Reservas</div><div class="value" th:text="${r.reservasEnPeriodo}"></div></div>
+        </div>
+        <p class="empty" th:if="${r.sinDatos}">Sin datos de reservas para este mes.</p>
+    </section>
+</div>
 </body>
 </html>

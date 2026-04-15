@@ -3,66 +3,55 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Habitacion - Hotel Donde Juana</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
-        h1 { color: #333; }
-        form.main-form { background: white; padding: 24px; border-radius: 8px; max-width: 500px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-        label { display: block; margin-top: 12px; font-weight: bold; color: #444; }
-        input, select, textarea { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        .error { color: red; font-size: 0.85em; }
-        .alert-error { background: #fdecea; color: #b71c1c; border: 1px solid #ef9a9a;
-                       padding: 10px 14px; border-radius: 4px; margin-bottom: 12px; }
-        .btn { display: inline-block; padding: 8px 18px; border-radius: 4px; text-decoration: none; margin-top: 16px; margin-right: 8px; cursor: pointer; border: none; font-size: 1em; }
-        .btn-primary { background: #0066cc; color: white; }
-        .btn-secondary { background: #666; color: white; }
-        .logout { float: right; font-size: 0.85em; margin-bottom: 8px; }
-        .logout-btn { color: #c0392b; text-decoration: none; background: none;
-                      border: none; padding: 0; cursor: pointer; font-size: inherit; }
-        .logout-btn:hover { text-decoration: underline; }
-    </style>
+    <link rel="stylesheet" href="/css/ui.css" th:href="">
 </head>
 <body>
-<div class="logout">
-    <span sec:authentication="name"></span>
-    &nbsp;|&nbsp;
-    <form th:action="@{/logout}" method="post" style="display:inline;margin:0;padding:0;">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-        <button type="submit" class="logout-btn">Cerrar sesi&oacute;n</button>
+<div class="app-shell">
+    <div class="user-bar">
+        <span sec:authentication="name"></span>
+        <span>|</span>
+        <form th:action="@{/logout}" method="post" class="inline-form-reset">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <button type="submit" class="logout-btn">Cerrar sesi&oacute;n</button>
+        </form>
+    </div>
+
+    <h1 th:text="${habitacion.idHabitacion != null} ? 'Editar Habitacion' : 'Nueva Habitacion'">Habitacion</h1>
+
+    <div th:if="${error != null}" class="alert-error" th:text="${error}"></div>
+
+    <form class="main-form" th:action="@{/habitaciones/guardar}" th:object="${habitacion}" method="post">
+        <input type="hidden" th:field="*{idHabitacion}" />
+
+        <label>Numero de Habitacion *</label>
+        <input type="text" th:field="*{numero}" placeholder="Ej: 101, 202" />
+        <span class="error" th:if="${#fields.hasErrors('numero')}" th:errors="*{numero}"></span>
+
+        <label>Tipo de Habitacion *</label>
+        <select th:field="*{idTipoHabitacion}">
+            <option value="">Seleccione una opci&oacute;n</option>
+            <option th:each="tipo : ${tipos}"
+                    th:value="${tipo.idTipo}"
+                    th:text="${tipo.nombre + ' - $' + #numbers.formatDecimal(tipo.precioNoche, 1, 2)}">
+            </option>
+        </select>
+
+        <label>Estado</label>
+        <select th:field="*{estado}">
+            <option value="">Seleccione estado</option>
+            <option th:each="est : ${estados}" th:value="${est}" th:text="${est}"></option>
+        </select>
+
+        <label>Descripcion</label>
+        <textarea th:field="*{descripcion}" rows="3" placeholder="Descripcion de la habitacion"></textarea>
+
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a class="btn btn-secondary" th:href="@{/habitaciones}">Cancelar</a>
+        </div>
     </form>
 </div>
-<h1 th:text="${habitacion.idHabitacion != null} ? 'Editar Habitacion' : 'Nueva Habitacion'">Habitacion</h1>
-<div th:if="${error != null}" class="alert-error" th:text="${error}"></div>
-<form class="main-form" th:action="@{/habitaciones/guardar}" th:object="${habitacion}" method="post">
-    <input type="hidden" th:field="*{idHabitacion}" />
-
-    <label>Numero de Habitacion *</label>
-    <input type="text" th:field="*{numero}" placeholder="Ej: 101, 202" />
-    <span class="error" th:if="${#fields.hasErrors('numero')}" th:errors="*{numero}"></span>
-
-    <label>Tipo de Habitacion *</label>
-    <select th:field="*{idTipoHabitacion}">
-        <option value="">-- Seleccione un tipo --</option>
-        <option th:each="tipo : ${tipos}"
-                th:value="${tipo.idTipo}"
-                th:text="${tipo.nombre + ' - $' + #numbers.formatDecimal(tipo.precioNoche, 1, 2)}">
-        </option>
-    </select>
-
-    <label>Estado</label>
-    <select th:field="*{estado}">
-        <option value="">-- Seleccione estado --</option>
-        <option th:each="est : ${estados}" th:value="${est}" th:text="${est}"></option>
-    </select>
-
-    <label>Descripcion</label>
-    <textarea th:field="*{descripcion}" rows="3" placeholder="Descripcion de la habitacion"></textarea>
-
-    <div>
-        <button type="submit" class="btn btn-primary">Guardar</button>
-        <a class="btn btn-secondary" th:href="@{/habitaciones}">Cancelar</a>
-    </div>
-</form>
 </body>
 </html>
-
