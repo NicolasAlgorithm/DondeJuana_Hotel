@@ -90,6 +90,29 @@ La página principal (`/`) muestra el estado de la conexión a BD:
 - ✅ **DB Status: OK** — la app se conectó correctamente y puede leer `ADMIN.USUARIOS`.
 - ❌ **DB Status: ERROR** — problema de conexión o permisos; se muestra el mensaje de error.
 
+## Pruebas unitarias
+
+El repositorio usa **JUnit 5 + Mockito** con `spring-boot-starter-test`.
+
+### Ejecutar pruebas
+
+```bash
+./mvnw test
+```
+
+### Alcance cubierto (suite actual)
+
+- **Backend (servicios críticos):**
+  - `ReservaService` *(pruebas existentes en el repositorio)*
+  - `CalendarioService` *(pruebas existentes en el repositorio)*
+  - `HabitacionServiceImpl` *(nuevo en esta PR)*
+  - `DbUserDetailsService` *(nuevo en esta PR, autenticación y permisos)*
+- **Frontend MVC (flujo UI en controladores):**
+  - `ReservaController` *(pruebas existentes en el repositorio)*
+  - `CalendarioController` *(pruebas existentes en el repositorio)*
+  - `HabitacionMvcController` *(nuevo en esta PR)*
+  - `IndexController` *(nuevo en esta PR)*
+
 ## Estructura del proyecto
 
 ```
