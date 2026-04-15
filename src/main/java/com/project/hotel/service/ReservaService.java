@@ -74,13 +74,12 @@ public class ReservaService {
 
     public Reserva crear(Long idPersona, Long idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida, String estado) {
         validarFechas(fechaEntrada, fechaSalida);
-        validarDisponibilidad(idHabitacion, fechaEntrada, fechaSalida, null);
+        validarDisponibilidadSinRevalidarFechas(idHabitacion, fechaEntrada, fechaSalida, null);
 
         Persona persona = personaRepository.findById(idPersona)
-                .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada: " + idPersona));
-
+            .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada: " + idPersona));
         Habitacion habitacion = habitacionRepository.findById(idHabitacion)
-                .orElseThrow(() -> new IllegalArgumentException("Habitación no encontrada: " + idHabitacion));
+            .orElseThrow(() -> new IllegalArgumentException("Habitación no encontrada: " + idHabitacion));
 
         Reserva r = new Reserva();
         r.setPersona(persona);
@@ -96,16 +95,15 @@ public class ReservaService {
 
     public Reserva modificar(Long idReserva, Long idPersona, Long idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida, String estado) {
         validarFechas(fechaEntrada, fechaSalida);
-        validarDisponibilidad(idHabitacion, fechaEntrada, fechaSalida, idReserva);
+        validarDisponibilidadSinRevalidarFechas(idHabitacion, fechaEntrada, fechaSalida, idReserva);
 
         Reserva actual = reservaRepository.findById(idReserva)
                 .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada: " + idReserva));
 
         Persona persona = personaRepository.findById(idPersona)
-                .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada: " + idPersona));
-
+            .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada: " + idPersona));
         Habitacion habitacion = habitacionRepository.findById(idHabitacion)
-                .orElseThrow(() -> new IllegalArgumentException("Habitación no encontrada: " + idHabitacion));
+            .orElseThrow(() -> new IllegalArgumentException("Habitación no encontrada: " + idHabitacion));
 
         actual.setPersona(persona);
         actual.setHabitacion(habitacion);
@@ -203,7 +201,12 @@ public class ReservaService {
     }
 
     private void validarDisponibilidad(Long idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida, Long idReservaExcluir) {
-        boolean disponible = estaDisponible(idHabitacion, fechaEntrada, fechaSalida, idReservaExcluir);
+        validarFechas(fechaEntrada, fechaSalida);
+        validarDisponibilidadSinRevalidarFechas(idHabitacion, fechaEntrada, fechaSalida, idReservaExcluir);
+    }
+
+    private void validarDisponibilidadSinRevalidarFechas(Long idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida, Long idReservaExcluir) {
+        boolean disponible = !reservaRepository.existeTraslapeActivo(idHabitacion, fechaEntrada, fechaSalida, idReservaExcluir);
         if (!disponible) {
             throw new IllegalArgumentException("La habitación no está disponible en el rango de fechas solicitado");
         }
