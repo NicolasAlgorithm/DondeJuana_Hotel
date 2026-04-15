@@ -8,6 +8,28 @@ Sistema de gestión hotelera con Spring Boot 3, Thymeleaf, Spring Security y Ora
 - Maven (o usar el Maven Wrapper incluido)
 - Oracle Autonomous Database con wallet descargado
 
+## Error común al actualizar desde `main`
+
+Si ejecutas:
+
+```bash
+git pull main
+```
+
+Git falla porque `main` **no es el remoto**, es la rama. Debes indicar remoto + rama:
+
+```bash
+git pull origin main
+```
+
+Opcionalmente, primero cambia a tu rama de trabajo y luego integra `main`:
+
+```bash
+git checkout <tu-rama>
+git fetch origin main
+git merge origin/main
+```
+
 ## Configuración del Wallet y conexión Oracle
 
 ### 1. Descargar el wallet
