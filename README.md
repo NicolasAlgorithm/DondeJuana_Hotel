@@ -80,6 +80,30 @@ $env:DB_PASSWORD="tuPassword"
 
 Luego abrir en el navegador: `http://localhost:8080/`
 
+## Git: error de `pull` por archivos sin merge
+
+Si al ejecutar `git pull origin main` aparece:
+
+```text
+error: Pulling is not possible because you have unmerged files.
+```
+
+significa que quedó una fusión a medio resolver. Para continuar:
+
+```bash
+git status
+git add <archivo_resuelto>
+git commit
+git pull origin main
+```
+
+Si deseas descartar esa fusión incompleta y volver al último commit de tu rama:
+
+```bash
+git merge --abort
+git pull origin main
+```
+
 ## Autenticación
 
 El sistema usa login con usuarios almacenados en la tabla `ADMIN.USUARIOS` (BCrypt).
