@@ -35,7 +35,7 @@ public class ReservaApiController {
             return ResponseEntity.ok(reservaService.listarTodos());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error interno al listar reservas: " + rootMessage(e)));
+                    .body(Map.of("error", "Error interno al listar reservas"));
         }
     }
 
@@ -51,7 +51,7 @@ public class ReservaApiController {
                             .body(Map.of("error", "Reserva no encontrada: " + id)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error interno al obtener reserva: " + rootMessage(e)));
+                    .body(Map.of("error", "Error interno al obtener reserva"));
         }
     }
 
@@ -73,10 +73,10 @@ public class ReservaApiController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Error de integridad en BD: " + rootMessage(e)));
+            return ResponseEntity.badRequest().body(Map.of("error", "Error de integridad en base de datos"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error interno al crear reserva: " + rootMessage(e)));
+                    .body(Map.of("error", "Error interno al crear reserva"));
         }
     }
 
@@ -96,10 +96,10 @@ public class ReservaApiController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Error de integridad en BD: " + rootMessage(e)));
+            return ResponseEntity.badRequest().body(Map.of("error", "Error de integridad en base de datos"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error interno al modificar reserva: " + rootMessage(e)));
+                    .body(Map.of("error", "Error interno al modificar reserva"));
         }
     }
 
@@ -113,7 +113,7 @@ public class ReservaApiController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error interno al cancelar reserva: " + rootMessage(e)));
+                    .body(Map.of("error", "Error interno al cancelar reserva"));
         }
     }
 
@@ -127,7 +127,7 @@ public class ReservaApiController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error interno al registrar check-in: " + rootMessage(e)));
+                    .body(Map.of("error", "Error interno al registrar check-in"));
         }
     }
 
@@ -144,7 +144,7 @@ public class ReservaApiController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error interno al registrar check-out: " + rootMessage(e)));
+                    .body(Map.of("error", "Error interno al registrar check-out"));
         }
     }
 
@@ -158,7 +158,7 @@ public class ReservaApiController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error interno al borrar reserva: " + rootMessage(e)));
+                    .body(Map.of("error", "Error interno al borrar reserva"));
         }
     }
 
@@ -188,16 +188,8 @@ public class ReservaApiController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error interno al validar disponibilidad: " + rootMessage(e)));
+                    .body(Map.of("error", "Error interno al validar disponibilidad"));
         }
-    }
-
-    private String rootMessage(Throwable t) {
-        Throwable cause = t;
-        while (cause.getCause() != null && cause.getCause() != cause) {
-            cause = cause.getCause();
-        }
-        return cause.getMessage() != null ? cause.getMessage() : t.getMessage();
     }
 
     private ReservaDetalleResponse toDetalleResponse(Reserva r) {

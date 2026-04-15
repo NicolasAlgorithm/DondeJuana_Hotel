@@ -3,20 +3,28 @@ package com.project.hotel.config;
 import com.project.hotel.service.DbUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 
 @Configuration
 public class SecurityConfig {
 
     private final DbUserDetailsService dbUserDetailsService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(DbUserDetailsService dbUserDetailsService) {
+    public SecurityConfig(DbUserDetailsService dbUserDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.dbUserDetailsService = dbUserDetailsService;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
@@ -33,16 +41,75 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    @Order(1)
+    public SecurityFilterChain apiFilterChain(
+            HttpSecurity http,
+            DaoAuthenticationProvider authenticationProvider
+    ) throws Exception {
+
+        http
+            .securityMatcher("/api/**")
+            .authenticationProvider(authenticationProvider)
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.POST, "/api/auth/token").permitAll()
+
+                .requestMatchers(HttpMethod.GET, "/api/calendario/**").hasAuthority("calendario.ver")
+
+                .requestMatchers(HttpMethod.GET, "/api/personas/**").hasAuthority("persona.ver")
+                .requestMatchers(HttpMethod.POST, "/api/personas").hasAuthority("persona.crear")
+                .requestMatchers(HttpMethod.PUT, "/api/personas/*").hasAuthority("persona.editar")
+                .requestMatchers(HttpMethod.DELETE, "/api/personas/*").hasAuthority("persona.eliminar")
+
+                .requestMatchers(HttpMethod.GET, "/api/tipos-habitacion/**").hasAuthority("tipohabitacion.ver")
+                .requestMatchers(HttpMethod.POST, "/api/tipos-habitacion").hasAuthority("tipohabitacion.crear")
+                .requestMatchers(HttpMethod.PUT, "/api/tipos-habitacion/*").hasAuthority("tipohabitacion.editar")
+                .requestMatchers(HttpMethod.DELETE, "/api/tipos-habitacion/*").hasAuthority("tipohabitacion.eliminar")
+
+                .requestMatchers(HttpMethod.GET, "/api/habitaciones/**").hasAuthority("habitacion.ver")
+                .requestMatchers(HttpMethod.POST, "/api/habitaciones").hasAuthority("habitacion.crear")
+                .requestMatchers(HttpMethod.PUT, "/api/habitaciones/*").hasAuthority("habitacion.editar")
+                .requestMatchers(HttpMethod.PATCH, "/api/habitaciones/*/estado").hasAuthority("habitacion.estado.cambiar")
+                .requestMatchers(HttpMethod.DELETE, "/api/habitaciones/*").hasAuthority("habitacion.eliminar")
+
+                .requestMatchers(HttpMethod.GET, "/api/reservas/**").hasAuthority("reserva.ver")
+                .requestMatchers(HttpMethod.POST, "/api/reservas").hasAuthority("reserva.crear")
+                .requestMatchers(HttpMethod.PUT, "/api/reservas/*").hasAuthority("reserva.editar")
+                .requestMatchers(HttpMethod.PATCH, "/api/reservas/*/cancelar").hasAuthority("reserva.cancelar")
+                .requestMatchers(HttpMethod.PATCH, "/api/reservas/*/checkin").hasAuthority("reserva.checkin")
+                .requestMatchers(HttpMethod.PATCH, "/api/reservas/*/checkout").hasAuthority("reserva.checkout")
+                .requestMatchers(HttpMethod.DELETE, "/api/reservas/*").hasAuthority("reserva.eliminar")
+
+                .anyRequest().denyAll()
+            )
+            .httpBasic(basic -> basic.realmName("DondeJuana Hotel API"))
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> {
+                response.setStatus(401);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\":\"No autorizado\"}");
+            }));
+
+        applySecureHeaders(http);
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
+    public SecurityFilterChain webFilterChain(
             HttpSecurity http,
             DaoAuthenticationProvider authenticationProvider
     ) throws Exception {
 
         http
             .authenticationProvider(authenticationProvider)
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
             .authorizeHttpRequests(auth -> auth
-
                 .requestMatchers("/login", "/error", "/css/**", "/js/**", "/images/**").permitAll()
 
                 .requestMatchers(HttpMethod.GET, "/").hasAuthority("dashboard.ver")
@@ -74,32 +141,6 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/reservas/guardar").hasAnyAuthority("reserva.crear", "reserva.editar")
                 .requestMatchers(HttpMethod.POST, "/reservas/eliminar/**").hasAuthority("reserva.eliminar")
 
-                .requestMatchers(HttpMethod.GET, "/api/calendario/**").hasAuthority("calendario.ver")
-
-                .requestMatchers(HttpMethod.GET, "/api/personas/**").hasAuthority("persona.ver")
-                .requestMatchers(HttpMethod.POST, "/api/personas").hasAuthority("persona.crear")
-                .requestMatchers(HttpMethod.PUT, "/api/personas/*").hasAuthority("persona.editar")
-                .requestMatchers(HttpMethod.DELETE, "/api/personas/*").hasAuthority("persona.eliminar")
-
-                .requestMatchers(HttpMethod.GET, "/api/tipos-habitacion/**").hasAuthority("tipohabitacion.ver")
-                .requestMatchers(HttpMethod.POST, "/api/tipos-habitacion").hasAuthority("tipohabitacion.crear")
-                .requestMatchers(HttpMethod.PUT, "/api/tipos-habitacion/*").hasAuthority("tipohabitacion.editar")
-                .requestMatchers(HttpMethod.DELETE, "/api/tipos-habitacion/*").hasAuthority("tipohabitacion.eliminar")
-
-                .requestMatchers(HttpMethod.GET, "/api/habitaciones/**").hasAuthority("habitacion.ver")
-                .requestMatchers(HttpMethod.POST, "/api/habitaciones").hasAuthority("habitacion.crear")
-                .requestMatchers(HttpMethod.PUT, "/api/habitaciones/*").hasAuthority("habitacion.editar")
-                .requestMatchers(HttpMethod.PATCH, "/api/habitaciones/*/estado").hasAuthority("habitacion.estado.cambiar")
-                .requestMatchers(HttpMethod.DELETE, "/api/habitaciones/*").hasAuthority("habitacion.eliminar")
-
-                .requestMatchers(HttpMethod.GET, "/api/reservas/**").hasAuthority("reserva.ver")
-                .requestMatchers(HttpMethod.POST, "/api/reservas").hasAuthority("reserva.crear")
-                .requestMatchers(HttpMethod.PUT, "/api/reservas/*").hasAuthority("reserva.editar")
-                .requestMatchers(HttpMethod.PATCH, "/api/reservas/*/cancelar").hasAuthority("reserva.cancelar")
-                .requestMatchers(HttpMethod.PATCH, "/api/reservas/*/checkin").hasAuthority("reserva.checkin")
-                .requestMatchers(HttpMethod.PATCH, "/api/reservas/*/checkout").hasAuthority("reserva.checkout")
-                .requestMatchers(HttpMethod.DELETE, "/api/reservas/*").hasAuthority("reserva.eliminar")
-
                 .anyRequest().denyAll()
             )
             .formLogin(form -> form
@@ -108,7 +149,6 @@ public class SecurityConfig {
                 .failureUrl("/login?error=true")
                 .permitAll()
             )
-            .httpBasic(basic -> basic.realmName("DondeJuana Hotel API"))
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout=true")
@@ -116,8 +156,32 @@ public class SecurityConfig {
                 .clearAuthentication(true)
                 .deleteCookies("JSESSIONID")
                 .permitAll()
+            )
+            .sessionManagement(sm -> sm
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .sessionFixation(sf -> sf.migrateSession())
+                .invalidSessionUrl("/login?expired=true")
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(false)
             );
 
+        applySecureHeaders(http);
         return http.build();
+    }
+
+    private void applySecureHeaders(HttpSecurity http) throws Exception {
+        http.headers(headers -> {
+            headers.contentSecurityPolicy(csp -> csp.policyDirectives(
+                    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
+                    "img-src 'self' data:; object-src 'none'; frame-ancestors 'none'; base-uri 'self'"
+            ));
+            headers.referrerPolicy(ref -> ref.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER));
+            headers.frameOptions(frame -> frame.deny());
+            headers.permissionsPolicy(policy -> policy.policy("camera=(), microphone=(), geolocation=()"));
+            headers.httpStrictTransportSecurity(hsts -> hsts
+                    .includeSubDomains(true)
+                    .maxAgeInSeconds(31536000)
+            );
+        });
     }
 }

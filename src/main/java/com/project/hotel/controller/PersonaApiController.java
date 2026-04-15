@@ -52,21 +52,30 @@ public class PersonaApiController {
             return ResponseEntity
                     .created(URI.create("/api/personas/" + creada.getIdPersona()))
                     .body(creada);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error interno al crear huésped: " + e.getMessage()));
+                    .body(Map.of("error", "Error interno al crear huésped"));
         }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody PersonaRequest request) {
-        return personaService.buscarPorId(id)
-                .<ResponseEntity<?>>map(p -> {
-                    mapToEntity(p, request);
-                    return ResponseEntity.ok(personaService.guardar(p));
-                })
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Huésped no encontrado: " + id)));
+        try {
+            return personaService.buscarPorId(id)
+                    .<ResponseEntity<?>>map(p -> {
+                        mapToEntity(p, request);
+                        return ResponseEntity.ok(personaService.guardar(p));
+                    })
+                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(Map.of("error", "Huésped no encontrado: " + id)));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error interno al actualizar huésped"));
+        }
     }
 
     @DeleteMapping("/{id}")
