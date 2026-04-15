@@ -8,7 +8,7 @@ Sistema de gestión hotelera con Spring Boot 3, Thymeleaf, Spring Security y Ora
 - Maven (o usar el Maven Wrapper incluido)
 - Oracle Autonomous Database con wallet descargado
 
-## Error común al actualizar desde `main`
+## Cómo actualizar tu rama desde `main`
 
 Si ejecutas:
 
@@ -26,7 +26,7 @@ Opcionalmente, primero cambia a tu rama de trabajo y luego integra `main`:
 
 ```bash
 git checkout <tu-rama>
-git fetch origin main
+git fetch origin
 git merge origin/main
 ```
 
