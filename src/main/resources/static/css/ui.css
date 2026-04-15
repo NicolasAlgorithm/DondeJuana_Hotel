@@ -475,10 +475,10 @@ tbody tr:hover td { background: #f7fbff; }
 
 .section-panel { padding: 16px; margin-bottom: 12px; }
 .metric-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-top: 10px; }
-.dot-available { background:#7cae96; }
-.dot-booked { background:#c98388; }
-.dot-maintenance { background:#c9a26d; }
-.dot-out { background:#8ea3b8; }
+.dot-available { background: var(--ok); }
+.dot-booked { background: var(--danger); }
+.dot-maintenance { background: var(--warning); }
+.dot-out { background: var(--secondary); }
 
 .mt-inline { margin-top: 10px; display: inline-block; }
 

@@ -31,7 +31,7 @@
 
         <label>Tipo de Habitacion *</label>
         <select th:field="*{idTipoHabitacion}">
-            <option value="">Seleccione un tipo</option>
+            <option value="">Seleccione una opci&oacute;n</option>
             <option th:each="tipo : ${tipos}"
                     th:value="${tipo.idTipo}"
                     th:text="${tipo.nombre + ' - $' + #numbers.formatDecimal(tipo.precioNoche, 1, 2)}">
