@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Administrativo - Ocupación e Ingresos</title>
+    <title th:text="${esAdmin} ? 'Panel Administrativo - Ocupación e Ingresos' : 'Panel Administrativo - Ocupación'">Panel Administrativo - Ocupación e Ingresos</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 28px; background: #f5f5f5; color: #1f2937; }
         .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
@@ -21,7 +21,7 @@
 <div class="top">
     <div>
         <h1>Panel Administrativo</h1>
-        <p>Ocupación e ingresos por período</p>
+        <p th:text="${esAdmin} ? 'Ocupación e ingresos por período' : 'Ocupación diaria resumida'">Ocupación e ingresos por período</p>
     </div>
     <div class="actions">
         <form method="get" th:action="@{/panel-administrativo}">
@@ -40,7 +40,7 @@
         <div class="metric"><div class="label">Ocupación</div><div class="value" th:text="${r.ocupacionPorcentaje + '%'}"></div></div>
         <div class="metric"><div class="label">Noches ocupadas</div><div class="value" th:text="${r.nochesOcupadas}"></div></div>
         <div class="metric"><div class="label">Noches disponibles</div><div class="value" th:text="${r.nochesDisponibles}"></div></div>
-        <div class="metric"><div class="label">Ingresos</div><div class="value" th:text="${'$ ' + #numbers.formatDecimal(r.ingresos, 1, 'POINT', 2, 'COMMA')}"></div></div>
+        <div class="metric" th:if="${esAdmin}"><div class="label">Ingresos</div><div class="value" th:text="${'$ ' + #numbers.formatDecimal(r.ingresos, 1, 'POINT', 2, 'COMMA')}"></div></div>
         <div class="metric"><div class="label">Reservas</div><div class="value" th:text="${r.reservasEnPeriodo}"></div></div>
     </div>
     <p class="empty" th:if="${r.sinDatos}">Sin datos de reservas para este día.</p>
