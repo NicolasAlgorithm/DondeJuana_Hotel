@@ -10,6 +10,7 @@ import com.project.hotel.dto.HabitacionRequest;
 import com.project.hotel.entities.Habitacion;
 import com.project.hotel.repository.HabitacionRepository;
 import com.project.hotel.service.HabitacionService;
+import com.project.hotel.service.InputSanitizer;
 
 @Service
 @Transactional
@@ -19,29 +20,35 @@ public class HabitacionServiceImpl implements HabitacionService {
             Set.of("DISPONIBLE", "RESERVADA", "OCUPADA", "MANTENIMIENTO");
 
     private final HabitacionRepository habitacionRepository;
+    private final InputSanitizer inputSanitizer;
 
-    public HabitacionServiceImpl(HabitacionRepository habitacionRepository) {
+    public HabitacionServiceImpl(HabitacionRepository habitacionRepository, InputSanitizer inputSanitizer) {
         this.habitacionRepository = habitacionRepository;
+        this.inputSanitizer = inputSanitizer;
     }
 
     @Override
     public Habitacion crear(HabitacionRequest request) {
-        validarEstado(request.getEstado());
+        String codigo = inputSanitizer.sanitizeUpperCode(request.getCodigo());
+        String numero = inputSanitizer.sanitizeUpperCode(request.getNumero());
+        String estado = inputSanitizer.sanitizeUpperCode(request.getEstado());
 
-        habitacionRepository.findByNumero(request.getNumero())
+        validarEstado(estado);
+
+        habitacionRepository.findByNumero(numero)
                 .ifPresent(h -> {
                     throw new IllegalArgumentException(
-                            "Ya existe una habitacion con numero: " + request.getNumero()
+                    "Ya existe una habitacion con numero: " + numero
                     );
                 });
 
         Habitacion h = new Habitacion();
-        h.setCodigo(request.getCodigo());
-        h.setNumero(request.getNumero());
+        h.setCodigo(codigo);
+        h.setNumero(numero);
         h.setPiso(request.getPiso());
         h.setIdTipoHabitacion(request.getIdTipoHabitacion());
         h.setTarifaNoche(request.getTarifaNoche());
-        h.setEstado(request.getEstado().toUpperCase());
+        h.setEstado(estado);
         h.setActivo("S");
 
         return habitacionRepository.save(h);
@@ -75,35 +82,40 @@ public class HabitacionServiceImpl implements HabitacionService {
 
     @Override
     public Habitacion actualizar(Long id, HabitacionRequest request) {
-        validarEstado(request.getEstado());
+        String codigo = inputSanitizer.sanitizeUpperCode(request.getCodigo());
+        String numero = inputSanitizer.sanitizeUpperCode(request.getNumero());
+        String estado = inputSanitizer.sanitizeUpperCode(request.getEstado());
+
+        validarEstado(estado);
 
         Habitacion actual = obtenerPorId(id);
 
-        habitacionRepository.findByNumero(request.getNumero())
+        habitacionRepository.findByNumero(numero)
                 .ifPresent(h -> {
                     if (!h.getIdHabitacion().equals(id)) {
                         throw new IllegalArgumentException(
-                                "Ya existe otra habitacion con numero: " + request.getNumero()
+                                "Ya existe otra habitacion con numero: " + numero
                         );
                     }
                 });
 
-        actual.setCodigo(request.getCodigo());
-        actual.setNumero(request.getNumero());
+        actual.setCodigo(codigo);
+        actual.setNumero(numero);
         actual.setPiso(request.getPiso());
         actual.setIdTipoHabitacion(request.getIdTipoHabitacion());
         actual.setTarifaNoche(request.getTarifaNoche());
-        actual.setEstado(request.getEstado().toUpperCase());
+        actual.setEstado(estado);
 
         return habitacionRepository.save(actual);
     }
 
     @Override
     public Habitacion actualizarEstado(Long id, String estado) {
-        validarEstado(estado);
+        String sanitizedEstado = inputSanitizer.sanitizeUpperCode(estado);
+        validarEstado(sanitizedEstado);
 
         Habitacion actual = obtenerPorId(id);
-        actual.setEstado(estado.toUpperCase());
+        actual.setEstado(sanitizedEstado);
 
         return habitacionRepository.save(actual);
     }

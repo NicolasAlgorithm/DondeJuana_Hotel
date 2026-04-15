@@ -53,21 +53,30 @@ public class TipoHabitacionApiController {
             return ResponseEntity
                     .created(URI.create("/api/tipos-habitacion/" + creado.getIdTipo()))
                     .body(creado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error interno al crear tipo de habitación: " + e.getMessage()));
+                    .body(Map.of("error", "Error interno al crear tipo de habitación"));
         }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody TipoHabitacionRequest request) {
-        return tipoHabitacionService.buscarPorId(id)
-                .<ResponseEntity<?>>map(tipo -> {
-                    mapToEntity(tipo, request);
-                    return ResponseEntity.ok(tipoHabitacionService.guardar(tipo));
-                })
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(Map.of("error", "Tipo de habitación no encontrado: " + id)));
+        try {
+            return tipoHabitacionService.buscarPorId(id)
+                    .<ResponseEntity<?>>map(tipo -> {
+                        mapToEntity(tipo, request);
+                        return ResponseEntity.ok(tipoHabitacionService.guardar(tipo));
+                    })
+                    .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
+                            .body(Map.of("error", "Tipo de habitación no encontrado: " + id)));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error interno al actualizar tipo de habitación"));
+        }
     }
 
     @DeleteMapping("/{id}")

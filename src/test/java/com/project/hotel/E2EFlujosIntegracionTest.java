@@ -111,6 +111,12 @@ class E2EFlujosIntegracionTest {
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl("/login?error=true"));
 
+        mockMvc.perform(SecurityMockMvcRequestBuilders.formLogin("/login")
+                        .user("usuario-invalido")
+                        .password("clave-invalida"))
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/login?error=true"));
+
         MockHttpSession session = (MockHttpSession) loginExitoso.getRequest().getSession(false);
         assertNotNull(session);
 
@@ -120,10 +126,12 @@ class E2EFlujosIntegracionTest {
         mockMvc.perform(post("/logout")
                         .session(session)
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("/login?logout=true"));
 
         mockMvc.perform(get("/reservas").session(session))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isFound())
+                .andExpect(redirectedUrl("http://localhost/login"));
     }
 
     @Test

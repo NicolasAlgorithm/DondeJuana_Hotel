@@ -1,6 +1,7 @@
 package com.project.hotel.dto;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import java.time.LocalDate;
 
 public class ReservaCreateRequest {
@@ -17,6 +18,7 @@ public class ReservaCreateRequest {
     @NotNull
     private LocalDate fechaSalida;
 
+    @Pattern(regexp = "^(ACTIVA|EN_ESTADIA|CANCELADA|CUMPLIDA)?$", message = "Estado invalido")
     private String estado;
 
     public Long getIdPersona() {

@@ -3,6 +3,7 @@ package com.project.hotel;
 import com.project.hotel.dto.HabitacionRequest;
 import com.project.hotel.entities.Habitacion;
 import com.project.hotel.repository.HabitacionRepository;
+import com.project.hotel.service.InputSanitizer;
 import com.project.hotel.service.impl.HabitacionServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 class HabitacionServiceImplTest {
@@ -23,12 +25,19 @@ class HabitacionServiceImplTest {
     @Mock
     private HabitacionRepository habitacionRepository;
 
+    @Mock
+    private InputSanitizer inputSanitizer;
+
     @InjectMocks
     private HabitacionServiceImpl habitacionService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        when(inputSanitizer.sanitizeUpperCode(anyString())).thenAnswer(invocation -> {
+            String value = invocation.getArgument(0);
+            return value == null ? null : value.toUpperCase();
+        });
     }
 
     @Test
