@@ -100,18 +100,18 @@ El repositorio usa **JUnit 5 + Mockito** con `spring-boot-starter-test`.
 ./mvnw test
 ```
 
-### Alcance cubierto
+### Alcance cubierto (suite actual)
 
 - **Backend (servicios críticos):**
-  - `ReservaService`
-  - `CalendarioService`
-  - `HabitacionServiceImpl`
-  - `DbUserDetailsService` (autenticación y permisos)
+  - `ReservaService` *(pruebas existentes en el repositorio)*
+  - `CalendarioService` *(pruebas existentes en el repositorio)*
+  - `HabitacionServiceImpl` *(nuevo en esta PR)*
+  - `DbUserDetailsService` *(nuevo en esta PR, autenticación y permisos)*
 - **Frontend MVC (flujo UI en controladores):**
-  - `ReservaController`
-  - `HabitacionMvcController`
-  - `IndexController`
-  - `CalendarioController`
+  - `ReservaController` *(pruebas existentes en el repositorio)*
+  - `CalendarioController` *(pruebas existentes en el repositorio)*
+  - `HabitacionMvcController` *(nuevo en esta PR)*
+  - `IndexController` *(nuevo en esta PR)*
 
 ## Estructura del proyecto
 
