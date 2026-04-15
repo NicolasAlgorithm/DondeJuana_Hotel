@@ -3,15 +3,21 @@ package com.project.hotel.dto;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 
 public class HabitacionRequest {
 
     @NotBlank
+    @Size(min = 1, max = 30)
+    @Pattern(regexp = "^[A-Za-z0-9_-]+$", message = "Codigo con formato invalido")
     private String codigo;
 
     @NotBlank
+    @Size(min = 1, max = 30)
+    @Pattern(regexp = "^[A-Za-z0-9-]+$", message = "Numero con formato invalido")
     private String numero;
 
     private Integer piso;
@@ -24,6 +30,7 @@ public class HabitacionRequest {
     private BigDecimal tarifaNoche;
 
     @NotBlank
+    @Pattern(regexp = "^(DISPONIBLE|RESERVADA|OCUPADA|MANTENIMIENTO)$", message = "Estado invalido")
     private String estado; // DISPONIBLE | RESERVADA | OCUPADA | MANTENIMIENTO
 
     public String getCodigo() { return codigo; }
