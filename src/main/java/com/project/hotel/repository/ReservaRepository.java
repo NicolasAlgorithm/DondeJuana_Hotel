@@ -18,7 +18,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> { List<R
      select case when count(r) > 0 then true else false end
      from Reserva r
      where r.habitacion.idHabitacion = :idHabitacion
-       and upper(coalesce(r.estado, '')) <> 'CANCELADA'
+         and (r.estado is null or r.estado <> 'CANCELADA')
        and (:idReservaExcluir is null or r.idReserva <> :idReservaExcluir)
        and r.fechaEntrada < :fechaSalida
        and r.fechaSalida > :fechaEntrada
@@ -46,7 +46,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> { List<R
      select r from Reserva r
      join fetch r.habitacion
      where r.habitacion.idHabitacion in :ids
-       and upper(coalesce(r.estado, '')) <> 'CANCELADA'
+         and (r.estado is null or r.estado <> 'CANCELADA')
        and r.fechaEntrada < :fechaFin
        and r.fechaSalida > :fechaInicio
  """)

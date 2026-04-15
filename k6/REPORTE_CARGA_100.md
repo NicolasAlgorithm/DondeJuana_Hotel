@@ -7,7 +7,7 @@ Validar el comportamiento de la API de reservas bajo 100 solicitudes concurrente
 - Proyecto: DondeJuana_Hotel
 - Fecha: 15/04/2026
 - Rama/commit: load_test
-- Equipo: ELPRODIGIOPC (local)
+- Equipo: owner pc (local)
 - Base URL: http://localhost:8080
 - Motor BD: Oracle ADB
 - Usuario de prueba: admin

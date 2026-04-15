@@ -6,6 +6,7 @@ import com.project.hotel.entities.Reserva;
 import com.project.hotel.repository.HabitacionRepository;
 import com.project.hotel.repository.PersonaRepository;
 import com.project.hotel.repository.ReservaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,13 +75,10 @@ public class ReservaService {
 
     public Reserva crear(Long idPersona, Long idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida, String estado) {
         validarFechas(fechaEntrada, fechaSalida);
-        validarDisponibilidad(idHabitacion, fechaEntrada, fechaSalida, null);
+        validarDisponibilidadSinRevalidarFechas(idHabitacion, fechaEntrada, fechaSalida, null);
 
-        Persona persona = personaRepository.findById(idPersona)
-                .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada: " + idPersona));
-
-        Habitacion habitacion = habitacionRepository.findById(idHabitacion)
-                .orElseThrow(() -> new IllegalArgumentException("Habitación no encontrada: " + idHabitacion));
+        Persona persona = obtenerReferenciaPersona(idPersona);
+        Habitacion habitacion = obtenerReferenciaHabitacion(idHabitacion);
 
         Reserva r = new Reserva();
         r.setPersona(persona);
@@ -96,16 +94,13 @@ public class ReservaService {
 
     public Reserva modificar(Long idReserva, Long idPersona, Long idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida, String estado) {
         validarFechas(fechaEntrada, fechaSalida);
-        validarDisponibilidad(idHabitacion, fechaEntrada, fechaSalida, idReserva);
+        validarDisponibilidadSinRevalidarFechas(idHabitacion, fechaEntrada, fechaSalida, idReserva);
 
         Reserva actual = reservaRepository.findById(idReserva)
                 .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada: " + idReserva));
 
-        Persona persona = personaRepository.findById(idPersona)
-                .orElseThrow(() -> new IllegalArgumentException("Persona no encontrada: " + idPersona));
-
-        Habitacion habitacion = habitacionRepository.findById(idHabitacion)
-                .orElseThrow(() -> new IllegalArgumentException("Habitación no encontrada: " + idHabitacion));
+        Persona persona = obtenerReferenciaPersona(idPersona);
+        Habitacion habitacion = obtenerReferenciaHabitacion(idHabitacion);
 
         actual.setPersona(persona);
         actual.setHabitacion(habitacion);
@@ -203,9 +198,30 @@ public class ReservaService {
     }
 
     private void validarDisponibilidad(Long idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida, Long idReservaExcluir) {
-        boolean disponible = estaDisponible(idHabitacion, fechaEntrada, fechaSalida, idReservaExcluir);
+        validarFechas(fechaEntrada, fechaSalida);
+        validarDisponibilidadSinRevalidarFechas(idHabitacion, fechaEntrada, fechaSalida, idReservaExcluir);
+    }
+
+    private void validarDisponibilidadSinRevalidarFechas(Long idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida, Long idReservaExcluir) {
+        boolean disponible = !reservaRepository.existeTraslapeActivo(idHabitacion, fechaEntrada, fechaSalida, idReservaExcluir);
         if (!disponible) {
             throw new IllegalArgumentException("La habitación no está disponible en el rango de fechas solicitado");
+        }
+    }
+
+    private Persona obtenerReferenciaPersona(Long idPersona) {
+        try {
+            return personaRepository.getReferenceById(idPersona);
+        } catch (EntityNotFoundException e) {
+            throw new IllegalArgumentException("Persona no encontrada: " + idPersona);
+        }
+    }
+
+    private Habitacion obtenerReferenciaHabitacion(Long idHabitacion) {
+        try {
+            return habitacionRepository.getReferenceById(idHabitacion);
+        } catch (EntityNotFoundException e) {
+            throw new IllegalArgumentException("Habitación no encontrada: " + idHabitacion);
         }
     }
 
