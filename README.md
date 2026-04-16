@@ -21,9 +21,10 @@ Descomprime el wallet dentro del proyecto en esta ruta:
 El wallet contiene archivos como: `cwallet.sso`, `ewallet.p12`, `tnsnames.ora`, `sqlnet.ora`, `ojdbc.properties`, etc.
 La aplicación detecta esta carpeta automáticamente al iniciar.
 
-### 2. Variables de entorno (recomendado)
+### 2. Variables de entorno (opcionales)
 
-Define las siguientes variables de entorno antes de ejecutar la app:
+La app ya incluye valores por defecto para conexión (usuario y contraseña) y puede iniciar sin exportar variables.
+Si quieres sobrescribirlos en otro ambiente, usa estas variables:
 
 | Variable      | Descripción                        | Ejemplo (Windows)                              |
 |---------------|------------------------------------|------------------------------------------------|
@@ -57,24 +58,18 @@ GRANT SELECT ON ADMIN.ROLES    TO HOTEL;
 ### Linux / Mac
 
 ```bash
-export DB_USERNAME=HOTEL
-export DB_PASSWORD=tuPassword
 ./mvnw spring-boot:run
 ```
 
 ### Windows (cmd)
 
 ```cmd
-set DB_USERNAME=HOTEL
-set DB_PASSWORD=tuPassword
 .\mvnw.cmd spring-boot:run
 ```
 
 ### Windows (PowerShell)
 
 ```powershell
-$env:DB_USERNAME="HOTEL"
-$env:DB_PASSWORD="tuPassword"
 .\mvnw.cmd spring-boot:run
 ```
 
