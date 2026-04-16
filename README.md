@@ -30,8 +30,11 @@ Si quieres sobrescribirlos en otro ambiente, usa estas variables:
 |---------------|------------------------------------|------------------------------------------------|
 | `DB_USERNAME` | Usuario de conexión en Oracle      | `HOTEL`                                        |
 | `DB_PASSWORD` | Contraseña del usuario de conexión | `tuPassword`                                   |
+| `APP_TEMPLATES_EXTERNAL_PREFIX` | Ruta de plantillas externas | `file:./` o `file:/opt/app/` |
 
 `TNS_ADMIN` quedó como opcional: si existe, la app lo usa; si no, usa `wallet/Wallet_DondeJuanaDB`.
+
+La vista principal se carga desde `index.html` en la raíz del proyecto mediante Thymeleaf.
 
 ### 3. Grants y sinónimos en Oracle (REQUERIDO)
 
@@ -157,8 +160,9 @@ src/
     │   └── service/
     │       └── DbUserDetailsService.java     ← UserDetailsService basado en BD
     └── resources/
-        ├── application.properties
-        └── templates/
-            ├── auth/login.html
-            └── index.html
+      ├── application.properties
+      └── templates/
+        └── auth/login.html
+
+  index.html                                  ← Vista principal en la raíz del proyecto
 ```
