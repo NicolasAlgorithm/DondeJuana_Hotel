@@ -5,228 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${reserva.idReserva != null} ? 'Editar Reserva' : 'Nueva Reserva'">Reserva</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Fraunces:opsz,wght@9..144,600&display=swap');
-
-        :root {
-            --bg-top: #f4f7ff;
-            --bg-bottom: #e8f5ee;
-            --panel: #ffffff;
-            --ink: #1c2533;
-            --muted: #6f7d90;
-            --line: #d7deea;
-            --primary: #0b6e4f;
-            --primary-dark: #084f39;
-            --accent: #ffb703;
-            --danger: #b42318;
-            --ok: #0b6e4f;
-            --radius-lg: 18px;
-            --radius-md: 12px;
-            --shadow: 0 20px 45px rgba(28, 37, 51, 0.12);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: "Space Grotesk", sans-serif;
-            color: var(--ink);
-            background:
-                radial-gradient(900px 300px at 10% -5%, #d2e9ff 0%, transparent 60%),
-                radial-gradient(1000px 420px at 95% 105%, #c7f0d9 0%, transparent 65%),
-                linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
-            display: grid;
-            place-items: center;
-            padding: 22px;
-        }
-
-        .wrap {
-            width: min(940px, 100%);
-            background: var(--panel);
-            border: 1px solid var(--line);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            animation: rise 0.35s ease-out;
-        }
-
-        @keyframes rise {
-            from { opacity: 0; transform: translateY(14px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .hero {
-            padding: 24px 26px;
-            background: linear-gradient(120deg, #0b6e4f, #2a9d8f);
-            color: #fff;
-        }
-
-        .eyebrow {
-            margin: 0 0 8px 0;
-            font-size: 12px;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            opacity: 0.9;
-        }
-
-        h1 {
-            margin: 0;
-            font-family: "Fraunces", serif;
-            font-size: clamp(1.35rem, 2.1vw, 2rem);
-            font-weight: 600;
-        }
-
-        .sub {
-            margin: 8px 0 0 0;
-            color: rgba(255, 255, 255, 0.92);
-            font-size: 0.95rem;
-        }
-
-        .content {
-            padding: 24px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 14px;
-        }
-
-        .field {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .field.span-2 {
-            grid-column: span 2;
-        }
-
-        label {
-            font-size: 0.92rem;
-            font-weight: 600;
-            color: #273243;
-        }
-
-        .req {
-            color: var(--danger);
-        }
-
-        input,
-        select {
-            width: 100%;
-            border: 1px solid var(--line);
-            border-radius: var(--radius-md);
-            padding: 11px 12px;
-            font: inherit;
-            background: #fff;
-            color: var(--ink);
-            transition: border-color .18s, box-shadow .18s;
-        }
-
-        input:focus,
-        select:focus {
-            outline: none;
-            border-color: #4f9cf9;
-            box-shadow: 0 0 0 4px rgba(79, 156, 249, 0.18);
-        }
-
-        .help {
-            color: var(--muted);
-            font-size: 0.83rem;
-        }
-
-        .error {
-            color: var(--danger);
-            font-size: 0.83rem;
-        }
-
-        .msg {
-            margin: 0 0 16px 0;
-            border-radius: 10px;
-            padding: 11px 12px;
-            font-size: 0.92rem;
-            display: none;
-        }
-
-        .msg.error {
-            display: block;
-            background: #fef3f2;
-            color: #7a271a;
-            border: 1px solid #fecdca;
-        }
-
-        .msg.ok {
-            display: block;
-            background: #ecfdf3;
-            color: #0f5132;
-            border: 1px solid #a6f4c5;
-        }
-
-        .actions {
-            margin-top: 18px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .btn {
-            border: 0;
-            border-radius: 11px;
-            padding: 10px 16px;
-            font: inherit;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            transition: transform .15s ease, filter .15s ease;
-        }
-
-        .btn:hover {
-            transform: translateY(-1px);
-            filter: brightness(1.03);
-        }
-
-        .btn-primary {
-            background: linear-gradient(120deg, var(--primary), var(--primary-dark));
-            color: #fff;
-        }
-
-        .btn-ghost {
-            background: #f4f6fb;
-            color: #243145;
-            border: 1px solid var(--line);
-        }
-
-        .actions .btn-ghost-danger {
-            background: #fff0f0;
-            color: #b42318;
-            border: 1px solid #fecdca;
-        }
-
-        .foot-note {
-            margin-top: 14px;
-            color: var(--muted);
-            font-size: 0.83rem;
-        }
-
-        @media (max-width: 760px) {
-            .content { padding: 18px; }
-            .hero { padding: 18px; }
-            .grid { grid-template-columns: 1fr; }
-            .field.span-2 { grid-column: span 1; }
-            .actions .btn { width: 100%; text-align: center; }
-        }
-    </style>
+    <link rel="stylesheet" href="/css/design-system.css" th:href="@{/css/design-system.css}">
 </head>
 <body>
 <div class="wrap">
     <div class="hero">
         <p class="eyebrow">Donde Juana · Reservas</p>
         <h1 th:text="${reserva.idReserva != null} ? 'Editar Reserva' : 'Nueva Reserva'">Reserva</h1>
-        <p class="sub">Formulario conectado a la API de reservas para crear o actualizar según corresponda.</p>
+        <p class="sub">Registra o actualiza reservas con la misma lógica operativa actual.</p>
     </div>
 
     <div class="content">
@@ -289,39 +75,35 @@
                     <label for="total">Total estimado</label>
                     <input id="total" type="text" readonly
                            th:value="${reserva.total != null ? '$' + #numbers.formatDecimal(reserva.total, 1, 2) : ''}"
-                           placeholder="Se calcula automáticamente" style="background:#f4f6fb;color:#334155;cursor:default;" />
+                           placeholder="Se calcula automáticamente" class="readonly-total" />
                     <div class="help">Calculado: noches &times; tarifa por noche.</div>
                 </div>
             </div>
 
             <div class="actions">
-                <button type="submit" class="btn btn-primary">Guardar en API</button>
+                <button type="submit" class="btn btn-primary">Guardar reserva</button>
                 <a class="btn btn-ghost" th:href="@{/reservas}">Volver a lista</a>
-                <form th:action="@{/logout}" method="post" style="display:inline;margin:0;padding:0;">
+                <form th:action="@{/logout}" method="post" class="inline-form">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                     <button type="submit" class="btn btn-ghost-danger">Cerrar sesi&oacute;n</button>
                 </form>
             </div>
 
-            <p class="foot-note">
-                Usuarios habilitados: ADMINISTRADOR y RECEPCIONISTA (según SecurityConfig).
-            </p>
         </form>
 
-        <!-- Comprobante básico (visible tras guardar) -->
-        <div id="comprobante" style="display:none;margin-top:22px;border:1px solid #a6f4c5;border-radius:14px;background:#f0fdf4;padding:20px 24px;">
-            <p style="margin:0 0 10px 0;font-size:0.78rem;letter-spacing:.08em;text-transform:uppercase;color:#0a6c4c;font-weight:700;">🧾 Comprobante de Reserva</p>
-            <table style="width:100%;border-collapse:collapse;font-size:.94rem;">
-                <tr><td style="padding:5px 0;color:#475467;width:40%">ID Reserva</td><td id="cmp-id" style="padding:5px 0;font-weight:600;">—</td></tr>
-                <tr><td style="padding:5px 0;color:#475467;">Huésped</td><td id="cmp-huesped" style="padding:5px 0;font-weight:600;">—</td></tr>
-                <tr><td style="padding:5px 0;color:#475467;">Habitación</td><td id="cmp-habitacion" style="padding:5px 0;font-weight:600;">—</td></tr>
-                <tr><td style="padding:5px 0;color:#475467;">Fecha entrada</td><td id="cmp-entrada" style="padding:5px 0;font-weight:600;">—</td></tr>
-                <tr><td style="padding:5px 0;color:#475467;">Fecha salida</td><td id="cmp-salida" style="padding:5px 0;font-weight:600;">—</td></tr>
-                <tr><td style="padding:5px 0;color:#475467;">Noches</td><td id="cmp-noches" style="padding:5px 0;font-weight:600;">—</td></tr>
-                <tr><td style="padding:5px 0;color:#475467;">Tarifa / noche</td><td id="cmp-tarifa" style="padding:5px 0;font-weight:600;">—</td></tr>
-                <tr style="border-top:2px solid #a6f4c5;">
-                    <td style="padding:8px 0 0 0;color:#0a6c4c;font-weight:700;font-size:1.05rem;">Total</td>
-                    <td id="cmp-total" style="padding:8px 0 0 0;font-weight:700;font-size:1.15rem;color:#0a6c4c;">—</td>
+        <div id="comprobante">
+            <p class="receipt-title">Comprobante de reserva</p>
+            <table class="receipt-table">
+                <tr><td class="receipt-key">ID Reserva</td><td id="cmp-id" class="receipt-value">—</td></tr>
+                <tr><td class="receipt-key">Huésped</td><td id="cmp-huesped" class="receipt-value">—</td></tr>
+                <tr><td class="receipt-key">Habitación</td><td id="cmp-habitacion" class="receipt-value">—</td></tr>
+                <tr><td class="receipt-key">Fecha entrada</td><td id="cmp-entrada" class="receipt-value">—</td></tr>
+                <tr><td class="receipt-key">Fecha salida</td><td id="cmp-salida" class="receipt-value">—</td></tr>
+                <tr><td class="receipt-key">Noches</td><td id="cmp-noches" class="receipt-value">—</td></tr>
+                <tr><td class="receipt-key">Tarifa / noche</td><td id="cmp-tarifa" class="receipt-value">—</td></tr>
+                <tr class="receipt-total-row">
+                    <td class="receipt-total-label">Total</td>
+                    <td id="cmp-total" class="receipt-total-value">—</td>
                 </tr>
             </table>
         </div>
