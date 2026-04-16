@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: dondejuana-hotel
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    autoDeploy: true
+    healthCheckPath: /login
+    envVars:
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: SESSION_COOKIE_SECURE
+        value: "true"
+      - key: APP_TEMPLATES_CACHE
+        value: "true"

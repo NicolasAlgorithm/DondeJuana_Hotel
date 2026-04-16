@@ -78,6 +78,49 @@ GRANT SELECT ON ADMIN.ROLES    TO HOTEL;
 
 Luego abrir en el navegador: `http://localhost:8080/`
 
+## Docker (local y producción)
+
+Se agregó configuración lista para contenedores:
+
+- `Dockerfile`
+- `.dockerignore`
+- `render.yaml` (Blueprint para Render)
+
+### Build y run local con Docker
+
+```bash
+docker build -t dondejuana-hotel .
+docker run --rm -p 8080:8080 \
+  -e DB_USERNAME=HOTEL \
+  -e DB_PASSWORD=tuPassword \
+  -e JWT_SECRET=tu_secreto_largo_de_32_caracteres_minimo \
+  dondejuana-hotel
+```
+
+## Deploy en Render (Web Service)
+
+### Opción A: Usando `render.yaml` (recomendado)
+
+1. En Render: **New +** → **Blueprint**.
+2. Conecta tu repo de GitHub.
+3. Render detectará `render.yaml` y creará el Web Service Docker.
+4. Configura variables secretas en el panel:
+   - `DB_USERNAME`
+   - `DB_PASSWORD`
+   - `JWT_SECRET`
+5. Deploy.
+
+### Opción B: Manual
+
+1. En Render: **New +** → **Web Service**.
+2. Selecciona el repo.
+3. Environment: **Docker**.
+4. Dockerfile path: `./Dockerfile`.
+5. Variables de entorno: `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`.
+6. Deploy.
+
+> Importante: GitHub Pages y Netlify (modo estático) no ejecutan Spring Boot, por eso no funcionan login/sesiones/Thymeleaf de este proyecto.
+
 ## Autenticación
 
 El sistema usa login con usuarios almacenados en la tabla `ADMIN.USUARIOS` (BCrypt).
