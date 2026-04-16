@@ -1,130 +1,123 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Habitaciones - Hotel Donde Juana</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
-        h1 { color: #333; }
-        table { border-collapse: collapse; width: 100%; background: white; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #0066cc; color: white; }
-        tr:nth-child(even) { background-color: #f2f2f2; }
-        a.btn { display: inline-block; padding: 6px 14px; border-radius: 4px; text-decoration: none; margin: 2px; }
-        a.btn-primary { background: #0066cc; color: white; }
-        a.btn-warning { background: #f0a500; color: white; }
-        a.btn-danger { background: #cc0000; color: white; }
-        a.btn-secondary { background: #666; color: white; }
-        .toolbar { margin-bottom: 16px; }
-        .estado-badge { display: inline-block; padding: 3px 10px; border-radius: 12px;
-                        font-weight: bold; font-size: 0.85em; }
-        .estado-DISPONIBLE { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
-        .estado-RESERVADA  { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
-        .estado-OCUPADA    { background: #fdecea; color: #b71c1c; border: 1px solid #ef9a9a; }
-        .estado-MANTENIMIENTO { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
-        .estado-form { display: flex; gap: 4px; align-items: center; }
-        .estado-form select { padding: 3px 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.85em; }
-        .btn-sm { padding: 3px 10px; border: none; border-radius: 4px; cursor: pointer;
-                  background: #0066cc; color: white; font-size: 0.82em; }
-        .btn-sm:hover { background: #0052a3; }
-        .logout { float: right; font-size: 0.85em; margin-bottom: 8px; }
-        .logout-btn { color: #c0392b; text-decoration: none; background: none;
-                      border: none; padding: 0; cursor: pointer; font-size: inherit; }
-        .logout-btn:hover { text-decoration: underline; }
-        #polling-indicator { font-size: 0.75em; color: #888; margin-left: 12px; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/app-shell.css}">
 </head>
-<body>
-<div class="logout">
-    <span sec:authentication="name"></span>
-    &nbsp;|&nbsp;
-    <form th:action="@{/logout}" method="post" style="display:inline;margin:0;padding:0;">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-        <button type="submit" class="logout-btn">Cerrar sesi&oacute;n</button>
-    </form>
-</div>
-<h1>Habitaciones <span id="polling-indicator"></span></h1>
-<div class="toolbar">
-    <a class="btn btn-primary"
-       sec:authorize="hasAuthority('habitacion.crear')"
-       th:href="@{/habitaciones/nuevo}">+ Nueva Habitacion</a>
-    <a class="btn btn-secondary" th:href="@{/}">Inicio</a>
-</div>
-<table id="tabla-habitaciones">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Numero</th>
-        <th>Tipo</th>
-        <th>Precio/Noche</th>
-        <th>Estado</th>
-        <th>Descripci&oacute;n</th>
-        <th>Acciones</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="habitacion : ${habitaciones}" th:data-id="${habitacion.idHabitacion}">
-        <td th:text="${habitacion.idHabitacion}"></td>
-        <td th:text="${habitacion.numero}"></td>
-        <td th:text="${habitacion.tipoHabitacion.nombre}"></td>
-        <td th:text="${#numbers.formatDecimal(habitacion.tipoHabitacion.precioNoche, 1, 2)}"></td>
-        <td>
-            <span class="estado-badge"
-                  th:classappend="'estado-' + ${habitacion.estado}"
-                  th:text="${habitacion.estado}"
-                  th:data-id="${habitacion.idHabitacion}">
-            </span>
-        </td>
-        <td th:text="${habitacion.descripcion}"></td>
-        <td>
-            <form sec:authorize="hasAuthority('habitacion.estado.cambiar')"
-                  th:action="@{/habitaciones/{id}/estado(id=${habitacion.idHabitacion})}"
-                  method="post" class="estado-form">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                <select name="estado" th:data-current="${habitacion.estado}">
-                    <option th:each="est : ${estados}"
-                            th:value="${est}"
-                            th:text="${est}"
-                            th:selected="${est == habitacion.estado}"></option>
-                </select>
-                <button type="submit" class="btn-sm">Cambiar</button>
+<body class="app-shell">
+<div class="app-layout">
+    <aside class="sidebar">
+        <div class="brand"><h1>Hotel<br>Donde Juana</h1></div>
+        <nav class="nav-menu">
+            <a class="nav-item" th:href="@{/panel-administrativo}"><span class="icon">🏠</span>Dashboard</a>
+            <a class="nav-item" th:href="@{/personas}"><span class="icon">👤</span>Huespedes</a>
+            <a class="nav-item" th:href="@{/tipos-habitacion}"><span class="icon">🛏️</span>Tipos de Habitaciones</a>
+            <a class="nav-item active" th:href="@{/habitaciones}"><span class="icon">🚪</span>Habitaciones</a>
+            <a class="nav-item" th:href="@{/reservas}"><span class="icon">📋</span>Reservas</a>
+            <a class="nav-item" th:href="@{/calendario}"><span class="icon">📅</span>Calendario Interactivo</a>
+        </nav>
+        <div class="sidebar-footer">
+            <form th:action="@{/logout}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit" class="logout-pill">↩ Salir</button>
             </form>
+        </div>
+    </aside>
 
-            <a class="btn btn-warning"
-               sec:authorize="hasAuthority('habitacion.editar')"
-               th:href="@{/habitaciones/editar/{id}(id=${habitacion.idHabitacion})}">Editar</a>
+    <main class="content-area">
+        <header class="top-header">
+            <div class="top-meta">
+                <span>🇨🇴 ES</span>
+                <span id="current-date">16/04/2026</span>
+            </div>
+            <div class="user-chip">
+                <span class="avatar" sec:authentication="name">U</span>
+                <span>
+                    <strong sec:authentication="name">Usuario</strong>
+                    <small style="display:block;color:#7f7265;" sec:authentication="principal.authorities">ROL</small>
+                </span>
+                <span>▾</span>
+            </div>
+        </header>
 
-            <form sec:authorize="hasAuthority('habitacion.eliminar')"
-                  th:action="@{/habitaciones/eliminar/{id}(id=${habitacion.idHabitacion})}"
-                  method="post"
-                  style="display:inline;">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                <button type="submit" class="btn btn-danger"
-                        onclick="return confirm('¿Eliminar esta habitacion?')">Eliminar</button>
-            </form>
-        </td>
-    </tr>
-    <tr th:if="${#lists.isEmpty(habitaciones)}">
-        <td colspan="7" style="text-align:center; color:#999;">No hay habitaciones registradas.</td>
-    </tr>
-    </tbody>
-</table>
+        <h1 class="page-title">Habitaciones</h1>
+        <div class="toolbar">
+            <a class="btn btn-primary"
+               sec:authorize="hasAuthority('habitacion.crear')"
+               th:href="@{/habitaciones/nuevo}">+ Nuevo Tipo</a>
+            <a class="btn" th:href="@{/}">Inicio</a>
+            <span id="polling-indicator" style="color:#6e6257;font-size:0.85rem;"></span>
+        </div>
+
+        <table id="tabla-habitaciones" class="data-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Numero</th>
+                <th>Tipo</th>
+                <th>Precio/noche</th>
+                <th>Estado</th>
+                <th>Descripci&oacute;n</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="habitacion : ${habitaciones}" th:data-id="${habitacion.idHabitacion}">
+                <td th:text="${habitacion.idHabitacion}"></td>
+                <td th:text="${habitacion.numero}"></td>
+                <td th:text="${habitacion.tipoHabitacion.nombre}"></td>
+                <td th:text="${#numbers.formatDecimal(habitacion.tipoHabitacion.precioNoche, 1, 2)}"></td>
+                <td class="estado">
+                    <span th:text="${habitacion.estado}" th:data-id="${habitacion.idHabitacion}" class="estado-badge">DISPONIBLE</span>
+                </td>
+                <td th:text="${habitacion.descripcion}"></td>
+                <td>
+                    <div class="actions-inline">
+                        <form sec:authorize="hasAuthority('habitacion.estado.cambiar')"
+                              th:action="@{/habitaciones/{id}/estado(id=${habitacion.idHabitacion})}"
+                              method="post" class="estado-form">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <select name="estado">
+                                <option th:each="est : ${estados}"
+                                        th:value="${est}"
+                                        th:text="${est}"
+                                        th:selected="${est == habitacion.estado}"></option>
+                            </select>
+                            <button type="submit" class="btn-small btn-edit">Cambiar</button>
+                        </form>
+                        <a class="btn-small btn-edit"
+                           sec:authorize="hasAuthority('habitacion.editar')"
+                           th:href="@{/habitaciones/editar/{id}(id=${habitacion.idHabitacion})}">Editar</a>
+                        <form sec:authorize="hasAuthority('habitacion.eliminar')"
+                              th:action="@{/habitaciones/eliminar/{id}(id=${habitacion.idHabitacion})}"
+                              method="post">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <button type="submit" class="btn-small btn-danger"
+                                    onclick="return confirm('¿Eliminar esta habitacion?')">Eliminar</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(habitaciones)}">
+                <td colspan="7" style="text-align:center;">No hay habitaciones registradas.</td>
+            </tr>
+            </tbody>
+        </table>
+    </main>
+</div>
 
 <script>
-    const POLL_INTERVAL = 10000; // 10 seconds
-    const estadoClases = ['estado-DISPONIBLE','estado-RESERVADA','estado-OCUPADA','estado-MANTENIMIENTO'];
+    const POLL_INTERVAL = 10000;
     const indicator = document.getElementById('polling-indicator');
 
     function actualizarEstadoBadge(idHabitacion, nuevoEstado) {
         const badge = document.querySelector('.estado-badge[data-id="' + idHabitacion + '"]');
         if (!badge) return;
-        if (badge.textContent.trim() === nuevoEstado) return;
-        badge.classList.remove(...estadoClases);
-        badge.classList.add('estado-' + nuevoEstado);
         badge.textContent = nuevoEstado;
 
-        // Also keep the dropdown in sync
         const row = badge.closest('tr');
         if (row) {
             const select = row.querySelector('select[name="estado"]');
@@ -133,21 +126,21 @@
     }
 
     function pollEstados() {
-        fetch('/api/habitaciones', { credentials: 'same-origin' })
-            .then(function(res) {
+        fetch('/api/habitaciones', {credentials: 'same-origin'})
+            .then(function (res) {
                 if (res.status === 401 || res.status === 403) {
                     indicator.textContent = '(sesión expirada)';
                     return Promise.reject(res.status);
                 }
                 return res.ok ? res.json() : Promise.reject(res.status);
             })
-            .then(function(habitaciones) {
-                habitaciones.forEach(function(h) {
+            .then(function (habitaciones) {
+                habitaciones.forEach(function (h) {
                     actualizarEstadoBadge(h.idHabitacion, h.estado);
                 });
                 indicator.textContent = '(actualizado: ' + new Date().toLocaleTimeString() + ')';
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 if (err !== 401 && err !== 403) {
                     indicator.textContent = '(sin conexión)';
                 }
@@ -156,7 +149,12 @@
 
     pollEstados();
     setInterval(pollEstados, POLL_INTERVAL);
+    (function () {
+        const currentDate = document.getElementById('current-date');
+        if (currentDate) {
+            currentDate.textContent = new Intl.DateTimeFormat('es-CO').format(new Date());
+        }
+    })();
 </script>
 </body>
 </html>
-

@@ -1,76 +1,141 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${esAdmin} ? 'Panel Administrativo - Ocupación e Ingresos' : 'Panel Administrativo - Ocupación'">Panel Administrativo - Ocupación e Ingresos</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 28px; background: #f5f5f5; color: #1f2937; }
-        .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
-        .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .btn { text-decoration: none; padding: 8px 12px; border-radius: 6px; border: 1px solid #d1d5db; background: #fff; color: #111827; cursor: pointer; }
-        .panel { background: #fff; border-radius: 8px; padding: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); margin-top: 14px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
-        .metric { border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; background: #fafafa; }
-        .label { color: #6b7280; font-size: 0.85rem; margin-bottom: 4px; }
-        .value { font-size: 1.2rem; font-weight: 700; }
-        .empty { margin-top: 10px; color: #4b5563; font-style: italic; }
-    </style>
+    <title>Dashboard - Hotel Donde Juana</title>
+    <link rel="stylesheet" th:href="@{/css/app-shell.css}">
 </head>
-<body>
-<div class="top">
-    <div>
-        <h1>Panel Administrativo</h1>
-        <p th:text="${esAdmin} ? 'Ocupación e ingresos por período' : 'Ocupación diaria resumida'">Ocupación e ingresos por período</p>
-    </div>
-    <div class="actions">
-        <form method="get" th:action="@{/panel-administrativo}">
-            <label for="fecha">Fecha base:</label>
-            <input id="fecha" type="date" name="fecha" th:value="${fechaConsulta}">
-            <button class="btn" type="submit">Actualizar</button>
-        </form>
-        <a class="btn" th:href="@{/}">Inicio</a>
-    </div>
+<body class="app-shell">
+<div class="app-layout">
+    <aside class="sidebar">
+        <div class="brand"><h1>Hotel<br>Donde Juana</h1></div>
+        <nav class="nav-menu">
+            <a class="nav-item active" th:href="@{/panel-administrativo}"><span class="icon">🏠</span>Dashboard</a>
+            <a class="nav-item" th:href="@{/personas}"><span class="icon">👤</span>Huespedes</a>
+            <a class="nav-item" th:href="@{/tipos-habitacion}"><span class="icon">🛏️</span>Tipos de Habitaciones</a>
+            <a class="nav-item" th:href="@{/habitaciones}"><span class="icon">🚪</span>Habitaciones</a>
+            <a class="nav-item" th:href="@{/reservas}"><span class="icon">📋</span>Reservas</a>
+            <a class="nav-item" th:href="@{/calendario}"><span class="icon">📅</span>Calendario Interactivo</a>
+        </nav>
+        <div class="sidebar-footer">
+            <form th:action="@{/logout}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit" class="logout-pill">↩ Salir</button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="content-area">
+        <header class="top-header">
+            <div class="top-meta">
+                <span>🇨🇴 ES</span>
+                <span id="current-date">16/04/2026</span>
+            </div>
+            <div class="user-chip">
+                <span class="avatar" sec:authentication="name">U</span>
+                <span>
+                    <strong sec:authentication="name">Usuario</strong>
+                    <small style="display:block;color:#7f7265;" sec:authentication="principal.authorities">ROL</small>
+                </span>
+                <span>▾</span>
+            </div>
+        </header>
+
+        <h1 class="page-title">Dashboard</h1>
+        <p class="dashboard-subtitle">Ocupaci&oacute;n e ingresos por periodo.</p>
+
+        <div class="toolbar">
+            <form method="get" th:action="@{/panel-administrativo}" class="toolbar" style="margin:0;">
+                <label for="fecha" style="font-weight:700;color:#5e5247;">Fecha base:</label>
+                <input id="fecha" type="date" name="fecha" th:value="${fechaConsulta}"
+                       style="border:2px solid #8c7b6d;border-radius:999px;padding:8px 12px;background:#f8f4ef;">
+                <button class="btn btn-primary" type="submit">Actualizar</button>
+            </form>
+            <a class="btn" th:href="@{/}">Inicio</a>
+        </div>
+
+        <section class="report-block" th:with="r=${reporteDiario}">
+            <h2>Reporte Diario</h2>
+            <p class="report-date" th:text="${r.fechaInicio}"></p>
+            <div class="metrics-grid">
+                <article class="metric-card">
+                    <p class="metric-label">Ocupaci&oacute;n</p>
+                    <p class="metric-value"><span th:text="${r.ocupacionPorcentaje + '%'}">0%</span><span class="metric-icon">📈</span></p>
+                </article>
+                <article class="metric-card">
+                    <p class="metric-label">Noches disponibles</p>
+                    <p class="metric-value"><span th:text="${r.nochesDisponibles}">0</span><span class="metric-icon">📆</span></p>
+                </article>
+                <article class="metric-card">
+                    <p class="metric-label">Ingresos</p>
+                    <p class="metric-value">$ <span th:text="${#numbers.formatDecimal(r.ingresos, 1, 'POINT', 2, 'COMMA')}">0.00</span><span class="metric-icon">💰</span></p>
+                </article>
+                <article class="metric-card">
+                    <p class="metric-label">Reservas</p>
+                    <p class="metric-value"><span th:text="${r.reservasEnPeriodo}">0</span><span class="metric-icon">✅</span></p>
+                </article>
+            </div>
+            <p class="empty" th:if="${r.sinDatos}">Sin datos de reservas para este d&iacute;a.</p>
+        </section>
+
+        <section class="report-block" th:if="${esAdmin}" th:with="r=${reporteSemanal}">
+            <h2>Reporte Semanal</h2>
+            <p class="report-date" th:text="${r.fechaInicio + ' - ' + r.fechaFin}"></p>
+            <div class="metrics-grid">
+                <article class="metric-card">
+                    <p class="metric-label">Ocupaci&oacute;n</p>
+                    <p class="metric-value"><span th:text="${r.ocupacionPorcentaje + '%'}">0%</span><span class="metric-icon">📈</span></p>
+                </article>
+                <article class="metric-card">
+                    <p class="metric-label">Noches disponibles</p>
+                    <p class="metric-value"><span th:text="${r.nochesDisponibles}">0</span><span class="metric-icon">📆</span></p>
+                </article>
+                <article class="metric-card">
+                    <p class="metric-label">Ingresos</p>
+                    <p class="metric-value">$ <span th:text="${#numbers.formatDecimal(r.ingresos, 1, 'POINT', 2, 'COMMA')}">0.00</span><span class="metric-icon">💰</span></p>
+                </article>
+                <article class="metric-card">
+                    <p class="metric-label">Reservas</p>
+                    <p class="metric-value"><span th:text="${r.reservasEnPeriodo}">0</span><span class="metric-icon">✅</span></p>
+                </article>
+            </div>
+            <p class="empty" th:if="${r.sinDatos}">Sin datos de reservas para esta semana.</p>
+        </section>
+
+        <section class="report-block" th:if="${esAdmin}" th:with="r=${reporteMensual}">
+            <h2>Reporte Mensual</h2>
+            <p class="report-date" th:text="${r.fechaInicio + ' - ' + r.fechaFin}"></p>
+            <div class="metrics-grid">
+                <article class="metric-card">
+                    <p class="metric-label">Ocupaci&oacute;n</p>
+                    <p class="metric-value"><span th:text="${r.ocupacionPorcentaje + '%'}">0%</span><span class="metric-icon">📈</span></p>
+                </article>
+                <article class="metric-card">
+                    <p class="metric-label">Noches disponibles</p>
+                    <p class="metric-value"><span th:text="${r.nochesDisponibles}">0</span><span class="metric-icon">📆</span></p>
+                </article>
+                <article class="metric-card">
+                    <p class="metric-label">Ingresos</p>
+                    <p class="metric-value">$ <span th:text="${#numbers.formatDecimal(r.ingresos, 1, 'POINT', 2, 'COMMA')}">0.00</span><span class="metric-icon">💰</span></p>
+                </article>
+                <article class="metric-card">
+                    <p class="metric-label">Reservas</p>
+                    <p class="metric-value"><span th:text="${r.reservasEnPeriodo}">0</span><span class="metric-icon">✅</span></p>
+                </article>
+            </div>
+            <p class="empty" th:if="${r.sinDatos}">Sin datos de reservas para este mes.</p>
+        </section>
+    </main>
 </div>
-
-<section class="panel" th:with="r=${reporteDiario}">
-    <h2>Reporte diario</h2>
-    <p th:text="${r.fechaInicio}"></p>
-    <div class="grid">
-        <div class="metric"><div class="label">Ocupación</div><div class="value" th:text="${r.ocupacionPorcentaje + '%'}"></div></div>
-        <div class="metric"><div class="label">Noches ocupadas</div><div class="value" th:text="${r.nochesOcupadas}"></div></div>
-        <div class="metric"><div class="label">Noches disponibles</div><div class="value" th:text="${r.nochesDisponibles}"></div></div>
-        <div class="metric" th:if="${esAdmin}"><div class="label">Ingresos</div><div class="value" th:text="${'$ ' + #numbers.formatDecimal(r.ingresos, 1, 'POINT', 2, 'COMMA')}"></div></div>
-        <div class="metric"><div class="label">Reservas</div><div class="value" th:text="${r.reservasEnPeriodo}"></div></div>
-    </div>
-    <p class="empty" th:if="${r.sinDatos}">Sin datos de reservas para este día.</p>
-</section>
-
-<section class="panel" th:if="${esAdmin}" th:with="r=${reporteSemanal}">
-    <h2>Reporte semanal</h2>
-    <p th:text="${r.fechaInicio + ' - ' + r.fechaFin}"></p>
-    <div class="grid">
-        <div class="metric"><div class="label">Ocupación</div><div class="value" th:text="${r.ocupacionPorcentaje + '%'}"></div></div>
-        <div class="metric"><div class="label">Noches ocupadas</div><div class="value" th:text="${r.nochesOcupadas}"></div></div>
-        <div class="metric"><div class="label">Noches disponibles</div><div class="value" th:text="${r.nochesDisponibles}"></div></div>
-        <div class="metric"><div class="label">Ingresos</div><div class="value" th:text="${'$ ' + #numbers.formatDecimal(r.ingresos, 1, 'POINT', 2, 'COMMA')}"></div></div>
-        <div class="metric"><div class="label">Reservas</div><div class="value" th:text="${r.reservasEnPeriodo}"></div></div>
-    </div>
-    <p class="empty" th:if="${r.sinDatos}">Sin datos de reservas para esta semana.</p>
-</section>
-
-<section class="panel" th:if="${esAdmin}" th:with="r=${reporteMensual}">
-    <h2>Reporte mensual</h2>
-    <p th:text="${r.fechaInicio + ' - ' + r.fechaFin}"></p>
-    <div class="grid">
-        <div class="metric"><div class="label">Ocupación</div><div class="value" th:text="${r.ocupacionPorcentaje + '%'}"></div></div>
-        <div class="metric"><div class="label">Noches ocupadas</div><div class="value" th:text="${r.nochesOcupadas}"></div></div>
-        <div class="metric"><div class="label">Noches disponibles</div><div class="value" th:text="${r.nochesDisponibles}"></div></div>
-        <div class="metric"><div class="label">Ingresos</div><div class="value" th:text="${'$ ' + #numbers.formatDecimal(r.ingresos, 1, 'POINT', 2, 'COMMA')}"></div></div>
-        <div class="metric"><div class="label">Reservas</div><div class="value" th:text="${r.reservasEnPeriodo}"></div></div>
-    </div>
-    <p class="empty" th:if="${r.sinDatos}">Sin datos de reservas para este mes.</p>
-</section>
-
+<script>
+    (function () {
+        const currentDate = document.getElementById('current-date');
+        if (currentDate) {
+            currentDate.textContent = new Intl.DateTimeFormat('es-CO').format(new Date());
+        }
+    })();
+</script>
 </body>
 </html>
