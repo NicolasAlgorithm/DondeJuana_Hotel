@@ -4,7 +4,7 @@ Sistema de gestión hotelera con Spring Boot 3, Thymeleaf, Spring Security y Ora
 
 ## Requisitos
 
-- Java 21+
+- Java 25+
 - Maven (o usar el Maven Wrapper incluido)
 - Oracle Autonomous Database con wallet descargado
 

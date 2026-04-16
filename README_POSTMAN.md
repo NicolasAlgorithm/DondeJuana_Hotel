@@ -72,7 +72,7 @@ todos los endpoints REST del backend.
 
 ## Prerrequisitos
 
-1. **JDK 21** instalado y en el PATH.
+1. **JDK 25** instalado y en el PATH.
 2. **Oracle ADB** con wallet configurado (`TNS_ADMIN` + `tnsnames.ora`).
 3. **Postman** (versión 10 o superior) instalado.
 
