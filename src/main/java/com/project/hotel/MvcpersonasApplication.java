@@ -16,14 +16,11 @@ public class MvcpersonasApplication {
 
     private static final Logger log = LoggerFactory.getLogger(MvcpersonasApplication.class);
 
-    private static final String ENV_DB_USERNAME = "DB_USERNAME";
-    private static final String ENV_DB_PASSWORD = "DB_PASSWORD";
     private static final String ENV_TNS_ADMIN = "TNS_ADMIN";
     private static final String SYS_TNS_ADMIN = "oracle.net.tns_admin";
 
     public static void main(String[] args) {
         configureOracleWallet();
-        validateDbCredentials();
         SpringApplication.run(MvcpersonasApplication.class, args);
     }
 
@@ -72,27 +69,5 @@ public class MvcpersonasApplication {
         return Files.isDirectory(walletDir)
                 && Files.isRegularFile(walletDir.resolve("tnsnames.ora"))
                 && Files.isRegularFile(walletDir.resolve("sqlnet.ora"));
-    }
-
-    private static void validateDbCredentials() {
-        String username = System.getenv(ENV_DB_USERNAME);
-        String password = System.getenv(ENV_DB_PASSWORD);
-        List<String> missing = new ArrayList<>();
-
-        if (username == null || username.isBlank()) {
-            missing.add(ENV_DB_USERNAME);
-        }
-        if (password == null || password.isBlank()) {
-            missing.add(ENV_DB_PASSWORD);
-        }
-
-        if (!missing.isEmpty()) {
-            String message = "Missing required environment variables for Oracle DB credentials: " + missing
-                    + ". Set them before starting the app.";
-            log.error(message);
-            throw new IllegalStateException(message);
-        }
-
-        log.info("Oracle DB user in use: {}", username);
     }
 }
