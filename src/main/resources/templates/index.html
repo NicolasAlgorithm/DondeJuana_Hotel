@@ -8,54 +8,56 @@
     <link rel="stylesheet" href="/css/design-system.css" th:href="@{/css/design-system.css}">
 </head>
 <body>
-<div class="logout">
-    <span sec:authentication="name"></span>
-    &nbsp;|&nbsp;
-    <form th:action="@{/logout}" method="post" class="inline-form">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-        <button type="submit" class="logout-btn">Cerrar sesi&oacute;n</button>
-    </form>
-</div>
-
-<h1>&#127968; Hotel Donde Juana</h1>
-<p>Bienvenido al sistema de gesti&oacute;n del hotel.</p>
-
-<div class="menu">
-    <div class="card" sec:authorize="hasAuthority('persona.ver')">
-        <a th:href="@{/personas}">&#128100; Hu&eacute;spedes</a>
-        <p>Gestionar clientes del hotel</p>
+<div class="shell">
+    <div class="head">
+        <div class="title-wrap">
+            <p>Donde Juana · Gestión hotelera</p>
+            <h1>Panel principal</h1>
+        </div>
+        <div class="toolbar">
+            <span class="user-chip" sec:authentication="name"></span>
+            <form th:action="@{/logout}" method="post" class="inline-form">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="btn btn-logout">Cerrar sesi&oacute;n</button>
+            </form>
+        </div>
     </div>
 
-    <div class="card" sec:authorize="hasAuthority('tipohabitacion.ver')">
-        <a th:href="@{/tipos-habitacion}">&#128197; Tipos de Habitaci&oacute;n</a>
-        <p>Gestionar tipos y precios</p>
-    </div>
+    <div class="panel">
+        <p>Selecciona un m&oacute;dulo para gestionar la operaci&oacute;n diaria del hotel de forma r&aacute;pida y ordenada.</p>
 
-    <div class="card" sec:authorize="hasAuthority('habitacion.ver')">
-        <a th:href="@{/habitaciones}">&#128719; Habitaciones</a>
-        <p>Gestionar habitaciones</p>
-    </div>
+        <div class="menu">
+            <div class="card" sec:authorize="hasAuthority('persona.ver')">
+                <a th:href="@{/personas}">Hu&eacute;spedes</a>
+                <p>Registro y actualizaci&oacute;n de clientes.</p>
+            </div>
 
-    <div class="card" sec:authorize="hasAuthority('reserva.ver')">
-        <a th:href="@{/reservas}">&#128203; Reservas</a>
-        <p>Gestionar reservas</p>
-    </div>
+            <div class="card" sec:authorize="hasAuthority('tipohabitacion.ver')">
+                <a th:href="@{/tipos-habitacion}">Tipos de habitaci&oacute;n</a>
+                <p>Configuraci&oacute;n de categor&iacute;as y tarifas.</p>
+            </div>
 
-    <div class="card" sec:authorize="hasAuthority('calendario.ver')">
-        <a th:href="@{/calendario}">&#128467; Calendario Interactivo</a>
-        <p>Ocupaci&oacute;n por fecha, filtros y detalle de reservas</p>
-    </div>
+            <div class="card" sec:authorize="hasAuthority('habitacion.ver')">
+                <a th:href="@{/habitaciones}">Habitaciones</a>
+                <p>Disponibilidad, estado y detalle operativo.</p>
+            </div>
 
-    <div class="card" sec:authorize="hasAnyAuthority('ROLE_ADMINISTRADOR','ROLE_RECEPCIONISTA')">
-        <a th:href="@{/panel-administrativo}">&#128202; Panel Administrativo</a>
-        <p>Reporte de ocupaci&oacute;n e ingresos</p>
-    </div>
-</div>
+            <div class="card" sec:authorize="hasAuthority('reserva.ver')">
+                <a th:href="@{/reservas}">Reservas</a>
+                <p>Creaci&oacute;n y seguimiento de estad&iacute;as.</p>
+            </div>
 
-<div th:class="${dbStatus == 'OK'} ? 'db-status db-ok' : 'db-status db-err'">
-    <span th:if="${dbStatus == 'OK'}">&#9989; DB Status: OK &mdash; </span>
-    <span th:if="${dbStatus != 'OK'}">&#10060; DB Status: ERROR &mdash; </span>
-    <span th:text="${dbDetail}"></span>
+            <div class="card" sec:authorize="hasAuthority('calendario.ver')">
+                <a th:href="@{/calendario}">Calendario</a>
+                <p>Vista por per&iacute;odo, filtros y detalle visual.</p>
+            </div>
+
+            <div class="card" sec:authorize="hasAnyAuthority('ROLE_ADMINISTRADOR','ROLE_RECEPCIONISTA')">
+                <a th:href="@{/panel-administrativo}">Panel administrativo</a>
+                <p>Indicadores de ocupaci&oacute;n e ingresos.</p>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>

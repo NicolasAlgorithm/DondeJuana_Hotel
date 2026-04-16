@@ -3,19 +3,27 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tipo de Habitaci&oacute;n - Hotel Donde Juana</title>
     <link rel="stylesheet" href="/css/design-system.css" th:href="@{/css/design-system.css}">
 </head>
 <body>
-<div class="logout">
-    <span sec:authentication="name"></span>
-    &nbsp;|&nbsp;
-    <form th:action="@{/logout}" method="post" class="inline-form">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-        <button type="submit" class="logout-btn">Cerrar sesi&oacute;n</button>
-    </form>
-</div>
-<h1 th:text="${tipo.idTipo != null} ? 'Editar Tipo de Habitaci&oacute;n' : 'Nuevo Tipo de Habitaci&oacute;n'">Tipo de Habitaci&oacute;n</h1>
+<div class="shell">
+    <div class="head">
+        <div class="title-wrap">
+            <p>Donde Juana · Cat&aacute;logo</p>
+            <h1 th:text="${tipo.idTipo != null} ? 'Editar tipo de habitaci&oacute;n' : 'Nuevo tipo de habitaci&oacute;n'">Tipo de habitaci&oacute;n</h1>
+        </div>
+        <div class="toolbar">
+            <a class="btn btn-light" th:href="@{/tipos-habitacion}">Volver al listado</a>
+            <form th:action="@{/logout}" method="post" class="inline-form">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="btn btn-logout">Cerrar sesi&oacute;n</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="panel">
 <form class="main-form" th:action="@{/tipos-habitacion/guardar}" th:object="${tipo}" method="post">
     <input type="hidden" th:field="*{idTipo}" />
 
@@ -30,10 +38,12 @@
     <input type="number" th:field="*{precioNoche}" step="0.01" min="0" placeholder="0.00" />
     <span class="error" th:if="${#fields.hasErrors('precioNoche')}" th:errors="*{precioNoche}"></span>
 
-    <div>
+    <div class="actions" style="margin-top: 14px;">
         <button type="submit" class="btn btn-primary">Guardar</button>
         <a class="btn btn-secondary" th:href="@{/tipos-habitacion}">Cancelar</a>
     </div>
 </form>
+    </div>
+</div>
 </body>
 </html>

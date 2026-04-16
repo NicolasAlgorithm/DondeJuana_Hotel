@@ -219,7 +219,7 @@
                     }
 
                     if (!data) {
-                        throw new Error("La sesión expiró o la API no devolvió JSON válido en " + url);
+                        throw new Error("No fue posible obtener datos del calendario. Actualiza la página e intenta de nuevo.");
                     }
 
                     return data;

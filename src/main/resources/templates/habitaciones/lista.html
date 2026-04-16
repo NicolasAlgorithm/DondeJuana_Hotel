@@ -3,25 +3,31 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Habitaciones - Hotel Donde Juana</title>
     <link rel="stylesheet" href="/css/design-system.css" th:href="@{/css/design-system.css}">
 </head>
 <body>
-<div class="logout">
-    <span sec:authentication="name"></span>
-    &nbsp;|&nbsp;
-    <form th:action="@{/logout}" method="post" class="inline-form">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-        <button type="submit" class="logout-btn">Cerrar sesi&oacute;n</button>
-    </form>
-</div>
-<h1>Habitaciones <span id="polling-indicator"></span></h1>
-<div class="toolbar">
-    <a class="btn btn-primary"
-       sec:authorize="hasAuthority('habitacion.crear')"
-       th:href="@{/habitaciones/nuevo}">+ Nueva Habitacion</a>
-    <a class="btn btn-secondary" th:href="@{/}">Inicio</a>
-</div>
+<div class="shell">
+    <div class="head">
+        <div class="title-wrap">
+            <p>Donde Juana · Habitaciones</p>
+            <h1>Estado de habitaciones</h1>
+        </div>
+        <div class="toolbar">
+            <span id="polling-indicator" class="status info" style="padding: 6px 10px;">Sin actualizar</span>
+            <a class="btn btn-primary"
+               sec:authorize="hasAuthority('habitacion.crear')"
+               th:href="@{/habitaciones/nuevo}">Nueva habitaci&oacute;n</a>
+            <a class="btn btn-light" th:href="@{/}">Inicio</a>
+            <form th:action="@{/logout}" method="post" class="inline-form">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="btn btn-logout">Cerrar sesi&oacute;n</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="panel table-wrap">
 <table id="tabla-habitaciones">
     <thead>
     <tr>
@@ -81,6 +87,8 @@
     </tr>
     </tbody>
 </table>
+    </div>
+</div>
 
 <script>
     const POLL_INTERVAL = 10000; // 10 seconds
@@ -116,11 +124,13 @@
                 habitaciones.forEach(function(h) {
                     actualizarEstadoBadge(h.idHabitacion, h.estado);
                 });
-                indicator.textContent = '(actualizado: ' + new Date().toLocaleTimeString() + ')';
+                indicator.className = 'status ok';
+                indicator.textContent = 'Actualizado: ' + new Date().toLocaleTimeString();
             })
             .catch(function(err) {
                 if (err !== 401 && err !== 403) {
-                    indicator.textContent = '(sin conexión)';
+                    indicator.className = 'status error';
+                    indicator.textContent = 'Sin conexión';
                 }
             });
     }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,20 +8,26 @@
     <link rel="stylesheet" href="/css/design-system.css" th:href="@{/css/design-system.css}">
 </head>
 <body>
-<div class="top">
-    <div>
-        <h1>Panel Administrativo</h1>
-        <p th:text="${esAdmin} ? 'Ocupación e ingresos por período' : 'Ocupación diaria resumida'">Ocupación e ingresos por período</p>
+<div class="shell">
+    <div class="head">
+        <div class="title-wrap">
+            <p>Donde Juana · Anal&iacute;tica</p>
+            <h1>Panel administrativo</h1>
+            <p th:text="${esAdmin} ? 'Ocupaci&oacute;n e ingresos por per&iacute;odo' : 'Ocupaci&oacute;n diaria resumida'">Ocupaci&oacute;n e ingresos por per&iacute;odo</p>
+        </div>
+        <div class="actions">
+            <form method="get" th:action="@{/panel-administrativo}">
+                <label for="fecha">Fecha base:</label>
+                <input id="fecha" type="date" name="fecha" th:value="${fechaConsulta}">
+                <button class="btn btn-primary" type="submit">Actualizar</button>
+            </form>
+            <a class="btn btn-light" th:href="@{/}">Inicio</a>
+            <form th:action="@{/logout}" method="post" class="inline-form">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="btn btn-logout">Cerrar sesi&oacute;n</button>
+            </form>
+        </div>
     </div>
-    <div class="actions">
-        <form method="get" th:action="@{/panel-administrativo}">
-            <label for="fecha">Fecha base:</label>
-            <input id="fecha" type="date" name="fecha" th:value="${fechaConsulta}">
-            <button class="btn" type="submit">Actualizar</button>
-        </form>
-        <a class="btn" th:href="@{/}">Inicio</a>
-    </div>
-</div>
 
 <section class="panel" th:with="r=${reporteDiario}">
     <h2>Reporte diario</h2>
@@ -60,6 +67,8 @@
     </div>
     <p class="empty" th:if="${r.sinDatos}">Sin datos de reservas para este mes.</p>
 </section>
+
+</div>
 
 </body>
 </html>

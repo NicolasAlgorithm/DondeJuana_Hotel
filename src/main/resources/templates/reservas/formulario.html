@@ -81,7 +81,7 @@
             </div>
 
             <div class="actions">
-                <button type="submit" class="btn btn-primary">Guardar en API</button>
+                <button type="submit" class="btn btn-primary">Guardar reserva</button>
                 <a class="btn btn-ghost" th:href="@{/reservas}">Volver a lista</a>
                 <form th:action="@{/logout}" method="post" class="inline-form">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
@@ -92,7 +92,7 @@
         </form>
 
         <div id="comprobante">
-            <p class="receipt-title">🧾 Comprobante de Reserva</p>
+            <p class="receipt-title">Comprobante de reserva</p>
             <table class="receipt-table">
                 <tr><td class="receipt-key">ID Reserva</td><td id="cmp-id" class="receipt-value">—</td></tr>
                 <tr><td class="receipt-key">Huésped</td><td id="cmp-huesped" class="receipt-value">—</td></tr>
