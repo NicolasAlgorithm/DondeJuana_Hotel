@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 
 @Configuration
@@ -183,7 +184,10 @@ public class SecurityConfig {
             ));
             headers.referrerPolicy(ref -> ref.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER));
             headers.frameOptions(frame -> frame.deny());
-            headers.permissionsPolicy(policy -> policy.policy("camera=(), microphone=(), geolocation=()"));
+                headers.addHeaderWriter(new StaticHeadersWriter(
+                    "Permissions-Policy",
+                    "camera=(), microphone=(), geolocation=()"
+                ));
             headers.httpStrictTransportSecurity(hsts -> hsts
                     .includeSubDomains(true)
                     .maxAgeInSeconds(31536000)

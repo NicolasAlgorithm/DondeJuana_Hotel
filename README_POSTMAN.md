@@ -103,16 +103,12 @@ Esto crea:
 ```powershell
 # Windows PowerShell
 $env:TNS_ADMIN = "C:\oracle\oracle\wallet\Wallet_DondeJuanaDB"
-$env:DB_USERNAME = "HOTEL"
-$env:DB_PASSWORD = "tu-contraseña"
 .\mvnw spring-boot:run
 ```
 
 ```bash
 # Linux / macOS / Git Bash
 export TNS_ADMIN="/ruta/al/Wallet_DondeJuanaDB"
-export DB_USERNAME="HOTEL"
-export DB_PASSWORD="tu-contraseña"
 ./mvnw spring-boot:run
 ```
 

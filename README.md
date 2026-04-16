@@ -21,16 +21,20 @@ Descomprime el wallet dentro del proyecto en esta ruta:
 El wallet contiene archivos como: `cwallet.sso`, `ewallet.p12`, `tnsnames.ora`, `sqlnet.ora`, `ojdbc.properties`, etc.
 La aplicación detecta esta carpeta automáticamente al iniciar.
 
-### 2. Variables de entorno (recomendado)
+### 2. Variables de entorno (opcionales)
 
-Define las siguientes variables de entorno antes de ejecutar la app:
+La app ya incluye valores por defecto para conexión (usuario y contraseña) y puede iniciar sin exportar variables.
+Si quieres sobrescribirlos en otro ambiente, usa estas variables:
 
 | Variable      | Descripción                        | Ejemplo (Windows)                              |
 |---------------|------------------------------------|------------------------------------------------|
 | `DB_USERNAME` | Usuario de conexión en Oracle      | `HOTEL`                                        |
 | `DB_PASSWORD` | Contraseña del usuario de conexión | `tuPassword`                                   |
+| `APP_TEMPLATES_EXTERNAL_PREFIX` | Ruta de plantillas externas | `file:./` o `file:/opt/app/` |
 
 `TNS_ADMIN` quedó como opcional: si existe, la app lo usa; si no, usa `wallet/Wallet_DondeJuanaDB`.
+
+La vista principal se carga desde `index.html` en la raíz del proyecto mediante Thymeleaf.
 
 ### 3. Grants y sinónimos en Oracle (REQUERIDO)
 
@@ -57,28 +61,65 @@ GRANT SELECT ON ADMIN.ROLES    TO HOTEL;
 ### Linux / Mac
 
 ```bash
-export DB_USERNAME=HOTEL
-export DB_PASSWORD=tuPassword
 ./mvnw spring-boot:run
 ```
 
 ### Windows (cmd)
 
 ```cmd
-set DB_USERNAME=HOTEL
-set DB_PASSWORD=tuPassword
 .\mvnw.cmd spring-boot:run
 ```
 
 ### Windows (PowerShell)
 
 ```powershell
-$env:DB_USERNAME="HOTEL"
-$env:DB_PASSWORD="tuPassword"
 .\mvnw.cmd spring-boot:run
 ```
 
 Luego abrir en el navegador: `http://localhost:8080/`
+
+## Docker (local y producción)
+
+Se agregó configuración lista para contenedores:
+
+- `Dockerfile`
+- `.dockerignore`
+- `render.yaml` (Blueprint para Render)
+
+### Build y run local con Docker
+
+```bash
+docker build -t dondejuana-hotel .
+docker run --rm -p 8080:8080 \
+  -e DB_USERNAME=HOTEL \
+  -e DB_PASSWORD=tuPassword \
+  -e JWT_SECRET=tu_secreto_largo_de_32_caracteres_minimo \
+  dondejuana-hotel
+```
+
+## Deploy en Render (Web Service)
+
+### Opción A: Usando `render.yaml` (recomendado)
+
+1. En Render: **New +** → **Blueprint**.
+2. Conecta tu repo de GitHub.
+3. Render detectará `render.yaml` y creará el Web Service Docker.
+4. Configura variables secretas en el panel:
+   - `DB_USERNAME`
+   - `DB_PASSWORD`
+   - `JWT_SECRET`
+5. Deploy.
+
+### Opción B: Manual
+
+1. En Render: **New +** → **Web Service**.
+2. Selecciona el repo.
+3. Environment: **Docker**.
+4. Dockerfile path: `./Dockerfile`.
+5. Variables de entorno: `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`.
+6. Deploy.
+
+> Importante: GitHub Pages y Netlify (modo estático) no ejecutan Spring Boot, por eso no funcionan login/sesiones/Thymeleaf de este proyecto.
 
 ## Autenticación
 
@@ -162,8 +203,9 @@ src/
     │   └── service/
     │       └── DbUserDetailsService.java     ← UserDetailsService basado en BD
     └── resources/
-        ├── application.properties
-        └── templates/
-            ├── auth/login.html
-            └── index.html
+      ├── application.properties
+      └── templates/
+        └── auth/login.html
+
+  index.html                                  ← Vista principal en la raíz del proyecto
 ```
