@@ -3,54 +3,31 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Habitaciones - Hotel Donde Juana</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
-        h1 { color: #333; }
-        table { border-collapse: collapse; width: 100%; background: white; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #0066cc; color: white; }
-        tr:nth-child(even) { background-color: #f2f2f2; }
-        a.btn { display: inline-block; padding: 6px 14px; border-radius: 4px; text-decoration: none; margin: 2px; }
-        a.btn-primary { background: #0066cc; color: white; }
-        a.btn-warning { background: #f0a500; color: white; }
-        a.btn-danger { background: #cc0000; color: white; }
-        a.btn-secondary { background: #666; color: white; }
-        .toolbar { margin-bottom: 16px; }
-        .estado-badge { display: inline-block; padding: 3px 10px; border-radius: 12px;
-                        font-weight: bold; font-size: 0.85em; }
-        .estado-DISPONIBLE { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
-        .estado-RESERVADA  { background: #e3f2fd; color: #0d47a1; border: 1px solid #90caf9; }
-        .estado-OCUPADA    { background: #fdecea; color: #b71c1c; border: 1px solid #ef9a9a; }
-        .estado-MANTENIMIENTO { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; }
-        .estado-form { display: flex; gap: 4px; align-items: center; }
-        .estado-form select { padding: 3px 6px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.85em; }
-        .btn-sm { padding: 3px 10px; border: none; border-radius: 4px; cursor: pointer;
-                  background: #0066cc; color: white; font-size: 0.82em; }
-        .btn-sm:hover { background: #0052a3; }
-        .logout { float: right; font-size: 0.85em; margin-bottom: 8px; }
-        .logout-btn { color: #c0392b; text-decoration: none; background: none;
-                      border: none; padding: 0; cursor: pointer; font-size: inherit; }
-        .logout-btn:hover { text-decoration: underline; }
-        #polling-indicator { font-size: 0.75em; color: #888; margin-left: 12px; }
-    </style>
+    <link rel="stylesheet" href="/css/design-system.css" th:href="@{/css/design-system.css}">
 </head>
 <body>
-<div class="logout">
-    <span sec:authentication="name"></span>
-    &nbsp;|&nbsp;
-    <form th:action="@{/logout}" method="post" style="display:inline;margin:0;padding:0;">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-        <button type="submit" class="logout-btn">Cerrar sesi&oacute;n</button>
-    </form>
-</div>
-<h1>Habitaciones <span id="polling-indicator"></span></h1>
-<div class="toolbar">
-    <a class="btn btn-primary"
-       sec:authorize="hasAuthority('habitacion.crear')"
-       th:href="@{/habitaciones/nuevo}">+ Nueva Habitacion</a>
-    <a class="btn btn-secondary" th:href="@{/}">Inicio</a>
-</div>
+<div class="shell">
+    <div class="head">
+        <div class="title-wrap">
+            <p>Donde Juana · Habitaciones</p>
+            <h1>Estado de habitaciones</h1>
+        </div>
+        <div class="toolbar">
+            <span id="polling-indicator" class="status info" style="padding: 6px 10px;">Sin actualizar</span>
+            <a class="btn btn-primary"
+               sec:authorize="hasAuthority('habitacion.crear')"
+               th:href="@{/habitaciones/nuevo}">Nueva habitaci&oacute;n</a>
+            <a class="btn btn-light" th:href="@{/}">Inicio</a>
+            <form th:action="@{/logout}" method="post" class="inline-form">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="btn btn-logout">Cerrar sesi&oacute;n</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="panel table-wrap">
 <table id="tabla-habitaciones">
     <thead>
     <tr>
@@ -98,7 +75,7 @@
             <form sec:authorize="hasAuthority('habitacion.eliminar')"
                   th:action="@{/habitaciones/eliminar/{id}(id=${habitacion.idHabitacion})}"
                   method="post"
-                  style="display:inline;">
+                  class="inline-form">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <button type="submit" class="btn btn-danger"
                         onclick="return confirm('¿Eliminar esta habitacion?')">Eliminar</button>
@@ -106,10 +83,12 @@
         </td>
     </tr>
     <tr th:if="${#lists.isEmpty(habitaciones)}">
-        <td colspan="7" style="text-align:center; color:#999;">No hay habitaciones registradas.</td>
+        <td colspan="7" class="empty">No hay habitaciones registradas.</td>
     </tr>
     </tbody>
 </table>
+    </div>
+</div>
 
 <script>
     const POLL_INTERVAL = 10000; // 10 seconds
@@ -145,11 +124,13 @@
                 habitaciones.forEach(function(h) {
                     actualizarEstadoBadge(h.idHabitacion, h.estado);
                 });
-                indicator.textContent = '(actualizado: ' + new Date().toLocaleTimeString() + ')';
+                indicator.className = 'status ok';
+                indicator.textContent = 'Actualizado: ' + new Date().toLocaleTimeString();
             })
             .catch(function(err) {
                 if (err !== 401 && err !== 403) {
-                    indicator.textContent = '(sin conexión)';
+                    indicator.className = 'status error';
+                    indicator.textContent = 'Sin conexión';
                 }
             });
     }

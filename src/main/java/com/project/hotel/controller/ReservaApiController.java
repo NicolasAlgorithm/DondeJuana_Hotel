@@ -73,7 +73,7 @@ public class ReservaApiController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Error de integridad en base de datos"));
+            return ResponseEntity.badRequest().body(Map.of("error", "No se pudo crear la reserva. Revisa los datos ingresados e intenta nuevamente."));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Error interno al crear reserva"));
@@ -96,7 +96,7 @@ public class ReservaApiController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Error de integridad en base de datos"));
+            return ResponseEntity.badRequest().body(Map.of("error", "No se pudo actualizar la reserva. Revisa los datos ingresados e intenta nuevamente."));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Error interno al modificar reserva"));

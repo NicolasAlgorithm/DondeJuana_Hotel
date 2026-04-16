@@ -3,86 +3,74 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Huespedes - Hotel Donde Juana</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
-        h1 { color: #333; }
-        table { border-collapse: collapse; width: 100%; background: white; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #0066cc; color: white; }
-        tr:nth-child(even) { background-color: #f2f2f2; }
-        .btn { display: inline-block; padding: 6px 14px; border-radius: 4px; text-decoration: none; margin: 2px; border: none; cursor: pointer; font-size: 0.95em; }
-        .btn-primary { background: #0066cc; color: white; }
-        .btn-warning { background: #f0a500; color: white; }
-        .btn-danger { background: #cc0000; color: white; }
-        .btn-secondary { background: #666; color: white; }
-        .toolbar { margin-bottom: 16px; }
-        .logout { float: right; font-size: 0.85em; margin-bottom: 8px; }
-        .logout-btn { color: #c0392b; text-decoration: none; background: none; border: none; padding: 0; cursor: pointer; font-size: inherit; }
-        .logout-btn:hover { text-decoration: underline; }
-    </style>
+    <link rel="stylesheet" href="/css/design-system.css" th:href="@{/css/design-system.css}">
 </head>
 <body>
-<div class="logout">
-    <span sec:authentication="name"></span>
-    &nbsp;|&nbsp;
-    <form th:action="@{/logout}" method="post" style="display:inline;margin:0;padding:0;">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-        <button type="submit" class="logout-btn">Cerrar sesi&oacute;n</button>
-    </form>
-</div>
-
-<h1>Huespedes</h1>
-
-<div class="toolbar">
-    <a class="btn btn-primary"
-       sec:authorize="hasAuthority('persona.crear')"
-       th:href="@{/personas/nuevo}">+ Nuevo Huesped</a>
-    <a class="btn btn-secondary" th:href="@{/}">Inicio</a>
-</div>
-
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Apellido</th>
-        <th>Tipo Doc.</th>
-        <th>Documento</th>
-        <th>Email</th>
-        <th>Telefono</th>
-        <th>Acciones</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="persona : ${personas}">
-        <td th:text="${persona.idPersona}"></td>
-        <td th:text="${persona.nombre}"></td>
-        <td th:text="${persona.apellido}"></td>
-        <td th:text="${persona.tipoDoc}"></td>
-        <td th:text="${persona.documento}"></td>
-        <td th:text="${persona.email}"></td>
-        <td th:text="${persona.telefono}"></td>
-        <td>
-            <a class="btn btn-warning"
-               sec:authorize="hasAuthority('persona.editar')"
-               th:href="@{/personas/editar/{id}(id=${persona.idPersona})}">Editar</a>
-
-            <form sec:authorize="hasAuthority('persona.eliminar')"
-                  th:action="@{/personas/eliminar/{id}(id=${persona.idPersona})}"
-                  method="post"
-                  style="display:inline;">
+<div class="shell">
+    <div class="head">
+        <div class="title-wrap">
+            <p>Donde Juana · Hu&eacute;spedes</p>
+            <h1>Listado de hu&eacute;spedes</h1>
+        </div>
+        <div class="toolbar">
+            <a class="btn btn-primary"
+               sec:authorize="hasAuthority('persona.crear')"
+               th:href="@{/personas/nuevo}">Nuevo hu&eacute;sped</a>
+            <a class="btn btn-light" th:href="@{/}">Inicio</a>
+            <form th:action="@{/logout}" method="post" class="inline-form">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                <button type="submit" class="btn btn-danger"
-                        onclick="return confirm('¿Eliminar este huesped?')">Eliminar</button>
+                <button type="submit" class="btn btn-logout">Cerrar sesi&oacute;n</button>
             </form>
-        </td>
-    </tr>
+        </div>
+    </div>
 
-    <tr th:if="${#lists.isEmpty(personas)}">
-        <td colspan="8" style="text-align:center; color:#999;">No hay huespedes registrados.</td>
-    </tr>
-    </tbody>
-</table>
+    <div class="panel table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Tipo Doc.</th>
+                <th>Documento</th>
+                <th>Email</th>
+                <th>Telefono</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="persona : ${personas}">
+                <td th:text="${persona.idPersona}"></td>
+                <td th:text="${persona.nombre}"></td>
+                <td th:text="${persona.apellido}"></td>
+                <td th:text="${persona.tipoDoc}"></td>
+                <td th:text="${persona.documento}"></td>
+                <td th:text="${persona.email}"></td>
+                <td th:text="${persona.telefono}"></td>
+                <td>
+                    <a class="btn btn-warning"
+                       sec:authorize="hasAuthority('persona.editar')"
+                       th:href="@{/personas/editar/{id}(id=${persona.idPersona})}">Editar</a>
+
+                    <form sec:authorize="hasAuthority('persona.eliminar')"
+                          th:action="@{/personas/eliminar/{id}(id=${persona.idPersona})}"
+                          method="post"
+                          class="inline-form">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" class="btn btn-danger"
+                                onclick="return confirm('¿Eliminar este huesped?')">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(personas)}">
+                <td colspan="8" class="empty">No hay hu&eacute;spedes registrados.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 </body>
 </html>
