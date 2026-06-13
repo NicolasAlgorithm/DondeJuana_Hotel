@@ -41,10 +41,10 @@ public class PersonaController {
             personaService.guardar(persona);
             return "redirect:/personas";
         } catch (DataIntegrityViolationException e) {
-            model.addAttribute("dbError", "No se pudo guardar el huésped por una restricción de base de datos (documento duplicado o dato inválido).");
+            model.addAttribute("dbError", "No fue posible guardar el huésped. Verifica que el documento no esté repetido y que los datos sean válidos.");
             return "personas/formulario";
         } catch (Exception e) {
-            model.addAttribute("dbError", "Error inesperado al guardar el huésped: " + e.getMessage());
+            model.addAttribute("dbError", "No fue posible guardar el huésped en este momento. Intenta nuevamente.");
             return "personas/formulario";
         }
     }
